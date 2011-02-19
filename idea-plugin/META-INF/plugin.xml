@@ -1,0 +1,56 @@
+<!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
+<!--
+ * Copyright 2009 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+-->
+<idea-plugin>
+  <name>JSTestDriver Plugin</name>
+  <description>Execute JavaScript unit tests using JSTestDriver</description>
+  <version>1.2</version>
+  <vendor url="http://code.google.com/p/js-test-driver/"
+          email="js-test-driver@googlegroups.com">Google</vendor>
+  <idea-version since-build="9886"/>
+  <depends>com.intellij.modules.lang</depends>
+  <extensions defaultExtensionNs="com.intellij">
+    <configurationType implementation="com.google.jstestdriver.idea.JSTestDriverConfigurationType"/>
+    <!--configurationProducer implementation="com.google.jstestdriver.idea.JSTestDriverConfigurationProducer"/-->
+  </extensions>
+  <project-components>
+    <component>
+      <implementation-class>com.google.jstestdriver.idea.JSTestDriverToolWindow</implementation-class>
+    </component>
+  </project-components>
+  <change-notes>
+    <![CDATA[
+Version 1.2:
+- Enable plugins when running tests, such as the coverage plugin
+- Bug fix: when browser disconnects, icon goes grey. When all browsers
+disconnect, status bar goes yellow and message is updated
+- Bug fix: don't make a socket connection on the UI event thread, as it may
+hang.
+- Bug fix: when server shuts down, status bar goes red. Start and stop buttons
+only enabled as appropriate.
+- Move Server control tool panel to the bottom by default.
+
+Version 0.1.1:
+- Support IDEA version 8
+- Use built-in IDEA Run UI for showing test results
+
+Version 0.1:
+- Initial release
+- Start server within IDE, run tests
+
+  ]]>
+  </change-notes>
+</idea-plugin>
