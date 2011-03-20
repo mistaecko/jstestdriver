@@ -21,6 +21,8 @@ import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.server.JettyModule;
 import com.google.jstestdriver.server.handlers.JstdHandlersModule;
 
+import org.mortbay.component.LifeCycle;
+import org.mortbay.component.LifeCycle.Listener;
 import org.mortbay.jetty.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +32,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Observable;
-import java.util.Set;
 import java.util.Timer;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
 public class JsTestDriverServerImpl extends Observable implements JsTestDriverServer {
+
   private static final Logger logger =
       LoggerFactory.getLogger(JsTestDriverServerImpl.class);
 
@@ -65,14 +67,19 @@ public class JsTestDriverServerImpl extends Observable implements JsTestDriverSe
   }
 
   private void initServer() {
-    // TODO(corysmith): move this to the normal guice injection scope.
-    server = Guice.createInjector(
-        new JettyModule(port, handlerPrefix),
-        new JstdHandlersModule(
-            capturedBrowsers,
-            filesCache,
-            browserTimeout,
-            handlerPrefix)).getInstance(Server.class);
+    if (server != null) {
+      logger.warn("Attempt to start a started server");
+    } else {
+      // TODO(corysmith): move this to the normal guice injection scope.
+      server = Guice.createInjector(
+          new JettyModule(port, handlerPrefix),
+          new JstdHandlersModule(
+              capturedBrowsers,
+              filesCache,
+              browserTimeout,
+              handlerPrefix)).getInstance(Server.class);
+      server.addLifeCycleListener(new JettyLifeCycleLogger());
+    }
   }
 
   /* (non-Javadoc)
@@ -80,10 +87,13 @@ public class JsTestDriverServerImpl extends Observable implements JsTestDriverSe
    */
   public void start() {
     try {
+      initServer();
       // TODO(corysmith): Move this to the constructor when we are injecting everything.
       timer = new Timer(true);
       timer.schedule(new BrowserReaper(capturedBrowsers), browserTimeout * 2, browserTimeout * 2);
+
       server.start();
+
       setChanged();
       notifyObservers(Event.STARTED);
       logger.info("Started the JsTD server on {}", port);
@@ -98,7 +108,11 @@ public class JsTestDriverServerImpl extends Observable implements JsTestDriverSe
   public void stop() {
     try {
       timer.cancel();
-      server.stop();
+      if (server != null) {
+        server.stop();
+        server.join();
+        server = null;
+      }
       setChanged();
       notifyObservers(Event.STOPPED);
       logger.debug("Stopped the server.");
@@ -116,12 +130,39 @@ public class JsTestDriverServerImpl extends Observable implements JsTestDriverSe
     try {
       connection = (HttpURLConnection) new URL(url).openConnection();
       connection.connect();
-      return connection.getResponseCode() == 200;
+      int responseCode = connection.getResponseCode();
+      if (responseCode == 200) {
+        return true;
+      }
+      logger.warn("Bad response code {} from server: {}", responseCode, connection.getContent());
+      return false;
     } catch (MalformedURLException e) {
       logger.warn("Bad url {}", e);
     } catch (IOException e) {
-      logger.warn("Server not ready {}", e);
+      logger.warn("Server not ready.", e);
     }
     return false;
+  }
+
+  private static final class JettyLifeCycleLogger implements Listener {
+    public void lifeCycleStopping(LifeCycle arg0) {
+      logger.debug("Server stopping");
+    }
+
+    public void lifeCycleStopped(LifeCycle arg0) {
+      logger.debug("Server stopped");
+    }
+
+    public void lifeCycleStarting(LifeCycle arg0) {
+      logger.debug("Server starting");
+    }
+
+    public void lifeCycleStarted(LifeCycle arg0) {
+      logger.debug("Server started");
+    }
+
+    public void lifeCycleFailure(LifeCycle arg0, Throwable arg1) {
+      logger.warn("Server failed", arg1);
+    }
   }
 }

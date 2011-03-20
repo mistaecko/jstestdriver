@@ -22,11 +22,9 @@ import com.google.jstestdriver.model.RunData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observer;
-import java.util.Set;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -50,8 +48,7 @@ public class ServerStartupAction implements ObservableAction {
   @Deprecated
   public ServerStartupAction(int port, CapturedBrowsers capturedBrowsers,
       FilesCache preloadedFilesCache, URLTranslator urlTranslator, URLRewriter urlRewriter) {
-    this(port, capturedBrowsers, preloadedFilesCache, SlaveBrowser.TIMEOUT,
-        false, null, new NullPathPrefix());
+    this(port, capturedBrowsers, preloadedFilesCache, SlaveBrowser.TIMEOUT, false, null, new NullPathPrefix());
   }
 
   public ServerStartupAction(
@@ -97,11 +94,17 @@ public class ServerStartupAction implements ObservableAction {
     }
     try {
       server.start();
-      for (int i = 0; i < 10; i++) {
+      // try for 30 seconds.
+      for (int i = 1; i < 31; i++) {
         if (server.isHealthy()) {
           return runData;
         }
         Thread.sleep(1000); // wait for the server to come up.
+        if (i % 6 == 0) {
+          logger.warn("Stopping unhealthy server and trying again.");
+          server.stop(); // kill it off and try again
+          server.start();
+        }
       }
       throw new ServerStartupException("Server never healthy on " + port);
     } catch (Exception e) {
