@@ -101,7 +101,7 @@ public class ServerStartupAction implements ObservableAction {
         if (server.isHealthy()) {
           return runData;
         }
-        Thread.sleep(500); // wait for the server to come up.
+        Thread.sleep(1000); // wait for the server to come up.
       }
       throw new RuntimeException("Server never healthy on " + port);
     } catch (Exception e) {
