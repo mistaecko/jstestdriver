@@ -103,13 +103,23 @@ public class ServerStartupAction implements ObservableAction {
         }
         Thread.sleep(1000); // wait for the server to come up.
       }
-      throw new RuntimeException("Server never healthy on " + port);
+      throw new ServerStartupException("Server never healthy on " + port);
     } catch (Exception e) {
-      throw new RuntimeException("Error starting the server on " + port, e);
+      throw new ServerStartupException("Error starting the server on " + port, e);
     }
   }
 
   public void addObservers(List<Observer> observers) {
     observerList.addAll(observers);
+  }
+
+  public static class ServerStartupException extends RuntimeException {
+    public ServerStartupException(String msg) {
+      super(msg);
+    }
+
+    public ServerStartupException(String msg, Exception e) {
+      super(msg, e);
+    }
   }
 }
