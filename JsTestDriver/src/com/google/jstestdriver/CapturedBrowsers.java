@@ -15,18 +15,18 @@
  */
 package com.google.jstestdriver;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.jstestdriver.browser.BrowserCaptureEvent;
-import com.google.jstestdriver.browser.BrowserCaptureEvent.Event;
-import com.google.jstestdriver.browser.BrowserIdStrategy;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.jstestdriver.browser.BrowserCaptureEvent;
+import com.google.jstestdriver.browser.BrowserCaptureEvent.Event;
+import com.google.jstestdriver.browser.BrowserIdStrategy;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

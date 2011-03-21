@@ -15,10 +15,10 @@
  */
 package com.google.jstestdriver;
 
+import java.util.Map;
+
 import com.google.gson.JsonElement;
 import com.google.inject.ImplementedBy;
-
-import java.util.Map;
 
 
 /**

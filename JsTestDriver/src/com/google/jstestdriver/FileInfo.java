@@ -196,10 +196,11 @@ public class FileInfo implements Cloneable {
 
   /**
    * @param resolvedPath The resolved absolute path of the file.
+   * @param displayPath The path to send to the browser for debugging and display.
    * @param timestamp The timestamp of the file.
    * @return An updated FileInfo.
    */
-  public FileInfo fromResolvedPath(String resolvedPath, long timestamp) {
+  public FileInfo fromResolvedPath(String resolvedPath, String displayPath, long timestamp) {
     return new FileInfo(resolvedPath, timestamp,
       length, isPatch, serveOnly, data, displayPath);
   }
@@ -209,7 +210,7 @@ public class FileInfo implements Cloneable {
    */
   public String getDisplayPath() {
     // remove relative path markers, as they won't resolve properly in the browser.
-    return filePath.replace("..", "_");
+    return displayPath;
   }
 
   /**

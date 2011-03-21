@@ -15,11 +15,12 @@
  */
 package com.google.jstestdriver;
 
-import com.google.inject.Guice;
-import com.google.jstestdriver.browser.BrowserReaper;
-import com.google.jstestdriver.model.HandlerPathPrefix;
-import com.google.jstestdriver.server.JettyModule;
-import com.google.jstestdriver.server.handlers.JstdHandlersModule;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Observable;
+import java.util.Timer;
 
 import org.mortbay.component.LifeCycle;
 import org.mortbay.component.LifeCycle.Listener;
@@ -27,12 +28,11 @@ import org.mortbay.jetty.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Observable;
-import java.util.Timer;
+import com.google.inject.Guice;
+import com.google.jstestdriver.browser.BrowserReaper;
+import com.google.jstestdriver.model.HandlerPathPrefix;
+import com.google.jstestdriver.server.JettyModule;
+import com.google.jstestdriver.server.handlers.JstdHandlersModule;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

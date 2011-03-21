@@ -15,13 +15,13 @@
  */
 package com.google.jstestdriver;
 
-import com.google.jstestdriver.browser.BrowserRunner;
-import com.google.jstestdriver.model.RunData;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import com.google.jstestdriver.browser.BrowserRunner;
+import com.google.jstestdriver.model.RunData;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

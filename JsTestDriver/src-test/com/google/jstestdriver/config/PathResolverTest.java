@@ -130,8 +130,10 @@ public class PathResolverTest extends TestCase {
     assertTrue(listFiles.get(0).getFilePath().endsWith("code/code.js"));
     
     List<FileInfo> tests = config.getTests();
-    assertEquals("test/test.js", tests.get(0).getFilePath());
-    assertEquals("test/test3.js", tests.get(1).getFilePath());
+    assertEquals(new File(tmpDir, "test/test.js").getAbsolutePath(), tests.get(0).getFilePath());
+    assertEquals("test/test.js", tests.get(0).getDisplayPath());
+    assertEquals(new File(tmpDir, "test/test3.js").getAbsolutePath(), tests.get(1).getFilePath());
+    assertEquals("test/test3.js", tests.get(1).getDisplayPath());
   }
 
   public void testParseConfigFileAndProcessAListOfFiles() throws Exception {

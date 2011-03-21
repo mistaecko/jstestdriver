@@ -15,14 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import com.google.jstestdriver.hooks.FileParsePostProcessor;
-
-import org.apache.oro.io.GlobFilenameFilter;
-import org.apache.oro.text.GlobCompiler;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -32,6 +24,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+
+import org.apache.oro.io.GlobFilenameFilter;
+import org.apache.oro.text.GlobCompiler;
+
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import com.google.jstestdriver.hooks.FileParsePostProcessor;
 
 /**
  * Handles the resolution of glob paths (*.js) and relative paths.
@@ -116,13 +116,12 @@ public class PathResolver {
       String filePath = fileInfo.getFilePath();
 
       if (fileInfo.isWebAddress()) {
-        resolvedFiles.add(fileInfo.fromResolvedPath(filePath, -1));
+        resolvedFiles.add(fileInfo.fromResolvedPath(filePath, filePath, -1));
       } else {
         File file = basePath != null
             ? new File(basePath.getAbsoluteFile(), filePath)
             : new File(filePath);
         File absoluteDir = file.getParentFile().getAbsoluteFile();
-        File relativeDir = new File(filePath).getParentFile();
 
         // Get all files for the current FileInfo. This will return one file if the FileInfo
         // doesn't represent a glob
@@ -130,11 +129,12 @@ public class PathResolver {
 
         for (String fileName : expandedFileNames) {
           String absoluteResolvedFilePath = FileInfo.getPath(absoluteDir, fileName);
-          String relativeResolvedFilePath = FileInfo.getPath(relativeDir, fileName);
+          String displayPath = absoluteResolvedFilePath.startsWith(basePath.getAbsolutePath()) ? absoluteResolvedFilePath.substring(basePath.getAbsolutePath().length() + 1) : absoluteResolvedFilePath;
 
           File resolvedFile = new File(absoluteResolvedFilePath);
           long timestamp = resolvedFile.lastModified();
-          FileInfo newFileInfo = fileInfo.fromResolvedPath(relativeResolvedFilePath, timestamp);
+          
+          FileInfo newFileInfo = fileInfo.fromResolvedPath(absoluteResolvedFilePath, displayPath, timestamp);
 
           resolvedFiles.add(newFileInfo);
         }

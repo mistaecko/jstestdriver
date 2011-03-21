@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class CoverageJsAdder implements ResourcePreProcessor {
 
-  public static final String LCOV_JS = "/com/google/jstestdriver/coverage/javascript/LCOV.js";
+  public static final String LCOV_JS = "com/google/jstestdriver/coverage/javascript/LCOV.js";
   private final ClassFileLoader fileLoader;
   private final CoverageNameMapper mapper;
 
@@ -45,7 +45,7 @@ public class CoverageJsAdder implements ResourcePreProcessor {
   public List<FileInfo> processPlugins(List<FileInfo> files) {
     LinkedList<FileInfo> processed = new LinkedList<FileInfo>();
     processed.add(0, new LoadedFileInfo(LCOV_JS, -1, false, false,
-        fileLoader.load(LCOV_JS)));
+        fileLoader.load("/" + LCOV_JS)));
     processed.addAll(files);
     return processed;
   }
