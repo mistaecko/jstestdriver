@@ -40,10 +40,10 @@ public class StandaloneRunnerHandlerTest extends TestCase {
   public void testCaptureAddFilesToLoadAndRun() throws Exception {
     Map<String, FileInfo> files = new LinkedHashMap<String, FileInfo>();
 
-    files.put("file1.js", new FileInfo("file1.js", 30, -1, false, false, "content1"));
-    files.put("file2.js", new FileInfo("file2.js", 5, -1, false, false, "content2"));
-    files.put("file3.js", new FileInfo("file3.js", 53, -1, false, false, "content3"));
-    files.put("file4.js", new FileInfo("file4.js", 1, -1, false, false, "content4"));
+    files.put("file1.js", new FileInfo("file1.js", 30, -1, false, false, "content1", "file1.js"));
+    files.put("file2.js", new FileInfo("file2.js", 5, -1, false, false, "content2", "file2.js"));
+    files.put("file3.js", new FileInfo("file3.js", 53, -1, false, false, "content3", "file3.js"));
+    files.put("file4.js", new FileInfo("file4.js", 1, -1, false, false, "content4", ""));
     FilesCache cache = new FilesCache(files);
     CapturedBrowsers capturedBrowsers = new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0)));
     BrowserInfo browserInfo = new BrowserInfo();
@@ -62,10 +62,16 @@ public class StandaloneRunnerHandlerTest extends TestCase {
 
     assertNotNull(cmd);
     assertEquals("{\"command\":\"loadTest\","
-        + "\"parameters\":[\"[{\\\"fileSrc\\\":\\\"/test/file1.js\\\",\\\"timestamp\\\":-1},"
-        + "{\\\"fileSrc\\\":\\\"/test/file2.js\\\",\\\"timestamp\\\":-1},"
-        + "{\\\"fileSrc\\\":\\\"/test/file3.js\\\",\\\"timestamp\\\":-1},"
-        + "{\\\"fileSrc\\\":\\\"/test/file4.js\\\",\\\"timestamp\\\":-1}]\",\"true\"]}",
+            + "\"parameters\":[\""
+            + "[{\\\"fileSrc\\\":\\\"/test/file1.js\\\"," +
+                "\\\"basePath\\\":\\\"file1.js\\\",\\\"timestamp\\\":30},"
+            + "{\\\"fileSrc\\\":\\\"/test/file2.js\\\"," +
+                "\\\"basePath\\\":\\\"file2.js\\\",\\\"timestamp\\\":5},"
+            + "{\\\"fileSrc\\\":\\\"/test/file3.js\\\"," +
+                "\\\"basePath\\\":\\\"file3.js\\\",\\\"timestamp\\\":53},"
+            + "{\\\"fileSrc\\\":\\\"/test/file4.js\\\"," +
+                "\\\"basePath\\\":\\\"file4.js\\\",\\\"timestamp\\\":1}"
+            + "]\",\"true\"]}",
         cmd.getCommand());
 
     assertNotNull(slaveBrowser.peekCommand());

@@ -17,10 +17,13 @@ package com.google.jstestdriver.coverage;
 
 import java.util.Collections;
 
+import org.joda.time.Instant;
+
 import junit.framework.TestCase;
 
 import com.google.common.collect.Sets;
 import com.google.jstestdriver.FileInfo;
+import com.google.jstestdriver.Time;
 
 /**
  * @author corbinrsmith@gmail.com (Cory Smith)
@@ -28,31 +31,34 @@ import com.google.jstestdriver.FileInfo;
 public class CoverageInstrumentingProcessorTest extends TestCase {
 
   public void testInstrument() throws Exception {
-    FileInfo fileInfo = new FileInfo("foo.js", 0, -1, true, false, "var a = 1;");
+    FileInfo fileInfo = new FileInfo("foo.js", 0, -1, true, false, "var a = 1;", "foo.js");
     String expected = "decorated";
-    Code code = new Code(fileInfo.getFilePath(),
-                         fileInfo.getData());
+    Code code = new Code(fileInfo.getFilePath(), fileInfo.getData());
     CoverageAccumulator accumulator = new CoverageAccumulator();
+    final Instant instant = new Instant(System.currentTimeMillis());
     FileInfo decorated =
-      new CoverageInstrumentingProcessor(new DecoratorStub(expected, code),
-                                         Collections.<String>emptySet(),
-                                         accumulator).process(fileInfo);
+        new CoverageInstrumentingProcessor(new DecoratorStub(expected, code),
+            Collections.<String>emptySet(), accumulator, new Time() {
+              public Instant now() {
+                return instant;
+              }
+            }).process(fileInfo);
     assertEquals(expected, decorated.getData());
     assertEquals(fileInfo.getFilePath(), decorated.getFilePath());
-    assertEquals(-1, decorated.getTimestamp());
+    assertEquals(instant.getMillis(), decorated.getTimestamp());
     assertEquals(fileInfo.isServeOnly(), decorated.isServeOnly());
   }
 
   public void testSkipInstrument() throws Exception {
-    FileInfo lcov = new FileInfo("LCOV.js", 0, -1, true, false, "var a = 1;");
-    FileInfo serveOnly = new FileInfo("someData.dat", 0, -1, true, true, "scally{wag}");
-    FileInfo excluded = new FileInfo("excluded.dat", 0, -1, true, false, "not{me}");
-    FileInfo remote = new FileInfo("https://foobar", 0, -1, true, false, null);
-    FileInfo empty = new FileInfo("foobar.js", 0, -1, true, false, "\n");
+    FileInfo lcov = new FileInfo("LCOV.js", 0, -1, true, false, "var a = 1;", "LCOV.js");
+    FileInfo serveOnly = new FileInfo("someData.dat", 0, -1, true, true, "scally{wag}", "someData.dat");
+    FileInfo excluded = new FileInfo("excluded.dat", 0, -1, true, false, "not{me}", "excluded.dat");
+    FileInfo remote = new FileInfo("https://foobar", 0, -1, true, false, null, "https://foobar");
+    FileInfo empty = new FileInfo("foobar.js", 0, -1, true, false, "\n", "foobar.js");
     CoverageInstrumentingProcessor processor =
         new CoverageInstrumentingProcessor(null,
             Sets.<String>newHashSet(excluded.getFilePath()),
-            null);
+            null, null);
     assertSame(lcov, processor.process(lcov));
     assertSame(serveOnly, processor.process(serveOnly));
     assertSame(remote, processor.process(remote));

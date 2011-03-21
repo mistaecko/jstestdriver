@@ -41,7 +41,7 @@ public class RunDataTest extends TestCase {
   }
 
   public void testAggregateresponses() throws Exception {
-    FileInfo one = new FileInfo("one", -1, -1, false, false, null);
+    FileInfo one = new FileInfo("one", -1, -1, false, false, null, "one");
     ResponseStream streamOne = new NoopStream();
     ResponseStream streamTwo = new NoopStream();
     final RunData runDataOne = new RunData(Lists
@@ -55,7 +55,7 @@ public class RunDataTest extends TestCase {
   }
 
   public void testRecordResponse() throws Exception {
-    FileInfo one = new FileInfo("one", -1, -1, false, false, null);
+    FileInfo one = new FileInfo("one", -1, -1, false, false, null, "one");
     ResponseStream streamOne = new NoopStream();
     ResponseStream streamTwo = new NoopStream();
     final RunData runDataOne = new RunData(Lists
@@ -68,8 +68,8 @@ public class RunDataTest extends TestCase {
 
   public void testUpdateFileSet() throws Exception {
     ResponseStream streamOne = new NoopStream();
-    FileInfo one = new FileInfo("one", -1, -1, false, false, null);
-    FileInfo two = new FileInfo("two", -1, -1, false, false, null);
+    FileInfo one = new FileInfo("one", -1, -1, false, false, null, "one");
+    FileInfo two = new FileInfo("two", -1, -1, false, false, null, "two");
     
     final JstdTestCaseFactory testCaseFactory =
         new JstdTestCaseFactory(

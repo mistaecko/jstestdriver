@@ -71,7 +71,7 @@ public class ProcessingFileLoaderTest extends TestCase {
   }
 
   public void testLoadFiles() throws Exception {
-    final FileInfo info = new FileInfo("foo.js", 1234, -1, false, true, null);
+    final FileInfo info = new FileInfo("foo.js", 1234, -1, false, true, null, "foo.js");
     final String infoData = "foobar";
     final boolean shouldReset = false;
     List<FileInfo> actual = new ProcessingFileLoader(new FileReader() {
@@ -91,10 +91,10 @@ public class ProcessingFileLoaderTest extends TestCase {
   }
 
   public void testLoadFilesWithPostProcessor() throws Exception {
-    final FileInfo info = new FileInfo("foo.js", 1234, -1, false, true, null);
+    final FileInfo info = new FileInfo("foo.js", 1234, -1, false, true, null, "foo.js");
     final String infoData = "foobar";
     final boolean shouldReset = false;
-    final FileInfo expected = new FileInfo("other.js", 4321, -1, false, true, null);
+    final FileInfo expected = new FileInfo("other.js", 4321, -1, false, true, null, "other.js");
 
     FileLoadPostProcessor processor = new FileLoadPostProcessor() {
       public FileInfo process(FileInfo file) {
@@ -115,8 +115,8 @@ public class ProcessingFileLoaderTest extends TestCase {
   }
 
   public void testLoadFileWithPatches() throws Exception {
-    final FileInfo info = new FileInfo("foo.js", 1234, -1, false, true, null);
-    FileInfo patch = new FileInfo("patchfoo.js", 1234, -1, false, true, null);
+    final FileInfo info = new FileInfo("foo.js", 1234, -1, false, true, null, "foo.js");
+    FileInfo patch = new FileInfo("patchfoo.js", 1234, -1, false, true, null, "patchfoo.js");
     info.addPatch(patch);
     final String infoData = "foobar";
     final String patchData = "patchbar";
@@ -138,7 +138,7 @@ public class ProcessingFileLoaderTest extends TestCase {
   }
 
   public void testRemoteLoadFiles() throws Exception {
-    final FileInfo info = new FileInfo("http://local/foo.js", -1, -1, false, false, "");
+    final FileInfo info = new FileInfo("http://local/foo.js", -1, -1, false, false, "", "http://local/foo.js");
     final boolean shouldReset = false;
     List<FileInfo> actual = new ProcessingFileLoader(null, Collections
         .<FileLoadPostProcessor> emptySet(), new File("."),

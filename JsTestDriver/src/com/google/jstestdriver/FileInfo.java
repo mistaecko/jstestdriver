@@ -28,7 +28,7 @@ import com.google.jstestdriver.model.HandlerPathPrefix;
  * 
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
-public class FileInfo {
+public class FileInfo implements Cloneable {
 
   public static final String SEPARATOR_CHAR = "/";
 
@@ -41,17 +41,20 @@ public class FileInfo {
 
   private long length;
 
+  private String displayPath;
+
   public FileInfo() {
   }
 
   public FileInfo(String fileName, long timestamp, long length,
-      boolean isPatch, boolean serveOnly, String data) {
+      boolean isPatch, boolean serveOnly, String data, String displayPath) {
     this.filePath = fileName;
     this.timestamp = timestamp;
     this.length = length;
     this.isPatch = isPatch;
     this.serveOnly = serveOnly;
     this.data = data;
+    this.displayPath = displayPath;
   }
 
   public String getData() {
@@ -148,17 +151,17 @@ public class FileInfo {
   }
 
   public FileInfo load(String data, long timestamp) {
-    return new FileInfo(filePath, timestamp, length, isPatch, serveOnly, data);
+    return new FileInfo(filePath, timestamp, length, isPatch, serveOnly, data, displayPath);
   }
 
   /** Translates the FileInfo into a lightwieght FileSrc object. */
   public FileSource toFileSource(HandlerPathPrefix prefix, Set<FileInfoScheme> schemes) {
     for (FileInfoScheme scheme : schemes) {
       if (scheme.matches(filePath)) {
-        return new FileSource(filePath, this.getTimestamp());
+        return new FileSource(displayPath, filePath, this.getTimestamp());
       }
     }
-    return new FileSource(prefix.prefixPath("/test/" + this.getDisplayPath()), this.getTimestamp());
+    return new FileSource(prefix.prefixPath("/test/" + this.getDisplayPath()), filePath, this.getTimestamp());
   }
 
   @Override
@@ -198,7 +201,7 @@ public class FileInfo {
    */
   public FileInfo fromResolvedPath(String resolvedPath, long timestamp) {
     return new FileInfo(resolvedPath, timestamp,
-      length, isPatch, serveOnly, null);
+      length, isPatch, serveOnly, data, displayPath);
   }
 
   /**
@@ -232,6 +235,12 @@ public class FileInfo {
                         length,
                         isPatch,
                         serveOnly,
-                        fileContent.toString());
+                        fileContent.toString(),
+                        displayPath);
+  }
+
+  @Override
+  protected Object clone() throws CloneNotSupportedException {
+    return new FileInfo(filePath, timestamp, length, isPatch, serveOnly, data, displayPath);
   }
 }

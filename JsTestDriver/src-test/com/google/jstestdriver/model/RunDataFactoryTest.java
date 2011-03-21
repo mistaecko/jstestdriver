@@ -36,8 +36,8 @@ import com.google.jstestdriver.hooks.ResourceDependencyResolver;
  */
 public class RunDataFactoryTest extends TestCase {
   public void testPreProcessFileSet() throws Exception {
-    final FileInfo info = new FileInfo("foo.js", 12434, -1, false, false, null);
-    final FileInfo addedInfo = new FileInfo("addedfoo.js", 12434, -1, false, false, null);
+    final FileInfo info = new FileInfo("foo.js", 12434, -1, false, false, null, "foo.js");
+    final FileInfo addedInfo = new FileInfo("addedfoo.js", 12434, -1, false, false, null, "addedfoo.js");
 
     ResourcePreProcessor preProcessor = new ResourcePreProcessor(){
       public List<FileInfo> processDependencies(List<FileInfo> files) {

@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.inject.internal.Sets;
 import com.google.jstestdriver.JsTestDriverClientTest.FakeResponseStream;
 import com.google.jstestdriver.JsonCommand.CommandType;
 import com.google.jstestdriver.browser.BrowserFileSet;
@@ -78,7 +79,7 @@ public class CommandTaskTest extends TestCase {
   public void testUploadFiles() throws Exception {
     String id = "1";
     MockServer server = new MockServer();
-    FileInfo fileInfo = new FileInfo("foo.js", 1232, -1, false, false, null);
+    FileInfo fileInfo = new FileInfo("foo.js", 1232, -1, false, false, null, "foo.js");
 
     server.expect(baseUrl + "heartbeat?id=1", "OK");
     server.expect(baseUrl + "fileSet?POST?{data=" + gson.toJson(Arrays.asList(fileInfo))
@@ -117,10 +118,10 @@ public class CommandTaskTest extends TestCase {
     MockServer server = new MockServer();
 
     // test file data.
-    FileInfo loadInfo = new FileInfo("foo.js", 0, -1, false, false, null);
+    FileInfo loadInfo = new FileInfo("foo.js", 0, -1, false, false, null, "foo.js");
     String loadInfoContents = "foobar";
 
-    FileInfo serveInfo = new FileInfo("foo2.js", 0, -1, false, true, null);
+    FileInfo serveInfo = new FileInfo("foo2.js", 0, -1, false, true, null, "foo2.js");
     String serveInfoContents = "foobar2";
     List<FileInfo> fileSet = Arrays.asList(loadInfo, serveInfo);
 
@@ -148,16 +149,20 @@ public class CommandTaskTest extends TestCase {
         + "\"last\":true}");
     server.expect(
         baseUrl
-        + "fileSet?POST?{data="
-        + gson.toJson(Arrays.asList(
-          new FileInfo(loadInfo.getFilePath(), loadInfo.getTimestamp(),
-            -1, loadInfo.isPatch(), loadInfo.isServeOnly(), loadInfoContents),
-          new FileInfo(serveInfo.getFilePath(), serveInfo.getTimestamp(), -1,
-                serveInfo.isPatch(), serveInfo.isServeOnly(), serveInfoContents))) + ", action=serverFileCheck}", "");
+                + "fileSet?POST?{data="
+                + gson.toJson(Arrays.asList(
+                    new FileInfo(loadInfo.getFilePath(), loadInfo.getTimestamp(), -1, loadInfo
+                        .isPatch(), loadInfo.isServeOnly(), loadInfoContents, loadInfo
+                        .getFilePath()),
+                    new FileInfo(serveInfo.getFilePath(), serveInfo.getTimestamp(), -1, serveInfo
+                        .isPatch(), serveInfo.isServeOnly(), serveInfoContents, loadInfo
+                        .getFilePath()))) + ", action=serverFileCheck}", "");
 
     String url =
-        baseUrl + "cmd?POST?" + createLoadCommandString("1", CommandType.LOADTEST,
-            Arrays.asList(fileInfoToFileSource(loadInfo)));
+        baseUrl
+            + "cmd?POST?"
+            + createLoadCommandString("1", CommandType.LOADTEST,
+                Arrays.asList(fileInfoToFileSource(loadInfo)));
     server.expect(url, "{\"response\":{\"response\":\"response\","
         + "\"browser\":{\"name\":\"browser\"},\"error\":\"error\",\"executionTime\":123},"
         + "\"last\":true}");
@@ -230,10 +235,6 @@ public class CommandTaskTest extends TestCase {
   }
 
   private FileSource fileInfoToFileSource(FileInfo info) {
-    if (info.getFilePath().startsWith("http://")) {
-      return new FileSource(info.getFilePath(), info.getTimestamp());
-    }
-    return new FileSource("/test/" + info.getFilePath(), info.getTimestamp());
+    return info.toFileSource(new NullPathPrefix(), Sets.<FileInfoScheme>newHashSet());
   }
-
 }

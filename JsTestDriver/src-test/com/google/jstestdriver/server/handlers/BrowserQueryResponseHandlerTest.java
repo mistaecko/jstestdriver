@@ -193,9 +193,9 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
         new BrowserQueryResponseHandler(null, null, browsers, streamedResponses);
     List<FileResult> fileResults = new LinkedList<FileResult>();
 
-    fileResults.add(new FileResult(new FileSource("/test/filename1.js", 123), true, ""));
-    fileResults.add(new FileResult(new FileSource("/test/filename2.js", 456), true, ""));
-    fileResults.add(new FileResult(new FileSource("/test/filename3.js", 789), true, ""));
+    fileResults.add(new FileResult(new FileSource("/test/filename1.js", "filename1.js", 123), true, ""));
+    fileResults.add(new FileResult(new FileSource("/test/filename2.js", "filename2.js", 456), true, ""));
+    fileResults.add(new FileResult(new FileSource("/test/filename3.js", "filename3.js", 789), true, ""));
     slave.createCommand("awaitingResponse");
     slave.dequeueCommand();
     slave.createCommand("BrowserCommand");

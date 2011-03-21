@@ -27,8 +27,9 @@ public class FileSource {
   public FileSource() {
   }
 
-  public FileSource(String fileSrc, long timestamp) {
+  public FileSource(String fileSrc, String basePath, long timestamp) {
     this.fileSrc = fileSrc;
+    this.basePath = basePath;
     this.timestamp = timestamp;
   }
 
@@ -41,13 +42,6 @@ public class FileSource {
   }
 
   public String getBasePath() {
-    if (basePath == null) {
-      if (fileSrc.startsWith("/test/")) {
-        basePath = fileSrc.substring(6);
-      } else {
-        basePath = fileSrc;
-      }
-    }
     return basePath;
   }
 

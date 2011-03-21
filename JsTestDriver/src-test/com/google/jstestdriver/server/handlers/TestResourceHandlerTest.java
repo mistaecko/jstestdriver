@@ -52,8 +52,9 @@ public class TestResourceHandlerTest extends TestCase {
     EasyMock.replay(response);
     Map<String, FileInfo> files = new HashMap<String, FileInfo>();
 
-    files.put("dummy.js", new FileInfo("dummy.js", -1, -1, false, false, "data"));
-    files.put("dummytoo.js", new FileInfo("dummytoo.js", 20, -1, false, false, "more data"));
+    files.put("dummy.js", new FileInfo("dummy.js", -1, -1, false, false, "data", "dummy.js"));
+    files.put("dummytoo.js", new FileInfo("dummytoo.js", 20, -1, false, false, "more data",
+        "dummytoo.js"));
     FilesCache filesCache = new FilesCache(files);
     TestResourceHandler handler = new TestResourceHandler(null, response, filesCache);
 

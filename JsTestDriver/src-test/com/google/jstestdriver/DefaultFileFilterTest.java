@@ -28,10 +28,10 @@ public class DefaultFileFilterTest extends TestCase {
   public void testResolveDepenencies() throws Exception {
     DefaultFileFilter filter = new DefaultFileFilter();
 
-    FileInfo changed = new FileInfo("foo2.js", -1, -1, false, false, "");
-    FileInfo reloaded = new FileInfo("foo3.js", -1, -1, false, false, "");
+    FileInfo changed = new FileInfo("foo2.js", -1, -1, false, false, "", "foo2.js");
+    FileInfo reloaded = new FileInfo("foo3.js", -1, -1, false, false, "", "foo3.js");
     List<FileInfo> files = Lists.newArrayList(
-      new FileInfo("foo1.js", -1, -1, false, false, ""),
+      new FileInfo("foo1.js", -1, -1, false, false, "", "foo1.js"),
       changed,
       reloaded
     );

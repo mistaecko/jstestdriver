@@ -143,7 +143,7 @@ class BrowserQueryResponseHandler implements RequestHandler {
 
               if (fileResult.isSuccess()) {
                 fileInfos.add(new FileInfo(fileSource.getBasePath(), fileSource.getTimestamp(),
-                    -1, false, false, null));
+                    -1, false, false, null, fileSource.getFileSrc()));
               } else {
                 errorFiles.add(fileSource);
               }

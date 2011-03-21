@@ -39,7 +39,7 @@ public class DebuggerFileListProcessor implements ResourcePreProcessor {
   public List<FileInfo> processTests(List<FileInfo> files) {
     LinkedList<FileInfo> processed = Lists.newLinkedList(files);
     processed.add(new FileInfo("debugger.js", time.now().getMillis(), -1,
-        false, false, DEBUGGER_SOURCE));
+        false, false, DEBUGGER_SOURCE, "debugger.js"));
     return processed;
   }
 

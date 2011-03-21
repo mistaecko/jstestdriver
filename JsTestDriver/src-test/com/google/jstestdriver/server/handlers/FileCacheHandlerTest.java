@@ -35,7 +35,7 @@ public class FileCacheHandlerTest extends junit.framework.TestCase {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     PrintWriter writer = new PrintWriter(out);
 
-    FileInfo info = new FileInfo("asdf", 1, -1, false, true, "data");
+    FileInfo info = new FileInfo("asdf", 1, -1, false, true, "data", "asdf");
 
     EasyMock.expect(request.getParameter("fileSet"))
         .andReturn(gson.toJson(new FileInfo[] {info}));

@@ -17,6 +17,7 @@ package com.google.jstestdriver.coverage;
 
 import com.google.inject.Inject;
 import com.google.jstestdriver.FileInfo;
+import com.google.jstestdriver.Time;
 import com.google.jstestdriver.hooks.FileLoadPostProcessor;
 
 import org.slf4j.Logger;
@@ -36,14 +37,17 @@ public class CoverageInstrumentingProcessor implements FileLoadPostProcessor {
   private final Instrumentor decorator;
   private final Set<String> excludes;
   private final CoverageAccumulator accumulator;
+  private final Time time;
 
   @Inject
   public CoverageInstrumentingProcessor(Instrumentor decorator,
                                         @Coverage("coverageExcludes") Set<String> excludes,
-                                        CoverageAccumulator accumulator) {
+                                        CoverageAccumulator accumulator,
+                                        Time time) {
     this.decorator = decorator;
     this.excludes = excludes;
     this.accumulator = accumulator;
+    this.time = time;
   }
 
   public FileInfo process(FileInfo file) {
@@ -62,10 +66,6 @@ public class CoverageInstrumentingProcessor implements FileLoadPostProcessor {
         (System.currentTimeMillis() - start)/1000.0
     ));
     decorated.writeInitialLines(accumulator);
-    return new FileInfo(file.getFilePath(),
-                        -1,
-                        -1,
-                        file.isPatch(),
-                        file.isServeOnly(), decorated.getInstrumentedCode());
+    return file.load(decorated.getInstrumentedCode(), time.now().getMillis());
   }
 }

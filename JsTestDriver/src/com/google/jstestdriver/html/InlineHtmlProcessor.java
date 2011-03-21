@@ -52,11 +52,7 @@ public class InlineHtmlProcessor implements FileLoadPostProcessor {
           lexer.createStream(
               new ByteArrayInputStream(source.getBytes()))).write(writer);
       writer.flush();
-      return new FileInfo(file.getFilePath(),
-                          file.getTimestamp(),
-                          -1,
-                          file.isPatch(),
-                          file.isServeOnly(), writer.toString());
+      return file.load(writer.toString(), file.getTimestamp());
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);

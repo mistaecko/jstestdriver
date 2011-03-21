@@ -19,6 +19,7 @@ import static com.google.jstestdriver.server.handlers.CaptureHandler.RUNNER_TYPE
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.FileResult;
 import com.google.jstestdriver.FileSource;
 import com.google.jstestdriver.FileUploader;
@@ -47,7 +49,9 @@ import com.google.jstestdriver.TestResult;
 import com.google.jstestdriver.TestResultGenerator;
 import com.google.jstestdriver.JsonCommand.CommandType;
 import com.google.jstestdriver.TestResult.Result;
+import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
+import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
 import com.google.jstestdriver.runner.RunnerType;
 import com.google.jstestdriver.server.handlers.pages.Page;
@@ -110,11 +114,10 @@ class StandaloneRunnerHandler implements RequestHandler {
 
   public void service(final SlaveBrowser slaveBrowser) {
 
-    Set<String> filesToload = cache.getAllFileNames();
     LinkedList<FileSource> filesSources = new LinkedList<FileSource>();
 
-    for (String f : filesToload) {
-      filesSources.add(new FileSource("/test/" + f, -1));
+    for (FileInfo f : cache.getAllFileInfos()) {
+      filesSources.add(f.toFileSource(new NullPathPrefix(), Collections.<FileInfoScheme>emptySet()));
     }
     final int size = filesSources.size();
     

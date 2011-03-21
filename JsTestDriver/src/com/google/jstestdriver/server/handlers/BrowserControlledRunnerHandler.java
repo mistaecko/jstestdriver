@@ -101,7 +101,7 @@ public class BrowserControlledRunnerHandler implements RequestHandler {
     LinkedList<FileSource> filesSources = new LinkedList<FileSource>();
 
     for (String f : filesToload) {
-      filesSources.add(new FileSource(prefix.prefixPath("/test/" + f), -1));
+      filesSources.add(new FileSource(prefix.prefixPath("/test/" + f), f, -1));
     }
     final int size = filesSources.size();
 
