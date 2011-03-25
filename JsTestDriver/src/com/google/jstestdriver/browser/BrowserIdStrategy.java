@@ -37,7 +37,7 @@ public class BrowserIdStrategy {
     this.time = time;
   }
 
-  public Long nextId() {
+  public synchronized Long nextId() {
     long nextId = time.now().getMillis();
     while(used.contains(nextId)) {
       nextId++;
