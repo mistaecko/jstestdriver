@@ -34,6 +34,7 @@ import com.google.jstestdriver.config.CmdLineFlagsFactory;
 import com.google.jstestdriver.config.Configuration;
 import com.google.jstestdriver.config.InitializeModule;
 import com.google.jstestdriver.config.Initializer;
+import com.google.jstestdriver.config.UnreadableFilesException;
 import com.google.jstestdriver.config.YamlParser;
 import com.google.jstestdriver.guice.TestResultPrintingModule.TestResultPrintingInitializer;
 import com.google.jstestdriver.hooks.PluginInitializer;
@@ -86,6 +87,9 @@ public class JsTestDriver {
       logger.info("Finished action run.");
     } catch (CmdLineException e) {
       System.out.println(e.getMessage());
+      System.exit(1);
+    } catch (UnreadableFilesException e) {
+      System.out.println("Configuration Error: " + e.getMessage());
       System.exit(1);
     } catch (FailureException e) {
       System.out.println("Tests failed: " + e.getMessage());

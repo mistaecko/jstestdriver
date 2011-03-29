@@ -18,12 +18,9 @@ package com.google.jstestdriver;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.oro.io.GlobFilenameFilter;
 import org.apache.oro.text.GlobCompiler;
@@ -31,6 +28,8 @@ import org.apache.oro.text.GlobCompiler;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.google.jstestdriver.config.UnreadableFile;
+import com.google.jstestdriver.config.UnreadableFilesException;
 import com.google.jstestdriver.hooks.FileParsePostProcessor;
 
 /**
@@ -50,36 +49,9 @@ public class PathResolver {
 
   // TODO(andrewtrenk): This method may not be needed since the File class
   // can resolve ".." on its own
-  public String resolvePath(String path) {
-    path  = FileInfo.formatFileSeparator(path);
-    Stack<String> resolvedPath = new Stack<String>();
-    String[] tokenizedPath = path.split(FileInfo.SEPARATOR_CHAR);
-
-    for (String token : tokenizedPath) {
-      if (token.equals("..")) {
-        if (!resolvedPath.isEmpty()) {
-          resolvedPath.pop();
-          continue;
-        }
-      }
-      resolvedPath.push(token);
-    }
-    return join(resolvedPath);
-  }
-
-  private String join(Collection<String> collection) {
-    StringBuilder sb = new StringBuilder();
-    Iterator<String> iterator = collection.iterator();
-
-    if (iterator.hasNext()) {
-      sb.append(iterator.next());
-
-      while (iterator.hasNext()) {
-        sb.append(FileInfo.SEPARATOR_CHAR);
-        sb.append(iterator.next());
-      }
-    }
-    return sb.toString();
+  public File resolvePath(String filePath) {
+    return !filePath.startsWith(File.separator) && basePath != null ?
+        new File(basePath.getAbsoluteFile(), filePath) : new File(filePath);
   }
 
   private Set<FileInfo> consolidatePatches(Set<FileInfo> resolvedFilesLoad) {
@@ -108,37 +80,50 @@ public class PathResolver {
    *
    * @param unresolvedFiles the FileInfos to resolved
    * @return the resolved FileInfos
+   * @throws IOException 
    */
   public Set<FileInfo> resolve(Set<FileInfo> unresolvedFiles) {
     Set<FileInfo> resolvedFiles = new LinkedHashSet<FileInfo>();
-
+    List<UnreadableFile> unreadable = Lists.newLinkedList();
     for (FileInfo fileInfo : unresolvedFiles) {
       String filePath = fileInfo.getFilePath();
 
       if (fileInfo.isWebAddress()) {
         resolvedFiles.add(fileInfo.fromResolvedPath(filePath, filePath, -1));
       } else {
-        File file = basePath != null
-            ? new File(basePath.getAbsoluteFile(), filePath)
-            : new File(filePath);
+        File file = resolvePath(filePath);           
         File absoluteDir = file.getParentFile().getAbsoluteFile();
 
-        // Get all files for the current FileInfo. This will return one file if the FileInfo
+        // Get all files for the current FileInfo. This will return one file
+        // if the FileInfo
         // doesn't represent a glob
-        String[] expandedFileNames = expandGlob(absoluteDir.getAbsolutePath(), file.getName(), absoluteDir);
+        String[] expandedFileNames =
+            expandGlob(absoluteDir.getAbsolutePath(), file.getName(), absoluteDir);
 
         for (String fileName : expandedFileNames) {
-          String absoluteResolvedFilePath = FileInfo.getPath(absoluteDir, fileName);
-          String displayPath = absoluteResolvedFilePath.startsWith(basePath.getAbsolutePath()) ? absoluteResolvedFilePath.substring(basePath.getAbsolutePath().length() + 1) : absoluteResolvedFilePath;
+          File sourceFile = new File(absoluteDir, fileName);
+          if (!sourceFile.canRead()) {
+            unreadable.add(new UnreadableFile(fileInfo.getFilePath(), sourceFile.getAbsolutePath()));
+          } else {
+            String absolutePath = sourceFile.getAbsolutePath();
+            String displayPath =
+                absolutePath.startsWith(basePath.getAbsolutePath())
+                    ? absolutePath.substring(basePath.getAbsolutePath().length() + 1)
+                    : absolutePath;
 
-          File resolvedFile = new File(absoluteResolvedFilePath);
-          long timestamp = resolvedFile.lastModified();
-          
-          FileInfo newFileInfo = fileInfo.fromResolvedPath(absoluteResolvedFilePath, displayPath, timestamp);
+            File resolvedFile = new File(absolutePath);
+            long timestamp = resolvedFile.lastModified();
 
-          resolvedFiles.add(newFileInfo);
+            FileInfo newFileInfo =
+                fileInfo.fromResolvedPath(absolutePath, displayPath, timestamp);
+
+            resolvedFiles.add(newFileInfo);
+          }
         }
       }
+    }
+    if (!unreadable.isEmpty()) {
+      throw new UnreadableFilesException(unreadable);
     }
 
     resolvedFiles = postProcessFiles(resolvedFiles);
@@ -169,9 +154,18 @@ public class PathResolver {
   }
 
   public List<Plugin> resolve(List<Plugin> plugins) {
+    List<UnreadableFile> unreadable = Lists.newLinkedList();
     List<Plugin> resolved = Lists.newLinkedList();
     for (Plugin plugin : plugins) {
-      resolved.add(plugin.getPluginFromPath(resolvePath(plugin.getPathToJar())));
+      File resolvedFile = resolvePath(plugin.getPathToJar());
+      if (!resolvedFile.canRead()) {
+        unreadable.add(new UnreadableFile(plugin.getPathToJar(), resolvedFile.getAbsolutePath()));
+        continue;
+      }
+      resolved.add(plugin.getPluginFromPath(resolvedFile.getAbsolutePath()));
+    }
+    if (!unreadable.isEmpty()) {
+      throw new UnreadableFilesException(unreadable);
     }
     return resolved;
   }

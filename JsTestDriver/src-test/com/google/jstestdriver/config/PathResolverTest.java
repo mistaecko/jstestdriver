@@ -239,31 +239,42 @@ public class PathResolverTest extends TestCase {
     }
   }
 
-  public void testParsePlugin() {
-    Plugin expected = new Plugin("test", "pathtojar", "com.test.PluginModule",
-      Lists.<String> newArrayList());
-    String configFile = "plugin:\n" + "  - name: test\n"
-      + "    jar: \"pathtojar\"\n" + "    module: \"com.test.PluginModule\"\n";
+  public void testParsePlugin() throws IOException {
+    String jarPath = "pathto.jar";
+    File jar = createTmpFile(this.tmpDir, jarPath);
+    Plugin expected = new Plugin("test", jar.getAbsolutePath(), "com.test.PluginModule",
+        Lists.<String>newArrayList());
+    String configFile =
+        String.format("plugin:\n  - name: %s\n    jar: \"%s\"\n    module: \"%s\"\n",
+            "test",
+            jarPath,
+            "com.test.PluginModule");
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
     YamlParser parser = new YamlParser();
 
-    Configuration config = parser.parse(new InputStreamReader(bais), null).resolvePaths(
-        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+    Configuration config =
+        parser.parse(new InputStreamReader(bais), null)
+            .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor>emptySet()),
+                createFlags());
     List<Plugin> plugins = config.getPlugins();
     assertEquals(expected, plugins.get(0));
   }
 
-  public void testParsePlugins() {
-    List<Plugin> expected = new LinkedList<Plugin>(Arrays.asList(new Plugin(
-      "test", "pathtojar", "com.test.PluginModule", Lists
-        .<String> newArrayList()), new Plugin("test2", "pathtojar2",
-      "com.test.PluginModule2", Lists.<String> newArrayList("hello", "world",
-        "some/file.js"))));
-    String configFile = "plugin:\n" + "  - name: test\n"
-      + "    jar: \"pathtojar\"\n" + "    module: \"com.test.PluginModule\"\n"
-      + "  - name: test2\n" + "    jar: \"pathtojar2\"\n"
+  public void testParsePlugins() throws IOException {
+    String jarPath = "pathto.jar";
+    String jarPath2 = "pathto.jar2";
+    File jar = createTmpFile(this.tmpDir, jarPath);
+    File jar2 = createTmpFile(this.tmpDir, jarPath2);
+    List<Plugin> expected = new LinkedList<Plugin>(Arrays.asList(
+      new Plugin("test", jar.getAbsolutePath(), "com.test.PluginModule",
+        Lists.<String> newArrayList()),
+      new Plugin("test2", jar2.getAbsolutePath(), "com.test.PluginModule2",
+        Lists.<String> newArrayList("hello", "world", "some/file.js"))));
+    String configFile = String.format("plugin:\n" + "  - name: test\n"
+      + "    jar: \"%s\"\n" + "    module: \"com.test.PluginModule\"\n"
+      + "  - name: test2\n" + "    jar: \"%s\"\n"
       + "    module: \"com.test.PluginModule2\"\n"
-      + "    args: hello, world, some/file.js\n";
+      + "    args: hello, world, some/file.js\n", jarPath, jarPath2);
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
     YamlParser parser = new YamlParser();
 
@@ -278,6 +289,10 @@ public class PathResolverTest extends TestCase {
   }
 
   public void testParsePluginArgs() throws Exception {
+    String jarPath = "pathtojar";
+    String jarPath2 = "pathtojar2";
+    createTmpFile(this.tmpDir, jarPath);
+    createTmpFile(this.tmpDir, jarPath2);
     String configFile = "plugin:\n" + "  - name: test\n"
       + "    jar: \"pathtojar\"\n" + "    module: \"com.test.PluginModule\"\n"
       + "    args: hello, mooh, some/file.js, another/file.js";
@@ -298,6 +313,10 @@ public class PathResolverTest extends TestCase {
   }
 
   public void testParsePluginNoArgs() throws Exception {
+    String jarPath = "pathtojar";
+    String jarPath2 = "pathtojar2";
+    createTmpFile(this.tmpDir, jarPath);
+    createTmpFile(this.tmpDir, jarPath2);
     String configFile = "plugin:\n" + "  - name: test\n"
       + "    jar: \"pathtojar\"\n" + "    module: \"com.test.PluginModule\"\n";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
