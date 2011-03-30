@@ -24,18 +24,6 @@ import java.io.File;
  */
 public class FileInfoTest extends TestCase {
 
-  public void testFormatFileSeparator() {
-    assertEquals("a/b/c", FileInfo.formatFileSeparator("a/b/c"));
-    assertEquals("a/b/c", FileInfo.formatFileSeparator("a\\b\\c"));
-  }
-
-  public void testGetPath() {
-    assertEquals("a/b/c/file.js", FileInfo.getPath(new File("a/b/c"), "file.js"));
-
-    // Make sure path doesn't have extra slashes if directory ends in a slash
-    assertEquals("a/b/c/file.js", FileInfo.getPath(new File("a/b/c/"), "file.js"));
-  }
-
   public void testIsWebAddress() {
     FileInfo httpFile =
         new FileInfo("http://www.google.com", 0, -1, false, false, null, "http://www.google.com");

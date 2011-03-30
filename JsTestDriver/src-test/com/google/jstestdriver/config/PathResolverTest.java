@@ -35,6 +35,7 @@ import com.google.jstestdriver.FlagsImpl;
 import com.google.jstestdriver.PathResolver;
 import com.google.jstestdriver.Plugin;
 import com.google.jstestdriver.hooks.FileParsePostProcessor;
+import com.google.jstestdriver.util.DisplayPathSanitizer;
 
 public class PathResolverTest extends TestCase {
 
@@ -88,8 +89,10 @@ public class PathResolverTest extends TestCase {
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
     YamlParser parser = new YamlParser();
 
-    Configuration config = parser.parse(new InputStreamReader(bais), null).resolvePaths(
-        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+    Configuration config =
+        parser.parse(new InputStreamReader(bais), null).resolvePaths(
+            new PathResolver(tmpDir, Collections.<FileParsePostProcessor>emptySet(),
+                new DisplayPathSanitizer(tmpDir)), createFlags());
 
     Set<FileInfo> files = config.getFilesList();
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
@@ -121,7 +124,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
     
     Configuration config = parser.parse(new InputStreamReader(bais), null).resolvePaths(
-        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
     
     Set<FileInfo> files = config.getFilesList();
     List<FileInfo> listFiles = Lists.newArrayList(files);
@@ -156,7 +159,7 @@ public class PathResolverTest extends TestCase {
                 }
                 return processed;
               }
-            })), createFlags());
+            }), new DisplayPathSanitizer(tmpDir)), createFlags());
     Set<FileInfo> files = config.getFilesList();
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
@@ -175,7 +178,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null).resolvePaths(
-        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
     Set<FileInfo> files = config.getFilesList();
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
@@ -202,7 +205,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null)
-        .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+        .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
     Set<FileInfo> files = config.getFilesList();
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
@@ -232,7 +235,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
     try {
       parser.parse(new InputStreamReader(bais), null).resolvePaths(
-          new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+          new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
       fail("should have thrown an exception due to patching a non-existant file");
     } catch (IllegalStateException e) {
       // pass
@@ -254,7 +257,7 @@ public class PathResolverTest extends TestCase {
 
     Configuration config =
         parser.parse(new InputStreamReader(bais), null)
-            .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor>emptySet()),
+            .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor>emptySet(), new DisplayPathSanitizer(tmpDir)),
                 createFlags());
     List<Plugin> plugins = config.getPlugins();
     assertEquals(expected, plugins.get(0));
@@ -279,7 +282,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null)
-        .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+        .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
     List<Plugin> plugins = config.getPlugins();
 
     assertEquals(2, plugins.size());
@@ -300,7 +303,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null).resolvePaths(
-        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
     List<Plugin> plugins = config.getPlugins();
     Plugin plugin = plugins.get(0);
     List<String> args = plugin.getArgs();
@@ -323,7 +326,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null).resolvePaths(
-        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
     List<Plugin> plugins = config.getPlugins();
     Plugin plugin = plugins.get(0);
     List<String> args = plugin.getArgs();
@@ -349,7 +352,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null).resolvePaths(
-        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
     Set<FileInfo> serveFilesSet = config.getFilesList();
     List<FileInfo> serveFiles = new ArrayList<FileInfo>(serveFilesSet);
 
@@ -376,7 +379,7 @@ public class PathResolverTest extends TestCase {
     YamlParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null).resolvePaths(
-        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+        new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
     Set<FileInfo> files = config.getFilesList();
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
@@ -396,7 +399,7 @@ public class PathResolverTest extends TestCase {
 
     try {
       parser.parse(new InputStreamReader(bais), null)
-          .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet()), createFlags());
+          .resolvePaths(new PathResolver(tmpDir, Collections.<FileParsePostProcessor> emptySet(), new DisplayPathSanitizer(tmpDir)), createFlags());
       fail("Exception not caught");
     } catch (IllegalArgumentException e) {
     }

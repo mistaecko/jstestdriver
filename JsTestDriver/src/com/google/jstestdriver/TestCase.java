@@ -18,8 +18,10 @@ package com.google.jstestdriver;
 import java.util.List;
 
 /**
+ * Model for reporting tests.
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
+// TODO(corysmith): Rename so it quits coming up in auto complete.
 public class TestCase {
 
   private final String name;

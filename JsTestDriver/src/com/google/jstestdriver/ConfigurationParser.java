@@ -31,6 +31,7 @@ import org.jvyaml.YAML;
 
 import com.google.common.collect.Lists;
 import com.google.jstestdriver.hooks.FileParsePostProcessor;
+import com.google.jstestdriver.util.DisplayPathSanitizer;
 
 /**
  * TODO: needs to give more feedback when something goes wrong...
@@ -57,7 +58,7 @@ public class ConfigurationParser {
     this.configReader = configReader;
     this.pathRewriter = pathRewriter;
     pathResolver =
-        new PathResolver(basePath, Collections.<FileParsePostProcessor>emptySet());
+        new PathResolver(basePath, Collections.<FileParsePostProcessor>emptySet(), new DisplayPathSanitizer(basePath));
   }
 
   @SuppressWarnings("unchecked")

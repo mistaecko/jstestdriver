@@ -30,8 +30,6 @@ import com.google.jstestdriver.model.HandlerPathPrefix;
  */
 public class FileInfo implements Cloneable {
 
-  public static final String SEPARATOR_CHAR = "/";
-
   private String filePath;
   private Long timestamp;
   private transient boolean isPatch;
@@ -92,11 +90,6 @@ public class FileInfo implements Cloneable {
     return filePath;
   }
 
-  /** Gets the absolute file name by appending the specified base path to a relative path. */
-  public String getAbsoluteFileName(File basePath) {
-    return getPath(basePath, filePath);
-  }
-
   public long getTimestamp() {
     return timestamp;
   }
@@ -118,7 +111,7 @@ public class FileInfo implements Cloneable {
   }
 
   public File toFile(File basePath) {
-    return new File(getPath(basePath, filePath));
+    return new File(filePath);
   }
 
   @Override
@@ -154,7 +147,7 @@ public class FileInfo implements Cloneable {
     return new FileInfo(filePath, timestamp, length, isPatch, serveOnly, data, displayPath);
   }
 
-  /** Translates the FileInfo into a lightwieght FileSrc object. */
+  /** Translates the FileInfo into a lightweight FileSrc object. */
   public FileSource toFileSource(HandlerPathPrefix prefix, Set<FileInfoScheme> schemes) {
     for (FileInfoScheme scheme : schemes) {
       if (scheme.matches(filePath)) {
@@ -168,30 +161,6 @@ public class FileInfo implements Cloneable {
   public String toString() {
     return "FileInfo [filePath=" + filePath + ", length=" + length + ", patches=" + patches
         + ", serveOnly=" + serveOnly + ", timestamp=" + timestamp + "]";
-  }
-
-  /** Formats the specified path to use {@link #SEPARATOR_CHAR} as the path separator. */
-  public static final String formatFileSeparator(String path) {
-    return path.replaceAll("\\\\", SEPARATOR_CHAR);
-  }
-
-  /**
-   * Gets a path containing the base dir and relative file path. The file separators in the path
-   * will be formatted to use {@link #SEPARATOR_CHAR} as the path separator.
-   */
-  public static String getPath(File dir, String path) {
-  // Don't prepend the directory if the path is already absolute
-    if (new File(path).isAbsolute()) {
-      return path;
-    }
-
-    String dirPath = formatFileSeparator(dir.getPath());
-
-    if (!dirPath.endsWith(SEPARATOR_CHAR)) {
-      dirPath = dirPath + SEPARATOR_CHAR;
-    }
-
-    return dirPath + path;
   }
 
   /**
@@ -224,11 +193,11 @@ public class FileInfo implements Cloneable {
       return this;
     }
     StringBuilder fileContent = new StringBuilder();
-    fileContent.append(reader.readFile(this.getAbsoluteFileName(basePath)));
+    fileContent.append(reader.readFile(filePath));
     List<FileInfo> patches = this.getPatches();
     if (patches != null) {
       for (FileInfo patch : patches) {
-        fileContent.append(reader.readFile(patch.getAbsoluteFileName(basePath)));
+        fileContent.append(reader.readFile(patch.getFilePath()));
       }
     }
     return new FileInfo(filePath,

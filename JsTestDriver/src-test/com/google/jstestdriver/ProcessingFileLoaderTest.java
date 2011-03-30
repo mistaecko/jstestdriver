@@ -51,7 +51,7 @@ public class ProcessingFileLoaderTest extends TestCase {
     }
 
     public String readFile(String file) {
-      assertEquals(info.getAbsoluteFileName(new File(".")), file);
+      assertEquals(info.getFilePath(), file);
       return infoData;
     }
   }
@@ -76,7 +76,7 @@ public class ProcessingFileLoaderTest extends TestCase {
     final boolean shouldReset = false;
     List<FileInfo> actual = new ProcessingFileLoader(new FileReader() {
       public String readFile(String file) {
-        assertEquals(info.getAbsoluteFileName(new File(".")), file);
+        assertEquals(info.getFilePath(), file);
         return infoData;
       }
     },
@@ -122,8 +122,8 @@ public class ProcessingFileLoaderTest extends TestCase {
     final String patchData = "patchbar";
     final boolean shouldReset = false;
     MockFileReader mockFileReader = new MockFileReader();
-    mockFileReader.expected(info.getAbsoluteFileName(new File(".")), infoData).expected(
-        patch.getAbsoluteFileName(new File(".")), patchData);
+    mockFileReader.expected(info.getFilePath(), infoData).expected(
+        patch.getFilePath(), patchData);
     List<FileInfo> actual =
         new ProcessingFileLoader(mockFileReader,
             Collections.<FileLoadPostProcessor>emptySet(),

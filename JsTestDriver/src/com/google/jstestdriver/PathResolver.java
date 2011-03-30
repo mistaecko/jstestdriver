@@ -31,6 +31,7 @@ import com.google.inject.name.Named;
 import com.google.jstestdriver.config.UnreadableFile;
 import com.google.jstestdriver.config.UnreadableFilesException;
 import com.google.jstestdriver.hooks.FileParsePostProcessor;
+import com.google.jstestdriver.util.DisplayPathSanitizer;
 
 /**
  * Handles the resolution of glob paths (*.js) and relative paths.
@@ -40,15 +41,15 @@ public class PathResolver {
 
   private final Set<FileParsePostProcessor> processors;
   private final File basePath;
+  private DisplayPathSanitizer sanitizer;
 
   @Inject
-  public PathResolver(@Named("basePath") File basePath, Set<FileParsePostProcessor> processors) {
+  public PathResolver(@Named("basePath") File basePath, Set<FileParsePostProcessor> processors, DisplayPathSanitizer sanitizer) {
     this.basePath = basePath;
     this.processors = processors;
+    this.sanitizer = sanitizer;
   }
 
-  // TODO(andrewtrenk): This method may not be needed since the File class
-  // can resolve ".." on its own
   public File resolvePath(String filePath) {
     return !filePath.startsWith(File.separator) && basePath != null ?
         new File(basePath.getAbsoluteFile(), filePath) : new File(filePath);
@@ -91,7 +92,7 @@ public class PathResolver {
       if (fileInfo.isWebAddress()) {
         resolvedFiles.add(fileInfo.fromResolvedPath(filePath, filePath, -1));
       } else {
-        File file = resolvePath(filePath);           
+        File file = resolvePath(filePath);
         File absoluteDir = file.getParentFile().getAbsoluteFile();
 
         // Get all files for the current FileInfo. This will return one file
@@ -103,13 +104,11 @@ public class PathResolver {
         for (String fileName : expandedFileNames) {
           File sourceFile = new File(absoluteDir, fileName);
           if (!sourceFile.canRead()) {
-            unreadable.add(new UnreadableFile(fileInfo.getFilePath(), sourceFile.getAbsolutePath()));
+            unreadable.add(new UnreadableFile(fileInfo.getFilePath(),
+                sourceFile.getAbsolutePath()));
           } else {
             String absolutePath = sourceFile.getAbsolutePath();
-            String displayPath =
-                absolutePath.startsWith(basePath.getAbsolutePath())
-                    ? absolutePath.substring(basePath.getAbsolutePath().length() + 1)
-                    : absolutePath;
+            String displayPath = sanitizer.sanitize(absolutePath);
 
             File resolvedFile = new File(absolutePath);
             long timestamp = resolvedFile.lastModified();

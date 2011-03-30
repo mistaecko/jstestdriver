@@ -53,6 +53,13 @@ public class FileSetCacheStrategy {
             if (clientFileInfo.getTimestamp() != browserFileInfo.getTimestamp() ||
                 clientFileInfo.getLength() != browserFileInfo.getLength()) {
               expiredFileSet.add(clientFileInfo);
+              logger.debug("files {} not equal ({},{}) ({},{}) update", new Object[] {
+                 clientFileInfo.getFilePath(),
+                 clientFileInfo.getLength(),
+                 clientFileInfo.getTimestamp(),
+                 browserFileInfo.getLength(),
+                 browserFileInfo.getTimestamp()
+              });
             } else {
               logger.debug("files equal {}, {} no update", clientFileInfo, browserFileInfo);
             }
