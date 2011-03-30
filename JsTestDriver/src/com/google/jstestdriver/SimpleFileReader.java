@@ -26,18 +26,25 @@ import java.nio.charset.Charset;
  * @author corysmith
  */
 public class SimpleFileReader implements FileReader {
+  public static final char UTF8_BOM = '\uFEFF';
 
   public String readFile(String file)  {
     InputStreamReader reader = null;
     try {
-      reader = new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), Charset.forName("UTF-8"));
+      reader = new InputStreamReader(new BufferedInputStream(
+        new FileInputStream(file)), Charset.forName("UTF-8"));
       StringBuilder sb = new StringBuilder();
 
-      for (int c = reader.read(); c != -1; c = reader.read()) {
+      // remove the UTF8 BOM if exists.
+      int c = reader.read();
+      if (c != UTF8_BOM && c != -1) {
         sb.append((char) c);
       }
-      String contents = sb.toString();
+      for (c = reader.read(); c != -1; c = reader.read()) {
+        sb.append((char) c);
+      }
 
+      String contents = sb.toString();
       return contents;
     } catch (IOException e) {
       throw new RuntimeException("Impossible to read file: " + file, e);
