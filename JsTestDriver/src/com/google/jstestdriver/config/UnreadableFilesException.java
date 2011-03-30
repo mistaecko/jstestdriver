@@ -38,6 +38,11 @@ public class UnreadableFilesException extends RuntimeException {
   }
 
   @Override
+  public String getMessage() {
+    return Joiner.on("\n").join(unreadables);
+  }
+
+  @Override
   public String toString() {
     return Joiner.on("\n").join(unreadables);
   }

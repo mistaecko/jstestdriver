@@ -89,7 +89,7 @@ public class JsTestDriver {
       System.out.println(e.getMessage());
       System.exit(1);
     } catch (UnreadableFilesException e) {
-      System.out.println("Configuration Error: " + e.getMessage());
+      System.out.println("Configuration Error: \n" + e.getMessage());
       System.exit(1);
     } catch (FailureException e) {
       System.out.println("Tests failed: " + e.getMessage());
