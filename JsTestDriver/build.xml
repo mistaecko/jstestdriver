@@ -505,6 +505,23 @@
       </manifest>
     </jar>
   </target>
+	
+  <target name="testisolation-plugin-jar" depends="jar">
+    <mkdir dir="${bin.dir}/plugins/" />
+    <jar destfile="${bin.dir}/plugins/testisolation.jar" duplicate="preserve">
+      <fileset dir="${obj.dir}">
+        <include name="**/testisolation/**" />
+      </fileset>
+      <manifest>
+        <!-- plugins will need to have a reference to the JsTestDriver jar they are working with.-->
+        <attribute name="Class-Path" value="../JsTestDriver.jar" />
+        <section name="jstd">
+          <attribute name="plugin-initializer"
+          	  value="com.google.jstestdriver.plugins.testisolation.TestIsolationInitializer" />
+        </section>
+      </manifest>
+    </jar>
+  </target>
 
   <target name="coverage-plugin-jar" depends="jar">
     <mkdir dir="${bin.dir}/plugins/" />
