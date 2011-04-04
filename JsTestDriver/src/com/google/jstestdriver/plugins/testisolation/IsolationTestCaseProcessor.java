@@ -31,8 +31,7 @@ import java.util.List;
  * @author Andrew Trenk
  */
 public class IsolationTestCaseProcessor implements JstdTestCaseProcessor {
-  
-  @Override
+
   public List<JstdTestCase> process(Iterator<JstdTestCase> testCasesIterator) {
     List<JstdTestCase> isolatedTestCases = Lists.newArrayList();    
     List<JstdTestCase> testCases = Lists.newArrayList(testCasesIterator);

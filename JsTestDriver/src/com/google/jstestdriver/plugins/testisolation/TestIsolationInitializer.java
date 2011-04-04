@@ -30,7 +30,6 @@ import com.google.jstestdriver.hooks.PluginInitializer;
  */
 public class TestIsolationInitializer implements PluginInitializer {
 
-  @Override
   public Module initializeModule(Flags flags, Configuration config) {    
     return new TestIsolationModule();
   }

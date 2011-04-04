@@ -101,23 +101,28 @@ public class PathResolver {
         String[] expandedFileNames =
             expandGlob(absoluteDir.getAbsolutePath(), file.getName(), absoluteDir);
 
-        for (String fileName : expandedFileNames) {
-          File sourceFile = new File(absoluteDir, fileName);
-          if (!sourceFile.canRead()) {
-            unreadable.add(new UnreadableFile(fileInfo.getFilePath(),
-                sourceFile.getAbsolutePath()));
-          } else {
-            String absolutePath = sourceFile.getAbsolutePath();
-            String displayPath = sanitizer.sanitize(absolutePath);
+        try {
+          for (String fileName : expandedFileNames) {
+            File sourceFile = new File(absoluteDir, fileName);
+            if (!sourceFile.canRead()) {
+              unreadable.add(
+                  new UnreadableFile(fileInfo.getFilePath(), sourceFile.getAbsolutePath()));
+            } else {
+              String absolutePath = sourceFile.getCanonicalPath();
+              String displayPath = sanitizer.sanitize(absolutePath);
 
-            File resolvedFile = new File(absolutePath);
-            long timestamp = resolvedFile.lastModified();
+              File resolvedFile = new File(absolutePath);
+              long timestamp = resolvedFile.lastModified();
 
-            FileInfo newFileInfo =
-                fileInfo.fromResolvedPath(absolutePath, displayPath, timestamp);
+              FileInfo newFileInfo =
+                  fileInfo.fromResolvedPath(absolutePath, displayPath, timestamp);
 
-            resolvedFiles.add(newFileInfo);
+              resolvedFiles.add(newFileInfo);
+            }
           }
+        } catch (IOException e) {
+          // can't happen in normal circumstances.
+          throw new RuntimeException(e);
         }
       }
     }

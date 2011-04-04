@@ -27,7 +27,14 @@ public interface JsTestDriverServer {
    */
   boolean isHealthy();
 
+  public static class ServerEvent {
+    
+  }
+
   public enum Event {
-    STARTED, STOPPED
+    STARTED,
+    STOPPED,
+    BROWSER_CONNECTED,
+    BROWSER_DISCONNECTED
   }
 }

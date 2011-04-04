@@ -15,6 +15,7 @@
  */
 package com.google.jstestdriver;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observer;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.model.RunData;
+import com.google.jstestdriver.server.ServerListener;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -87,10 +89,11 @@ public class ServerStartupAction implements ObservableAction {
         capturedBrowsers,
         preloadedFilesCache,
         browserTimeout,
-        handlerPrefix);
+        handlerPrefix, Collections.<ServerListener>emptyList());
 
-    for (Observer o : observerList) {
-      server.addObserver(o);
+    if (!observerList.isEmpty()) {
+      throw new RuntimeException("Observers not supported during the transition to listners.");
+      
     }
     try {
       server.start();

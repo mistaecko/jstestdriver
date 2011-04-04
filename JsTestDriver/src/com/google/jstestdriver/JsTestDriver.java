@@ -102,4 +102,20 @@ public class JsTestDriver {
       System.exit(1);
     }
   }
+  
+  public void startServer() {
+    
+  }
+
+  public void stopServer() {
+    
+  }
+  
+  public TestCase runConfiguration(String path) {
+    return null;
+  }
+  
+  public TestCase runConfiguration(Configuration config) {
+    return null;
+  }
 }

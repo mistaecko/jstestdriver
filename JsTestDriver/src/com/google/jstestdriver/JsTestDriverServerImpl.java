@@ -1,12 +1,12 @@
 /*
  * Copyright 2008 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,12 +15,14 @@
  */
 package com.google.jstestdriver;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Observable;
-import java.util.Timer;
+import com.google.common.collect.Lists;
+import com.google.inject.Guice;
+import com.google.jstestdriver.browser.BrowserCaptureEvent;
+import com.google.jstestdriver.browser.BrowserReaper;
+import com.google.jstestdriver.model.HandlerPathPrefix;
+import com.google.jstestdriver.server.JettyModule;
+import com.google.jstestdriver.server.ServerListener;
+import com.google.jstestdriver.server.handlers.JstdHandlersModule;
 
 import org.mortbay.component.LifeCycle;
 import org.mortbay.component.LifeCycle.Listener;
@@ -28,19 +30,21 @@ import org.mortbay.jetty.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Guice;
-import com.google.jstestdriver.browser.BrowserReaper;
-import com.google.jstestdriver.model.HandlerPathPrefix;
-import com.google.jstestdriver.server.JettyModule;
-import com.google.jstestdriver.server.handlers.JstdHandlersModule;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Timer;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
-public class JsTestDriverServerImpl extends Observable implements JsTestDriverServer {
+public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(JsTestDriverServerImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(JsTestDriverServerImpl.class);
 
   private Server server;
 
@@ -53,16 +57,16 @@ public class JsTestDriverServerImpl extends Observable implements JsTestDriverSe
 
   private final HandlerPathPrefix handlerPrefix;
 
-  public JsTestDriverServerImpl(int port,
-                            CapturedBrowsers capturedBrowsers,
-                            FilesCache preloadedFilesCache,
-                            long browserTimeout,
-                            HandlerPathPrefix handlerPrefix) {
+  private final List<ServerListener> listeners;
+
+  public JsTestDriverServerImpl(int port, CapturedBrowsers capturedBrowsers,
+      FilesCache preloadedFilesCache, long browserTimeout, HandlerPathPrefix handlerPrefix, List<ServerListener> listeners) {
     this.port = port;
     this.capturedBrowsers = capturedBrowsers;
     this.filesCache = preloadedFilesCache;
     this.browserTimeout = browserTimeout;
     this.handlerPrefix = handlerPrefix;
+    this.listeners = listeners;
     initServer();
   }
 
@@ -71,38 +75,42 @@ public class JsTestDriverServerImpl extends Observable implements JsTestDriverSe
       logger.warn("Attempt to start a started server");
     } else {
       // TODO(corysmith): move this to the normal guice injection scope.
-      server = Guice.createInjector(
-          new JettyModule(port, handlerPrefix),
-          new JstdHandlersModule(
-              capturedBrowsers,
-              filesCache,
-              browserTimeout,
-              handlerPrefix)).getInstance(Server.class);
+      capturedBrowsers.deleteObserver(this);
+      capturedBrowsers.addObserver(this);
+      server =
+          Guice.createInjector(new JettyModule(port, handlerPrefix), new JstdHandlersModule(
+              capturedBrowsers, filesCache, browserTimeout, handlerPrefix))
+              .getInstance(Server.class);
       server.addLifeCycleListener(new JettyLifeCycleLogger());
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   *
    * @see com.google.jstestdriver.JsTestDriverServer#start()
    */
   public void start() {
     try {
       initServer();
-      // TODO(corysmith): Move this to the constructor when we are injecting everything.
+      // TODO(corysmith): Move this to the constructor when we are injecting
+      // everything.
       timer = new Timer(true);
       timer.schedule(new BrowserReaper(capturedBrowsers), browserTimeout * 2, browserTimeout * 2);
 
       server.start();
 
-      setChanged();
-      notifyObservers(Event.STARTED);
+      notifyListeners(STARTED_NOTIFICATION);
+
       logger.info("Started the JsTD server on {}", port);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   *
    * @see com.google.jstestdriver.JsTestDriverServer#stop()
    */
   public void stop() {
@@ -113,15 +121,24 @@ public class JsTestDriverServerImpl extends Observable implements JsTestDriverSe
         server.join();
         server = null;
       }
-      setChanged();
-      notifyObservers(Event.STOPPED);
+      notifyListeners(STOPPED_NOTIFICATION);
+
       logger.debug("Stopped the server.");
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  /* (non-Javadoc)
+  /** Separate function for synchronization and thread handling. */
+  private void notifyListeners(ServerNotification<ServerListener> notification) {
+    for (ServerListener listener : listeners) {
+      notification.notify(listener);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   *
    * @see com.google.jstestdriver.JsTestDriverServer#isHealthy()
    */
   public boolean isHealthy() {
@@ -164,5 +181,74 @@ public class JsTestDriverServerImpl extends Observable implements JsTestDriverSe
     public void lifeCycleFailure(LifeCycle arg0, Throwable arg1) {
       logger.warn("Server failed", arg1);
     }
+  }
+
+  /**
+   * Receives updates from the CapturedBrowsers.
+   */
+  public void update(Observable o, Object arg) {
+    // TODO(corysmith): Cleanup browser capture event.
+    BrowserCaptureEvent event = (BrowserCaptureEvent) arg;
+    final BrowserInfo info = event.getBrowser().getBrowserInfo();
+    switch (event.event) {
+      case CONNECTED:
+        System.out.printf("captured %s", info);
+        notifyListeners(new BrowserCaptureNotification(info));
+        break;
+      case DISCONNECTED:
+        System.out.printf("panicked %s", info);
+        notifyListeners(new BrowserPanickedNotification(info));
+        break;
+      default:
+        System.out.println(event);
+    }
+  }
+
+
+  private static final class BrowserPanickedNotification implements ServerNotification<
+      ServerListener> {
+
+    private final BrowserInfo info;
+
+    private BrowserPanickedNotification(BrowserInfo info) {
+      this.info = info;
+    }
+
+    public void notify(ServerListener listener) {
+      listener.browserPanicked(info);
+    }
+  }
+
+  private static final class BrowserCaptureNotification implements ServerNotification<
+      ServerListener> {
+
+    private final BrowserInfo info;
+
+    private BrowserCaptureNotification(BrowserInfo info) {
+      this.info = info;
+    }
+
+    public void notify(ServerListener listener) {
+      listener.browserCaptured(info);
+    }
+  }
+
+  private static final ServerNotification<ServerListener> STARTED_NOTIFICATION =
+      new ServerNotification<ServerListener>() {
+        public void notify(ServerListener listener) {
+          listener.serverStarted();
+        }
+      };
+
+  private static final ServerNotification<ServerListener> STOPPED_NOTIFICATION =
+      new ServerNotification<ServerListener>() {
+        public void notify(ServerListener listener) {
+          listener.serverStopped();
+        }
+      };
+
+  /** Internal server notification. */
+  private static interface ServerNotification<T> {
+    public void notify(ServerListener listener);
   }
 }
