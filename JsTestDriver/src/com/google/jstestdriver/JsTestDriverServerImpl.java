@@ -192,15 +192,11 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
     final BrowserInfo info = event.getBrowser().getBrowserInfo();
     switch (event.event) {
       case CONNECTED:
-        System.out.printf("captured %s", info);
         notifyListeners(new BrowserCaptureNotification(info));
         break;
       case DISCONNECTED:
-        System.out.printf("panicked %s", info);
         notifyListeners(new BrowserPanickedNotification(info));
         break;
-      default:
-        System.out.println(event);
     }
   }
 
