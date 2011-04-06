@@ -38,17 +38,22 @@
 /**
  * Constructs an AsyncTestRunnerPlugin.
  *
- * @param dateObj the date object constructor
- * @param clearBody a function to call to clear the document body.
- * @param opt_setTimeout window.setTimeout replacement.
- * @param opt_queueConstructor a constructor for obtaining new DeferredQueues.
- * @param opt_armorConstructor a constructor for obtaining new DeferredQueueArmors.
+ * @param {Function} dateObj the date object constructor
+ * @param {Function} clearBody a function to call to clear the document body.
+ * @param {boolean} opt_pauseForHuman Whether to pause for debugging.
+ * @param {Function} opt_setTimeout window.setTimeout replacement.
+ * @param {Function} opt_queueConstructor a constructor for obtaining new
+ *     DeferredQueues.
+ * @param {Function} opt_armorConstructor a constructor for obtaining new
+ *     DeferredQueueArmors.
  */
-jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(
-    dateObj, clearBody, opt_setTimeout, opt_queueConstructor, opt_armorConstructor) {
+jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody,
+      opt_pauseForHuman, opt_setTimeout, opt_queueConstructor,
+      opt_armorConstructor) {
   this.name = "AsyncTestRunnerPlugin";
   this.dateObj_ = dateObj;
   this.clearBody_ = clearBody;
+  this.pauseForHuman_ = !!opt_pauseForHuman;
   this.setTimeout_ = opt_setTimeout || jstestdriver.setTimeout;
   this.queueConstructor_ = opt_queueConstructor || jstestdriver.plugins.async.DeferredQueue;
   this.armorConstructor_ = opt_armorConstructor || jstestdriver.plugins.async.DeferredQueueArmor;
@@ -129,7 +134,8 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.execute_ = function(
   var onError = function(error) {runner.errors_.push(error);};
   var stage = new jstestdriver.plugins.async.TestStage(
       onError, onStageComplete, this.testCase_, invokeMethod, null,
-      this.armorConstructor_, this.queueConstructor_, this.setTimeout_);
+      this.pauseForHuman_, this.armorConstructor_, this.queueConstructor_,
+      this.setTimeout_);
   stage.execute();
 };
 

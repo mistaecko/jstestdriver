@@ -245,6 +245,67 @@ callbackPoolTest.prototype.testAddWithErrors = function() {
 };
 
 
+callbackPoolTest.prototype.testAddWithTimeout = function() {
+  var complete = false;
+  var pool = new jstestdriver.plugins.async.CallbackPool(function(callback) {
+    callback();
+  }, {}, function(errors) {
+    assertEquals(1, errors.length);
+    complete = true;
+  }, false /* pauseForHuman */, function() {
+    // Force callbacks to expire immediately when armed
+    return new jstestdriver.plugins.async.TestSafeCallbackBuilder(function(callback) {
+      callback();
+    })
+  });
+
+  assertEquals(0, pool.count());
+
+  var callbackA = pool.add(function() {});
+
+  assertEquals(0, pool.count());
+  assertFalse(complete);
+
+  pool.activate();
+
+  assertEquals(0, pool.count());
+  assertTrue(complete);
+};
+
+
+callbackPoolTest.prototype.testAddWithTimeoutDisabledForDebugging = function() {
+  var complete = false;
+  var pool = new jstestdriver.plugins.async.CallbackPool(function(callback) {
+    callback();
+  }, {}, function(errors) {
+    assertEquals(0, errors.length);
+    complete = true;
+  }, true /* pauseForHuman */, function() {
+    // Force callbacks to expire immediately when armed
+    return new jstestdriver.plugins.async.TestSafeCallbackBuilder(function(callback) {
+      callback();
+    })
+  });
+
+  assertEquals(0, pool.count());
+
+  var callbackA = pool.add(function() {});
+
+  assertEquals(1, pool.count());
+  assertFalse(complete);
+
+  pool.activate();
+
+  assertEquals(1, pool.count());
+  assertFalse(complete);
+
+  callbackA();
+
+  assertEquals(0, pool.count());
+  assertTrue(complete);
+};
+
+
 callbackPoolTest.prototype.testAddErrback = function() {
   var complete = false;
   var pool = new jstestdriver.plugins.async.CallbackPool(function(callback) {

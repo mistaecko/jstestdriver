@@ -30,10 +30,14 @@
  * @param testCase the test case instance.
  * @param onPoolComplete a function to call when the pool empties.
  */
-jstestdriver.plugins.async.CallbackPool = function(setTimeout, testCase, onPoolComplete) {
+jstestdriver.plugins.async.CallbackPool = function(setTimeout, testCase,
+      onPoolComplete, opt_pauseForHuman, opt_callbackBuilderConstructor) {
   this.setTimeout_ = setTimeout;
   this.testCase_ = testCase;
   this.onPoolComplete_ = onPoolComplete;
+  this.pauseForHuman_ = !!opt_pauseForHuman;
+  this.callbackBuilderConstructor_ = opt_callbackBuilderConstructor ||
+      jstestdriver.plugins.async.TestSafeCallbackBuilder;
   this.errors_ = [];
   this.count_ = 0;
   this.active_ = false;
@@ -94,14 +98,15 @@ jstestdriver.plugins.async.CallbackPool.prototype.onError = function(error) {
  */
 jstestdriver.plugins.async.CallbackPool.prototype.addCallback = function(wrapped, opt_n) {
   this.count_ += opt_n || 1;
-  //console.log('adding. (' + this.count_ + ' in pool)');
-  var callback = new jstestdriver.plugins.async.TestSafeCallbackBuilder()
+  var callback = new (this.callbackBuilderConstructor_)()
       .setPool(this)
       .setRemainingUses(opt_n)
       .setTestCase(this.testCase_)
       .setWrapped(wrapped)
       .build();
-  callback.arm(jstestdriver.plugins.async.CallbackPool.TIMEOUT);
+  if (!this.pauseForHuman_) {
+    callback.arm(jstestdriver.plugins.async.CallbackPool.TIMEOUT);
+  }
   return function() {
     return callback.invoke.apply(callback, arguments);
   };
@@ -147,9 +152,6 @@ jstestdriver.plugins.async.CallbackPool.prototype.addErrback = function(message)
 jstestdriver.plugins.async.CallbackPool.prototype.remove = function(message, opt_n) {
   if (this.count_ > 0) {
     this.count_ -= opt_n || 1;
-    /*if (message) {
-      console.log(message + ' (' + this.count_ + ' in pool)');
-    }*/
     this.maybeComplete();
   }
 };

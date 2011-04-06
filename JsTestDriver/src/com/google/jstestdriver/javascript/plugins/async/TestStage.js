@@ -31,6 +31,8 @@
  * @param {Function} onStageComplete A callback for stage completion.
  * @param {Object} testCase The test case that owns this test stage.
  * @param {Function} testMethod The test method this stage represents.
+ * @param {Object} opt_argument An argument to pass to the test method.
+ * @param {boolean} opt_pauseForHuman Whether to pause for debugging.
  * @param {Function} opt_armorConstructor The constructor of DeferredQueueArmor.
  * @param {Function} opt_queueConstructor The constructor of DeferredQueue.
  * @param {Function} opt_setTimeout The setTimeout function or suitable
@@ -39,12 +41,14 @@
  */
 jstestdriver.plugins.async.TestStage = function(
     onError, onStageComplete, testCase, testMethod, opt_argument,
-    opt_armorConstructor, opt_queueConstructor, opt_setTimeout) {
+    opt_pauseForHuman, opt_armorConstructor, opt_queueConstructor,
+    opt_setTimeout) {
   this.onError_ = onError;
   this.onStageComplete_ = onStageComplete;
   this.testCase_ = testCase;
   this.testMethod_ = testMethod;
   this.argument_ = opt_argument;
+  this.pauseForHuman_ = !!opt_pauseForHuman;
   this.armorConstructor_ = opt_armorConstructor ||
       jstestdriver.plugins.async.DeferredQueueArmor;
   this.queueConstructor_ = opt_queueConstructor ||
@@ -58,8 +62,8 @@ jstestdriver.plugins.async.TestStage = function(
  */
 jstestdriver.plugins.async.TestStage.prototype.execute = function() {
   var armor = new (this.armorConstructor_)();
-  var queue = new (this.queueConstructor_)(
-      this.setTimeout_, this.testCase_, this.onStageComplete_, armor);
+  var queue = new (this.queueConstructor_)(this.setTimeout_, this.testCase_,
+      this.onStageComplete_, armor, this.pauseForHuman_);
   armor.setQueue(queue);
 
   if (this.testMethod_) {
