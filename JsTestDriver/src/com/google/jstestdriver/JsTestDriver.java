@@ -38,6 +38,7 @@ import com.google.jstestdriver.config.UnreadableFilesException;
 import com.google.jstestdriver.config.YamlParser;
 import com.google.jstestdriver.guice.TestResultPrintingModule.TestResultPrintingInitializer;
 import com.google.jstestdriver.hooks.PluginInitializer;
+import com.google.jstestdriver.util.RetryException;
 
 public class JsTestDriver {
 
@@ -90,6 +91,10 @@ public class JsTestDriver {
       System.exit(1);
     } catch (UnreadableFilesException e) {
       System.out.println("Configuration Error: \n" + e.getMessage());
+      System.exit(1);
+    } catch (RetryException e) {
+      System.out.println(
+          "Tests failed due to unexpected environment issue: " + e.getCause().getMessage());
       System.exit(1);
     } catch (FailureException e) {
       System.out.println("Tests failed: " + e.getMessage());

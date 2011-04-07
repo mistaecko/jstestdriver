@@ -59,7 +59,7 @@ public class RetryingCallable<V> implements Callable<V> {
             exceptionsString.append("\nFailure " + (i + 1) + ": " + exceptions.get(i));
           }
 
-          throw new RuntimeException("Failed after " + retried + " tries." + exceptionsString, e);
+         throw new RetryException(retried, exceptionsString.toString(), e);
         } else {
           logger.info(
               "Retrying statement; number of times failed: " + retried + "; exception\n:" + e);
@@ -67,5 +67,4 @@ public class RetryingCallable<V> implements Callable<V> {
       }
     }
   }
-
 }

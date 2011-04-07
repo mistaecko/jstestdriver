@@ -15,16 +15,7 @@
  */
 package com.google.jstestdriver;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.oro.io.GlobFilenameFilter;
-import org.apache.oro.text.GlobCompiler;
-
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -32,6 +23,16 @@ import com.google.jstestdriver.config.UnreadableFile;
 import com.google.jstestdriver.config.UnreadableFilesException;
 import com.google.jstestdriver.hooks.FileParsePostProcessor;
 import com.google.jstestdriver.util.DisplayPathSanitizer;
+
+import org.apache.oro.io.GlobFilenameFilter;
+import org.apache.oro.text.GlobCompiler;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Handles the resolution of glob paths (*.js) and relative paths.
@@ -50,9 +51,13 @@ public class PathResolver {
     this.sanitizer = sanitizer;
   }
 
+  /**
+   * Creates a full resolved path to a resource without following the sym links.
+   */
   public File resolvePath(String filePath) {
-    return !filePath.startsWith(File.separator) && basePath != null ?
-        new File(basePath.getAbsoluteFile(), filePath) : new File(filePath);
+    File absolute = !filePath.startsWith(File.separator) && basePath != null ?
+        new File(basePath, filePath) : new File(filePath);
+    return new File(resolveRelativePathReferences(absolute.getAbsolutePath()));
   }
 
   private Set<FileInfo> consolidatePatches(Set<FileInfo> resolvedFilesLoad) {
@@ -81,7 +86,6 @@ public class PathResolver {
    *
    * @param unresolvedFiles the FileInfos to resolved
    * @return the resolved FileInfos
-   * @throws IOException 
    */
   public Set<FileInfo> resolve(Set<FileInfo> unresolvedFiles) {
     Set<FileInfo> resolvedFiles = new LinkedHashSet<FileInfo>();
@@ -101,28 +105,23 @@ public class PathResolver {
         String[] expandedFileNames =
             expandGlob(absoluteDir.getAbsolutePath(), file.getName(), absoluteDir);
 
-        try {
-          for (String fileName : expandedFileNames) {
-            File sourceFile = new File(absoluteDir, fileName);
-            if (!sourceFile.canRead()) {
-              unreadable.add(
-                  new UnreadableFile(fileInfo.getFilePath(), sourceFile.getAbsolutePath()));
-            } else {
-              String absolutePath = sourceFile.getCanonicalPath();
-              String displayPath = sanitizer.sanitize(absolutePath);
+        for (String fileName : expandedFileNames) {
+          File sourceFile = new File(absoluteDir, fileName);
+          if (!sourceFile.canRead()) {
+            unreadable.add(
+                new UnreadableFile(fileInfo.getFilePath(), sourceFile.getAbsolutePath()));
+          } else {
+            String absolutePath = sourceFile.getAbsolutePath();
+            String displayPath = sanitizer.sanitize(absolutePath);
 
-              File resolvedFile = new File(absolutePath);
-              long timestamp = resolvedFile.lastModified();
+            File resolvedFile = new File(absolutePath);
+            long timestamp = resolvedFile.lastModified();
 
-              FileInfo newFileInfo =
-                  fileInfo.fromResolvedPath(absolutePath, displayPath, timestamp);
+            FileInfo newFileInfo =
+                fileInfo.fromResolvedPath(absolutePath, displayPath, timestamp);
 
-              resolvedFiles.add(newFileInfo);
-            }
+            resolvedFiles.add(newFileInfo);
           }
-        } catch (IOException e) {
-          // can't happen in normal circumstances.
-          throw new RuntimeException(e);
         }
       }
     }
@@ -133,6 +132,23 @@ public class PathResolver {
     resolvedFiles = postProcessFiles(resolvedFiles);
 
     return consolidatePatches(resolvedFiles);
+  }
+  
+  /**
+   * This function is needed to deal with removing ".." from a path.
+   * Java absolute paths  
+   */
+  private String resolveRelativePathReferences(String path) {
+    String[] elements = path.split(File.separator);
+    List<String> resolved = Lists.newArrayListWithExpectedSize(elements.length);
+    for (String element : elements) {
+      if ("..".equals(element)) {
+        resolved.remove(resolved.size() - 1);
+      } else {
+        resolved.add(element);
+      }
+    }
+    return Joiner.on(File.separator).join(resolved);
   }
 
   private String[] expandGlob(String filePath, String fileNamePattern, File dir) {

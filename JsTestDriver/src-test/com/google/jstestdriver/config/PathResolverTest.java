@@ -102,6 +102,41 @@ public class PathResolverTest extends TestCase {
     assertTrue(listFiles.get(1).getFilePath().endsWith("test/test.js"));
     assertTrue(listFiles.get(2).getFilePath().endsWith("test/test3.js"));
   }
+  public void testParseConfigFileAndHaveListOfFilesRelative() throws Exception {
+    File codeDir = createTmpSubDir("code");
+    File testDir = createTmpSubDir("test");
+    createTmpFile(codeDir, "code.js");
+    createTmpFile(codeDir, "code2.js");
+    createTmpFile(testDir, "test.js");
+    createTmpFile(testDir, "test2.js");
+    createTmpFile(testDir, "test3.js");
+
+    String configFile =
+      "load:\n" +
+      " - '*.js'\n" +
+      " - '../test/*.js'\n" +
+      "exclude:\n" +
+      " - code2.js\n" +
+      " - '../test/test2.js'\n";
+    ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
+    YamlParser parser = new YamlParser();
+    
+    Configuration config =
+      parser.parse(new InputStreamReader(bais), null).resolvePaths(
+          new PathResolver(codeDir, Collections.<FileParsePostProcessor>emptySet(),
+              new DisplayPathSanitizer(codeDir)), createFlags());
+    
+    Set<FileInfo> files = config.getFilesList();
+    List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
+    
+    assertEquals(3, files.size());
+    assertFalse(listFiles.get(0).getDisplayPath().contains(".."));
+    assertFalse(listFiles.get(1).getDisplayPath().contains(".."));
+    assertFalse(listFiles.get(2).getDisplayPath().contains(".."));
+    assertTrue(listFiles.get(0).getFilePath().endsWith("code/code.js"));
+    assertTrue(listFiles.get(1).getFilePath().endsWith("test/test.js"));
+    assertTrue(listFiles.get(2).getFilePath().endsWith("test/test3.js"));
+  }
 
   public void testParseConfigFileAndHaveListOfFilesWithTests() throws Exception {
     File codeDir = createTmpSubDir("code");
