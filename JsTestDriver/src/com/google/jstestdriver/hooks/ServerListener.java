@@ -1,6 +1,6 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
 
-package com.google.jstestdriver.server;
+package com.google.jstestdriver.hooks;
 
 import com.google.jstestdriver.BrowserInfo;
 

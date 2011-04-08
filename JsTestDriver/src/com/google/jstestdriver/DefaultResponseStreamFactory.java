@@ -31,7 +31,7 @@ import com.google.jstestdriver.output.TestResultListener;
  */
 public class DefaultResponseStreamFactory implements ResponseStreamFactory {
 
-  private final Provider<TestResultListener> responsePrinterFactory;
+  private final Provider<TestResultListener> resultListener;
   private final FailureAccumulator accumulator;
   private final PrintStream out;
 
@@ -39,13 +39,13 @@ public class DefaultResponseStreamFactory implements ResponseStreamFactory {
   public DefaultResponseStreamFactory(Provider<TestResultListener> responsePrinterFactory,
                                       FailureAccumulator accumulator,
                                       @Named("outputStream") PrintStream out) {
-    this.responsePrinterFactory = responsePrinterFactory;
+    this.resultListener = responsePrinterFactory;
     this.accumulator = accumulator;
     this.out = out;
   }
 
   public ResponseStream getRunTestsActionResponseStream(String browserId) {
-    TestResultListener listener = responsePrinterFactory.get();
+    TestResultListener listener = resultListener.get();
 
     RunTestsActionResponseStream responseStream = new RunTestsActionResponseStream(
         new TestResultGenerator(), listener, accumulator);

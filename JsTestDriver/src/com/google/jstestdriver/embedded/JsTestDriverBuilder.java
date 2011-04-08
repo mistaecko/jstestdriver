@@ -2,11 +2,13 @@
 
 package com.google.jstestdriver.embedded;
 
+import java.io.File;
+
 import com.google.jstestdriver.JsTestDriver;
-import com.google.jstestdriver.Plugin;
 import com.google.jstestdriver.hooks.PluginInitializer;
+import com.google.jstestdriver.hooks.ServerListener;
+import com.google.jstestdriver.output.TestResultListener;
 import com.google.jstestdriver.runner.RunnerMode;
-import com.google.jstestdriver.server.ServerListener;
 
 /**
  * @author corysmith@google.com (Your Name Here)
@@ -36,7 +38,7 @@ public class JsTestDriverBuilder {
    * @param testServerListener
    * @return
    */
-  public JsTestDriverBuilder addListener(ServerListener testServerListener) {
+  public JsTestDriverBuilder addServerListener(ServerListener testServerListener) {
     // TODO Auto-generated method stub
     return this;
   }
@@ -52,7 +54,8 @@ public class JsTestDriverBuilder {
    * @param plugin
    * @return
    */
-  public JsTestDriverBuilder withPluginInitializer(Class<? extends PluginInitializer> initializer) {
+  public JsTestDriverBuilder withPluginInitializer(
+        Class<? extends PluginInitializer> initializer) {
     return this;
   }
 
@@ -61,7 +64,30 @@ public class JsTestDriverBuilder {
    * @return
    */
   public JsTestDriverBuilder setRunnerMode(RunnerMode mode) {
-    // TODO Auto-generated method stub
+    return this;
+  }
+
+  /**
+   * @param testTestResultsListener
+   * @return
+   */
+  public JsTestDriverBuilder addTestListener(TestResultListener testResultListener) {
+    return this;
+  }
+
+  /**
+   * @param string
+   * @return
+   */
+  public JsTestDriverBuilder setServer(String serverAddress) {
+    return null;
+  }
+
+  /**
+   * @param file
+   * @return
+   */
+  public JsTestDriverBuilder setBaseDir(File file) {
     return this;
   }
 

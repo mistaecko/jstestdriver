@@ -4,16 +4,20 @@ package com.google.jstestdriver.embedded;
 
 import com.google.inject.Module;
 import com.google.jstestdriver.BrowserInfo;
+import com.google.jstestdriver.FileResult;
 import com.google.jstestdriver.Flags;
 import com.google.jstestdriver.JsTestDriver;
+import com.google.jstestdriver.TestResult;
 import com.google.jstestdriver.config.Configuration;
 import com.google.jstestdriver.hooks.PluginInitializer;
+import com.google.jstestdriver.output.TestResultListener;
 import com.google.jstestdriver.runner.RunnerMode;
-import com.google.jstestdriver.server.ServerListener;
+import com.google.jstestdriver.hooks.ServerListener;
 
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.io.FileWriter;
 
 /**
  * @author corysmith@google.com (Your Name Here)
@@ -22,10 +26,6 @@ import java.io.File;
 public class JsTestDriverBuilderTest extends TestCase {
   private File tmpDir;
 
-  /**
-   * @author corysmith@google.com (Your Name Here)
-   *
-   */
   private final class TestServerListener implements ServerListener {
     public void serverStopped() {
       // TODO Auto-generated method stub
@@ -46,6 +46,25 @@ public class JsTestDriverBuilderTest extends TestCase {
       // TODO Auto-generated method stub
       
     }
+  }
+  
+  private static final class TestTestResultsListener implements TestResultListener {
+
+    public void onTestComplete(TestResult testResult) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void onFileLoad(String browser, FileResult fileResult) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void finish() {
+      // TODO Auto-generated method stub
+      
+    }
+    
   }
 
   @Override
@@ -73,17 +92,20 @@ public class JsTestDriverBuilderTest extends TestCase {
       .setConfiguration(configuration.getAbsolutePath())
       .setRunnerMode(RunnerMode.QUIET)
       .setPort(8080)
-      .addListener(new TestServerListener())
+      .addServerListener(new TestServerListener())
       .build();
   }
 
   public void testBuildClient() throws Exception {
     File configuration = new File(tmpDir, "config.yml");
+    FileWriter writer = new FileWriter(configuration);
+    writer.append("");
+    writer.flush();
     JsTestDriver client = new JsTestDriverBuilder()
       .setConfiguration(configuration.getAbsolutePath())
-      .setPort(8080)
+      .setServer("http://localhost:8080")
       .withPluginInitializer(TestInitializer.class)
-      .addListener(new TestServerListener())
+      .addTestListener(new TestTestResultsListener())
       .build();
   }
 }
