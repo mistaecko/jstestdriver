@@ -601,8 +601,7 @@
     </jar>
   </target>
 
-  <target name="jar-all-src-nodeps" depends="coverage-plugin-jar-nodeps, token-jar-nodeps, jar-nodeps, src-jar">
-      <antcall target="export-js" inheritrefs="true" />
+  <target name="jar-all-src-nodeps" depends="coverage-plugin-jar-nodeps, token-jar-nodeps, jar-nodeps, src-jar, export-js">
   </target>
 
   <target name="checkNoLocalChanges">
