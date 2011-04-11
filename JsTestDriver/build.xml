@@ -11,6 +11,7 @@
   <property name="obj.dir" value="${target.dir}/obj" />
   <property name="obj-debug.dir" value="${target.dir}/obj-debug" />
   <property name="obj-test.dir" value="${target.dir}/obj-test" />
+  <property name="export-js.dir" value="${target.dir}/export-js" />
   <property name="bin.dir" value="${target.dir}/bin" />
   <property name="emma.dir" value="${target.dir}/emma" />
   <property name="emma-bin.dir" value="${target.dir}/bin" />
@@ -127,6 +128,16 @@
     <copy todir="${destdir}/${javascript-resources}">
       <fileset dir="${src.dir}/${javascript-resources}">
         <include name="**/*.js" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="export-js">
+    <echo  message="Exporting Js to ${export-js.dir}" />
+    <copy  todir="${export-js.dir}">
+      <fileset  dir="${src.dir}/${javascript-resources}">
+        <include name="**/*.js" />
+        <exclude name="lib/**/*.js" />
       </fileset>
     </copy>
   </target>
@@ -591,6 +602,7 @@
   </target>
 
   <target name="jar-all-src-nodeps" depends="coverage-plugin-jar-nodeps, token-jar-nodeps, jar-nodeps, src-jar">
+      <antcall target="export-js" inheritrefs="true" />
   </target>
 
   <target name="checkNoLocalChanges">
