@@ -15,21 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import com.google.common.collect.Lists;
-import com.google.inject.Guice;
-import com.google.jstestdriver.browser.BrowserCaptureEvent;
-import com.google.jstestdriver.browser.BrowserReaper;
-import com.google.jstestdriver.model.HandlerPathPrefix;
-import com.google.jstestdriver.server.JettyModule;
-import com.google.jstestdriver.server.ServerListener;
-import com.google.jstestdriver.server.handlers.JstdHandlersModule;
-
-import org.mortbay.component.LifeCycle;
-import org.mortbay.component.LifeCycle.Listener;
-import org.mortbay.jetty.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -38,6 +23,20 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Timer;
+
+import org.mortbay.component.LifeCycle;
+import org.mortbay.component.LifeCycle.Listener;
+import org.mortbay.jetty.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.inject.Guice;
+import com.google.jstestdriver.browser.BrowserCaptureEvent;
+import com.google.jstestdriver.browser.BrowserReaper;
+import com.google.jstestdriver.hooks.ServerListener;
+import com.google.jstestdriver.model.HandlerPathPrefix;
+import com.google.jstestdriver.server.JettyModule;
+import com.google.jstestdriver.server.handlers.JstdHandlersModule;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

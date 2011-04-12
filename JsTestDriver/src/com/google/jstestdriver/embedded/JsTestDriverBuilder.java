@@ -80,7 +80,7 @@ public class JsTestDriverBuilder {
    * @return
    */
   public JsTestDriverBuilder setServer(String serverAddress) {
-    return null;
+    return this;
   }
 
   /**

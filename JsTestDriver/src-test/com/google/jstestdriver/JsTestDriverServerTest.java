@@ -15,22 +15,21 @@
  */
 package com.google.jstestdriver;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.jstestdriver.browser.BrowserIdStrategy;
-import com.google.jstestdriver.hooks.FileInfoScheme;
-import com.google.jstestdriver.model.NullPathPrefix;
-import com.google.jstestdriver.server.ServerListener;
-import com.google.jstestdriver.util.NullStopWatch;
-
-import junit.framework.TestCase;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+
+import junit.framework.TestCase;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.jstestdriver.browser.BrowserIdStrategy;
+import com.google.jstestdriver.hooks.FileInfoScheme;
+import com.google.jstestdriver.hooks.ServerListener;
+import com.google.jstestdriver.model.NullPathPrefix;
+import com.google.jstestdriver.util.NullStopWatch;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

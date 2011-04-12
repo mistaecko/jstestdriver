@@ -116,11 +116,19 @@ public class JsTestDriver {
     
   }
   
-  public TestCase runConfiguration(String path) {
+  public List<TestCase> runConfiguration(String path) {
     return null;
   }
   
-  public TestCase runConfiguration(Configuration config) {
+  public List<TestCase> runConfiguration(Configuration config) {
+    return null;
+  }
+  
+  public List<TestCase> getTestCasesFor(String path) {
+    return null;
+  }
+  
+  public List<TestCase> getTestCasesFor(Configuration conifg) {
     return null;
   }
 }
