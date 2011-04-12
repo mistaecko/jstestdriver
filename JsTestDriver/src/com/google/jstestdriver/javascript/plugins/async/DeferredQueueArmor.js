@@ -16,8 +16,8 @@
 
 
 /**
- * @fileoverview Defines the DeferredQueueArmor class. Encapsulates a DeferredQueue
- * behind a narrower interface. Also, validates arguments.
+ * @fileoverview Defines the DeferredQueueArmor class. Encapsulates a
+ * DeferredQueue behind a narrower interface. Also, validates arguments.
  *
  * @author rdionne@google.com (Robert Dionne)
  */
@@ -37,7 +37,8 @@ jstestdriver.plugins.async.DeferredQueueArmor = function() {
  * Sets the current queue instance.
  * @param {jstestdriver.plugins.async.DeferredQueue} queue The queue.
  */
-jstestdriver.plugins.async.DeferredQueueArmor.prototype.setQueue = function(queue) {
+jstestdriver.plugins.async.DeferredQueueArmor.prototype.setQueue = function(
+    queue) {
   this.q_ = queue;
 };
 
@@ -46,8 +47,10 @@ jstestdriver.plugins.async.DeferredQueueArmor.prototype.setQueue = function(queu
  * Adds a function to the queue to call later.
  * @param {string|Function} description The description or function.
  * @param {Function=} operation The function.
+ * @return {jstestdriver.plugins.async.DeferredQueueArmor} This.
  */
-jstestdriver.plugins.async.DeferredQueueArmor.prototype.call = function(description, operation) {
+jstestdriver.plugins.async.DeferredQueueArmor.prototype.call = function(
+    description, operation) {
   if (!this.q_) {
     throw new Error('Queue undefined!');
   }
@@ -70,7 +73,7 @@ jstestdriver.plugins.async.DeferredQueueArmor.prototype.call = function(descript
  * Adds a function to the queue to call later.
  * @param {string|Function} description The description or function.
  * @param {Function=} operation The function.
- * @deprecated
+ * @deprecated Use DeferredQueueArmor#call().
  */
 jstestdriver.plugins.async.DeferredQueueArmor.prototype.defer =
     jstestdriver.plugins.async.DeferredQueueArmor.prototype.call;

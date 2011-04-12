@@ -24,6 +24,18 @@
 
 /**
  * Constructs a DeferredQueue.
+ * @param {Function} setTimeout The setTimeout function.
+ * @param {Object} testCase The test case that owns this queue.
+ * @param {Function} onQueueComplete The queue complete callback.
+ * @param {jstestdriver.plugins.async.DeferredQueueArmor} armor The armor
+ *     wrapping all DeferredQueues for this test run0.
+ * @param {boolean} opt_pauseForHuman Whether or not to pause for debugging.
+ * @param {Function} opt_queueConstructor The DeferredQueue constructor.
+ * @param {Function} opt_queueArmorConstructor The DeferredQueueArmor
+ *     constructor.
+ * @param {Function} opt_poolConstructor The CallbackPool constructor.
+ * @param {Function} opt_poolArmorConstructor The CallbackPoolArmor constructor.
+ * @constructor
  */
 jstestdriver.plugins.async.DeferredQueue = function(setTimeout, testCase,
     onQueueComplete, armor, opt_pauseForHuman, opt_queueConstructor,
@@ -33,17 +45,28 @@ jstestdriver.plugins.async.DeferredQueue = function(setTimeout, testCase,
   this.onQueueComplete_ = onQueueComplete;
   this.armor_ = armor;
   this.pauseForHuman_ = !!opt_pauseForHuman;
-  this.queueConstructor_ = opt_queueConstructor || jstestdriver.plugins.async.DeferredQueue;
-  this.queueArmorConstructor_ = opt_queueArmorConstructor || jstestdriver.plugins.async.DeferredQueueArmor;
-  this.poolConstructor_ = opt_poolConstructor || jstestdriver.plugins.async.CallbackPool;
-  this.poolArmorConstructor_ = opt_poolArmorConstructor || jstestdriver.plugins.async.CallbackPoolArmor;
+  this.queueConstructor_ = opt_queueConstructor ||
+      jstestdriver.plugins.async.DeferredQueue;
+  this.queueArmorConstructor_ = opt_queueArmorConstructor ||
+      jstestdriver.plugins.async.DeferredQueueArmor;
+  this.poolConstructor_ = opt_poolConstructor ||
+      jstestdriver.plugins.async.CallbackPool;
+  this.poolArmorConstructor_ = opt_poolArmorConstructor ||
+      jstestdriver.plugins.async.CallbackPoolArmor;
   this.descriptions_ = [];
   this.operations_ = [];
   this.errors_ = [];
 };
 
 
-jstestdriver.plugins.async.DeferredQueue.prototype.execute_ = function(operation, onQueueComplete) {
+/**
+ * Executes a step of the test.
+ * @param {Function} operation The next test step.
+ * @param {Function} onQueueComplete The queue complete callback.
+ * @private
+ */
+jstestdriver.plugins.async.DeferredQueue.prototype.execute_ = function(
+    operation, onQueueComplete) {
   var queue = new (this.queueConstructor_)(this.setTimeout_,
       this.testCase_, onQueueComplete, this.armor_, this.pauseForHuman_);
   this.armor_.setQueue(queue);
@@ -67,17 +90,25 @@ jstestdriver.plugins.async.DeferredQueue.prototype.execute_ = function(operation
 };
 
 
-jstestdriver.plugins.async.DeferredQueue.prototype.defer = function(description, operation) {
+/**
+ * Enqueues a test step.
+ * @param {string} description The test step description.
+ * @param {Function} operation The test step to add to the queue.
+ */
+jstestdriver.plugins.async.DeferredQueue.prototype.defer = function(
+    description, operation) {
   this.descriptions_.push(description);
   this.operations_.push(operation);
 };
 
 
+/**
+ * Starts the next test step.
+ */
 jstestdriver.plugins.async.DeferredQueue.prototype.startStep = function() {
   var nextDescription = this.descriptions_.shift();
   var nextOp = this.operations_.shift();
   if (nextOp) {
-    //console.log('Starting step: \'' + nextDescription + '\'');
     var q = this;
     this.execute_(nextOp, function(errors) {
       q.finishStep_(errors);
@@ -88,7 +119,14 @@ jstestdriver.plugins.async.DeferredQueue.prototype.startStep = function() {
 };
 
 
-jstestdriver.plugins.async.DeferredQueue.prototype.finishStep_ = function(errors) {
+/**
+ * Finishes the current test step.
+ * @param {Array.<Error>} errors An array of any errors that occurred during the
+ *     previous test step.
+ * @private
+ */
+jstestdriver.plugins.async.DeferredQueue.prototype.finishStep_ = function(
+    errors) {
   this.errors_ = this.errors_.concat(errors);
   if (this.errors_.length) {
     this.onQueueComplete_(this.errors_);
