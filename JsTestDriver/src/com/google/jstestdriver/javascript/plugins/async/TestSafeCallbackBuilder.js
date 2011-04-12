@@ -16,10 +16,11 @@
 
 
 /**
- * @fileoverview Defines the TestSafeCallbackBuilder class, which decorates a
+ * @fileoverview Defines the TestSafeCallbackBuilder class. It decorates a
  * Javascript function with several safeguards so that it may be safely executed
- * asynchronously within a test. The safeguards include:
- * 
+ * asynchronously within a test.
+ *
+ * The safeguards include:
  *   1) notifying the test runner about any exceptions thrown when the function
  *      executes
  *   2) restricting the number of times the asynchronous system may call the
@@ -33,16 +34,19 @@
 
 /**
  * Constructs a TestSafeCallbackBuilder.
- * 
- * @param opt_setTimeout the global setTimeout function to use.
- * @param opt_clearTimeout the global clearTimeout function to use.
- * @param opt_timeoutConstructor a constructor for obtaining new the Timeouts.
+ *
+ * @param {Function} opt_setTimeout the global setTimeout function to use.
+ * @param {Function} opt_clearTimeout the global clearTimeout function to use.
+ * @param {Function} opt_timeoutConstructor a constructor for obtaining new the
+ *     Timeouts.
+ * @constructor
  */
 jstestdriver.plugins.async.TestSafeCallbackBuilder = function(
     opt_setTimeout, opt_clearTimeout, opt_timeoutConstructor) {
   this.setTimeout_ = opt_setTimeout || jstestdriver.setTimeout;
   this.clearTimeout_ = opt_clearTimeout || jstestdriver.clearTimeout;
-  this.timeoutConstructor_ = opt_timeoutConstructor || jstestdriver.plugins.async.Timeout;
+  this.timeoutConstructor_ = opt_timeoutConstructor ||
+      jstestdriver.plugins.async.Timeout;
   this.pool_ = null;
   this.remainingUses_ = null;
   this.testCase_ = null;
@@ -52,49 +56,65 @@ jstestdriver.plugins.async.TestSafeCallbackBuilder = function(
 
 /**
  * Returns the original function decorated with safeguards.
+ * @return {*} The return value of the original callback.
  */
-jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.build = function() {
-  var catchingCallback = new jstestdriver.plugins.async.CatchingCallback(this.testCase_, this.pool_, this.wrapped_);
-  var timeout = new (this.timeoutConstructor_)(this.setTimeout_, this.clearTimeout_);
+jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.build =
+    function() {
+  var catchingCallback = new jstestdriver.plugins.async.CatchingCallback(
+      this.testCase_, this.pool_, this.wrapped_);
+  var timeout = new (this.timeoutConstructor_)(
+      this.setTimeout_, this.clearTimeout_);
   var onDepleted = function() {
     timeout.maybeDisarm();
   };
-  var finiteUseCallback = new jstestdriver.plugins.async.FiniteUseCallback(catchingCallback, onDepleted, this.remainingUses_);
-  return new jstestdriver.plugins.async.ExpiringCallback(this.pool_, finiteUseCallback, timeout);
+  var finiteUseCallback = new jstestdriver.plugins.async.FiniteUseCallback(
+      catchingCallback, onDepleted, this.remainingUses_);
+  return new jstestdriver.plugins.async.ExpiringCallback(
+      this.pool_, finiteUseCallback, timeout);
 };
 
 
 /**
- * @param pool the CallbackPool to contain the callback.
+ * @param {jstestdriver.plugins.async.CallbackPool} pool the CallbackPool to
+ *     contain the callback.
+ * @return {jstestdriver.plugins.async.TestSafeCallbackBuilder} This.
  */
-jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setPool = function(pool) {
+jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setPool = function(
+    pool) {
   this.pool_ = pool;
   return this;
 };
 
 
 /**
- * @param remainingUses the remaining number of permitted calls.
+ * @param {number} remainingUses The remaining number of permitted calls.
+ * @return {jstestdriver.plugins.async.TestSafeCallbackBuilder} This.
  */
-jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setRemainingUses = function(remainingUses) {
+jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setRemainingUses =
+    function(remainingUses) {
   this.remainingUses_ = remainingUses;
   return this;
 };
 
 
 /**
- * @param testCase the test case instance available as 'this' within the functions scope.
+ * @param {Object} testCase The test case instance available as 'this' within
+ *     the function's scope.
+ * @return {jstestdriver.plugins.async.TestSafeCallbackBuilder} This.
  */
-jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setTestCase = function(testCase) {
+jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setTestCase =
+    function(testCase) {
   this.testCase_ = testCase;
   return this;
 };
 
 
 /**
- * @param wrapped the function wrapped by the above safeguards.
+ * @param {Function} wrapped The function wrapped by the above safeguards.
+ * @return {jstestdriver.plugins.async.TestSafeCallbackBuilder} This.
  */
-jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setWrapped = function(wrapped) {
+jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setWrapped =
+    function(wrapped) {
   this.wrapped_ = wrapped;
   return this;
 };

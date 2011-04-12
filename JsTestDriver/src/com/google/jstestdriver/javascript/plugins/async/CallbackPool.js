@@ -26,9 +26,13 @@
 /**
  * Constructs a CallbackPool.
  *
- * @param setTimeout the global setTimeout function.
- * @param testCase the test case instance.
- * @param onPoolComplete a function to call when the pool empties.
+ * @param {Function} setTimeout The global setTimeout function.
+ * @param {Object} testCase The test case instance.
+ * @param {Function} onPoolComplete A function to call when the pool empties.
+ * @param {boolean} opt_pauseForHuman Whether or not to pause for debugging.
+ * @param {Function} opt_callbackBuilderConstructor An optional constructor for
+ *     a callback builder.
+ * @constructor
  */
 jstestdriver.plugins.async.CallbackPool = function(setTimeout, testCase,
       onPoolComplete, opt_pauseForHuman, opt_callbackBuilderConstructor) {
@@ -73,7 +77,7 @@ jstestdriver.plugins.async.CallbackPool.prototype.activate = function() {
 
 
 /**
- * Returns the number of outstanding callbacks in the pool.
+ * @return {number} The number of outstanding callbacks in the pool.
  */
 jstestdriver.plugins.async.CallbackPool.prototype.count = function() {
   return this.count_;
@@ -82,7 +86,7 @@ jstestdriver.plugins.async.CallbackPool.prototype.count = function() {
 
 /**
  * Accepts errors to later report them to the test runner via onPoolComplete.
- * @param error the error to report
+ * @param {Error} error The error to report.
  */
 jstestdriver.plugins.async.CallbackPool.prototype.onError = function(error) {
   this.errors_.push(error);
@@ -92,11 +96,14 @@ jstestdriver.plugins.async.CallbackPool.prototype.onError = function(error) {
 /**
  * Adds a callback function to the pool, optionally more than once.
  *
- * @param wrapped the callback function to decorate with safeguards and to add
- * to the pool.
- * @param opt_n the number of permitted uses of the given callback; defaults to one.
+ * @param {Function} wrapped The callback function to decorate with safeguards
+ *     and to add to the pool.
+ * @param {number} opt_n The number of permitted uses of the given callback;
+ *     defaults to one.
+ * @return {Function} A test safe callback.
  */
-jstestdriver.plugins.async.CallbackPool.prototype.addCallback = function(wrapped, opt_n) {
+jstestdriver.plugins.async.CallbackPool.prototype.addCallback = function(
+    wrapped, opt_n) {
   this.count_ += opt_n || 1;
   var callback = new (this.callbackBuilderConstructor_)()
       .setPool(this)
@@ -116,10 +123,11 @@ jstestdriver.plugins.async.CallbackPool.prototype.addCallback = function(wrapped
 /**
  * Adds a callback function to the pool, optionally more than once.
  *
- * @param wrapped the callback function to decorate with safeguards and to add
- * to the pool.
- * @param opt_n the number of permitted uses of the given callback; defaults to one.
- * @deprecated
+ * @param {Function} wrapped The callback function to decorate with safeguards
+ *     and to add to the pool.
+ * @param {number} opt_n The number of permitted uses of the given callback;
+ *     defaults to one.
+ * @deprecated Use CallbackPool#addCallback().
  */
 jstestdriver.plugins.async.CallbackPool.prototype.add =
     jstestdriver.plugins.async.CallbackPool.prototype.addCallback;
@@ -130,7 +138,8 @@ jstestdriver.plugins.async.CallbackPool.prototype.add =
  *     that the test runner can be notified in the event of error.
  * @param {string} message A message to report to the user upon error.
  */
-jstestdriver.plugins.async.CallbackPool.prototype.addErrback = function(message) {
+jstestdriver.plugins.async.CallbackPool.prototype.addErrback = function(
+    message) {
   var pool = this;
   return function() {
     pool.onError(new Error(
@@ -145,11 +154,12 @@ jstestdriver.plugins.async.CallbackPool.prototype.addErrback = function(message)
 /**
  * Removes a callback from the pool, optionally more than one.
  *
- * @param message a message to pass to the pool for logging purposes; usually the
- * reason that the callback was removed from the pool.
- * @param opt_n the number of callbacks to remove from the pool.
+ * @param {string} message A message to pass to the pool for logging purposes;
+ *     usually the reason that the callback was removed from the pool.
+ * @param {number} opt_n The number of callbacks to remove from the pool.
  */
-jstestdriver.plugins.async.CallbackPool.prototype.remove = function(message, opt_n) {
+jstestdriver.plugins.async.CallbackPool.prototype.remove = function(
+    message, opt_n) {
   if (this.count_ > 0) {
     this.count_ -= opt_n || 1;
     this.maybeComplete();

@@ -19,7 +19,7 @@
  * @fileoverview Defines the ExpiringCallback class, which decorates a
  * Javascript function by restricting the length of time the asynchronous system
  * may delay before calling the function.
- * 
+ *
  * @author rdionne@google.com (Robert Dionne)
  */
 
@@ -27,11 +27,15 @@
 /**
  * Constructs an ExpiringCallback.
  *
- * @param pool the pool to which this callback belongs.
- * @param callback a FiniteUseCallback.
- * @param timeout a Timeout object.
+ * @param {jstestdriver.plugins.async.CallbackPool} pool The pool to which this
+ *     callback belongs.
+ * @param {jstestdriver.plugins.async.FiniteUseCallback} callback A
+ *     FiniteUseCallback.
+ * @param {jstestdriver.plugins.async.Timeout} timeout A Timeout object.
+ * @constructor
  */
-jstestdriver.plugins.async.ExpiringCallback = function(pool, callback, timeout) {
+jstestdriver.plugins.async.ExpiringCallback = function(
+    pool, callback, timeout) {
   this.pool_ = pool;
   this.callback_ = callback;
   this.timeout_ = timeout;
@@ -40,8 +44,8 @@ jstestdriver.plugins.async.ExpiringCallback = function(pool, callback, timeout) 
 
 /**
  * Arms this callback to expire after the given delay.
- * 
- * @param delay the amount of time before this callback expires.
+ *
+ * @param {number} delay The amount of time (ms) before this callback expires.
  */
 jstestdriver.plugins.async.ExpiringCallback.prototype.arm = function(delay) {
   var callback = this;
@@ -55,6 +59,7 @@ jstestdriver.plugins.async.ExpiringCallback.prototype.arm = function(delay) {
 
 /**
  * Invokes this callback.
+ * @return {*} The return value of the FiniteUseCallback.
  */
 jstestdriver.plugins.async.ExpiringCallback.prototype.invoke = function() {
   return this.callback_.invoke.apply(this.callback_, arguments);

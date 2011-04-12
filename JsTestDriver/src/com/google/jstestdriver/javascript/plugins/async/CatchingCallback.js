@@ -26,11 +26,15 @@
 /**
  * Constructs a CatchingCallback.
  *
- * @param testCase the testCase to use as 'this' when calling the wrapped function.
- * @param pool the pool to which this callback belongs.
- * @param wrapped the wrapped callback function.
+ * @param {Object} testCase the testCase to use as 'this' when calling the
+ *    wrapped function.
+ * @param {jstestdriver.plugins.async.CallbackPool} pool the pool to which this
+ *    callback belongs.
+ * @param {Function} wrapped the wrapped callback function.
+ * @constructor
  */
-jstestdriver.plugins.async.CatchingCallback = function(testCase, pool, wrapped) {
+jstestdriver.plugins.async.CatchingCallback = function(
+    testCase, pool, wrapped) {
   this.testCase_ = testCase;
   this.pool_ = pool;
   this.callback_ = wrapped;
@@ -38,8 +42,9 @@ jstestdriver.plugins.async.CatchingCallback = function(testCase, pool, wrapped) 
 
 
 /**
- * Invokes the wrapped callback, catching any exceptions and reporting the status
- * to the pool.
+ * Invokes the wrapped callback, catching any exceptions and reporting the
+ * status to the pool.
+ * @return {*} The return value of the original callback.
  */
 jstestdriver.plugins.async.CatchingCallback.prototype.invoke = function() {
   var result;

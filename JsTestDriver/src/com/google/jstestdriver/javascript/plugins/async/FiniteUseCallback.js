@@ -27,12 +27,16 @@
 /**
  * Constructs a FiniteUseCallback.
  *
- * @param callback a CatchingCallback.
- * @param onDepleted a function to execute when this FiniteUseCallback depletes.
- * @param opt_remainingUses the number of permitted uses remaining; defaults to
- * one.
+ * @param {jstestdriver.plugins.async.CatchingCallback} callback A
+ *     CatchingCallback.
+ * @param {Function} onDepleted a function to execute when this
+ *     FiniteUseCallback depletes.
+ * @param {?number} opt_remainingUses the number of permitted uses remaining;
+ *     defaults to one.
+ * @constructor
  */
-jstestdriver.plugins.async.FiniteUseCallback = function(callback, onDepleted, opt_remainingUses) {
+jstestdriver.plugins.async.FiniteUseCallback = function(
+    callback, onDepleted, opt_remainingUses) {
   this.callback_ = callback;
   this.onDepleted_ = onDepleted;
   this.remainingUses_ = opt_remainingUses || 1;
@@ -51,9 +55,10 @@ jstestdriver.plugins.async.FiniteUseCallback.prototype.deplete = function() {
 
 
 /**
- * Returns the number of remaining permitted uses.
+ * @return {number} The number of remaining permitted uses.
  */
-jstestdriver.plugins.async.FiniteUseCallback.prototype.getRemainingUses = function() {
+jstestdriver.plugins.async.FiniteUseCallback.prototype.getRemainingUses =
+    function() {
   return this.remainingUses_;
 };
 
@@ -61,8 +66,11 @@ jstestdriver.plugins.async.FiniteUseCallback.prototype.getRemainingUses = functi
 /**
  * Invokes this callback if it is usable. Calls onDepleted if invoking this
  * callback depletes its remaining permitted uses.
+ * @param {...*} var_args The original callback arguments.
+ * @return {*} The return value of the CatchingCallback or null.
  */
-jstestdriver.plugins.async.FiniteUseCallback.prototype.invoke = function(var_args) {
+jstestdriver.plugins.async.FiniteUseCallback.prototype.invoke =
+    function(var_args) {
   if (this.isUsable()) {
     try {
       this.remainingUses_ -= 1;
@@ -72,14 +80,12 @@ jstestdriver.plugins.async.FiniteUseCallback.prototype.invoke = function(var_arg
         this.onDepleted_.apply();
       }
     }
-  } /*else {
-    console.log('Warning. Attempted to call unusable callback.');
-  }*/
+  }
 };
 
 
 /**
- * Returns true if any permitted uses remain.
+ * @return {boolean} True if any permitted uses remain.
  */
 jstestdriver.plugins.async.FiniteUseCallback.prototype.isUsable = function() {
   return this.remainingUses_ > 0;

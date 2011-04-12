@@ -18,7 +18,7 @@
 /**
  * @fileoverview Defines the Timeout class.  The arm() method is equivalent to
  * window.setTimeout() and maybeDisarm() is equivalent to window.clearTimeout().
- *  
+ *
  * @author rdionne@google.com (Robert Dionne)
  */
 
@@ -27,8 +27,9 @@
  * Constructs a Timeout. Accepts alternate implementations of setTimeout and
  * clearTimeout.
  *
- * @param setTimeout the global setTimeout function to use.
- * @param clearTimeout the global clearTimeout function to use.
+ * @param {Function} setTimeout The global setTimeout function to use.
+ * @param {Function} clearTimeout The global clearTimeout function to use.
+ * @constructor
  */
 jstestdriver.plugins.async.Timeout = function(setTimeout, clearTimeout) {
   this.setTimeout_ = setTimeout;
@@ -40,8 +41,8 @@ jstestdriver.plugins.async.Timeout = function(setTimeout, clearTimeout) {
 /**
  * Arms this Timeout to fire after the specified delay.
  *
- * @param callback the callback to call after the delay passes.
- * @param delay the timeout delay in milliseconds.
+ * @param {Function} callback The callback to call after the delay passes.
+ * @param {number} delay The timeout delay in milliseconds.
  */
 jstestdriver.plugins.async.Timeout.prototype.arm = function(callback, delay) {
   var self = this;
@@ -53,6 +54,7 @@ jstestdriver.plugins.async.Timeout.prototype.arm = function(callback, delay) {
 
 /**
  * Explicitly disarms the timeout.
+ * @private
  */
 jstestdriver.plugins.async.Timeout.prototype.disarm_ = function() {
   this.clearTimeout_(this.handle_);
@@ -61,7 +63,7 @@ jstestdriver.plugins.async.Timeout.prototype.disarm_ = function() {
 
 
 /**
- * Returns true if the timeout is armed.
+ * @return {boolean} True if the timeout is armed.
  */
 jstestdriver.plugins.async.Timeout.prototype.isArmed = function() {
   return this.handle_ != null;
