@@ -854,7 +854,7 @@ arrayItem
 	;
 
 objectLiteral
-	: lb=LBRACE ( nameValuePair ( COMMA nameValuePair )* )? RBRACE
+	: lb=LBRACE ( nameValuePair ( COMMA nameValuePair )* (COMMA)? )? RBRACE
 	-> ^( OBJECT[$lb, "OBJECT"] nameValuePair* )
 	;
 	
