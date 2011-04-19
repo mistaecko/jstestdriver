@@ -19,6 +19,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.Plugin;
+import com.google.jstestdriver.browser.DocType;
+import com.google.jstestdriver.browser.DocTypeParser;
 
 import org.jvyaml.YAML;
 
@@ -37,6 +39,9 @@ import java.util.Set;
  * @author corysmith@google.com (Cory Smith)
  */
 public class YamlParser {
+
+  private DocTypeParser docTypeParser = new DocTypeParser();
+
   @SuppressWarnings("unchecked")
   public Configuration parse(Reader configReader, File defaultBasePath) {
     Map<Object, Object> data = (Map<Object, Object>) YAML.load(configReader);
@@ -45,6 +50,7 @@ public class YamlParser {
     Set<FileInfo> resolvedFilesExclude = new LinkedHashSet<FileInfo>();
 
     String server = "";
+    DocType doctype = docTypeParser.parse("quirks");
     File basePath = defaultBasePath;
     long timeOut = 0;
     List<Plugin> plugins = Lists.newLinkedList();
@@ -77,18 +83,18 @@ public class YamlParser {
         true);
       resolvedFilesLoad.addAll(resolvedServeFiles);
     }
-    
+    if (data.containsKey("doctype")) {
+      doctype = docTypeParser.parse((String) data.get("doctype"));
+    }
     if (data.containsKey("timeout")) {
       timeOut = (Long) data.get("timeout");
     }
-    
     if (data.containsKey("basepath")) {
       basePath = new File((String) data.get("basepath"));
       if (!basePath.isAbsolute()) {
         basePath = new File(defaultBasePath, basePath.getPath());
       }
     }
-
     if (data.containsKey("proxy")) {
       for (Map<String, String> value :
           (List<Map<String, String>>) data.get("proxy")) {
@@ -106,7 +112,8 @@ public class YamlParser {
                                    timeOut,
                                    basePath,
                                    Lists.newArrayList(testFiles),
-                                   proxyConfig);
+                                   proxyConfig,
+                                   doctype);
   }
 
   private List<String> createArgsList(String args) {

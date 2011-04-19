@@ -20,6 +20,7 @@ import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.Flags;
 import com.google.jstestdriver.PathResolver;
 import com.google.jstestdriver.Plugin;
+import com.google.jstestdriver.browser.DocType;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 
 import java.io.File;
@@ -88,5 +89,13 @@ public class ResolvedConfiguration implements Configuration {
 
   public JsonArray getProxyConfiguration() {
     return proxyConfig;
+  }
+
+  /* (non-Javadoc)
+   * @see com.google.jstestdriver.config.Configuration#getDocType()
+   */
+  public DocType getDocType() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

@@ -22,6 +22,7 @@ import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.Flags;
 import com.google.jstestdriver.PathResolver;
 import com.google.jstestdriver.Plugin;
+import com.google.jstestdriver.browser.DocType;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 
 import java.io.File;
@@ -43,9 +44,11 @@ public class ParsedConfiguration implements Configuration {
   private final List<FileInfo> tests;
   private final File basePath;
   private final JsonArray proxyConfig;
+  private final DocType doctype;
 
   public ParsedConfiguration(Set<FileInfo> filesList, Set<FileInfo> excludedFiles,
-      List<Plugin> plugins, String server, long testTimeout, File basePath, List<FileInfo> tests, JsonArray proxyConfig) {
+      List<Plugin> plugins, String server, long testTimeout, File basePath, List<FileInfo> tests,
+      JsonArray proxyConfig, DocType doctype) {
     this.filesList = filesList;
     this.excludedFiles = excludedFiles;
     this.plugins = plugins;
@@ -54,6 +57,7 @@ public class ParsedConfiguration implements Configuration {
     this.basePath = basePath;
     this.tests = tests;
     this.proxyConfig = proxyConfig;
+    this.doctype = doctype;
   }
 
   public Set<FileInfo> getFilesList() {
@@ -113,5 +117,9 @@ public class ParsedConfiguration implements Configuration {
 
   public JsonArray getProxyConfiguration() {
     return proxyConfig;
+  }
+
+  public DocType getDocType() {
+    return doctype;
   }
 }

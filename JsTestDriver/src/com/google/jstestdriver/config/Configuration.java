@@ -20,6 +20,7 @@ import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.Flags;
 import com.google.jstestdriver.PathResolver;
 import com.google.jstestdriver.Plugin;
+import com.google.jstestdriver.browser.DocType;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 
 import java.io.File;
@@ -59,4 +60,9 @@ public interface Configuration {
   public File getBasePath();
 
   JsonArray getProxyConfiguration();
+
+  /**
+   * Provides the expected doctype for the test environment.
+   */
+  public DocType getDocType();
 }

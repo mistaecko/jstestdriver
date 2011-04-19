@@ -15,36 +15,15 @@
  */
 package com.google.jstestdriver.config;
 
-import java.util.List;
-
-import com.google.common.base.Joiner;
-
 /**
- * Thrown when files are are unredable.
- *
+ * Represents and invalid configuration.
  * @author Cory Smith (corbinrsmith@gmail.com) 
  */
-public class UnreadableFilesException extends ConfigurationException {
+public class ConfigurationException extends RuntimeException {
 
-  private static final long serialVersionUID = 9101262574286912459L;
+  private static final long serialVersionUID = 1L;
 
-  private final List<UnreadableFile> unreadables;
-
-  /**
-   * @param unreadable
-   */
-  public UnreadableFilesException(List<UnreadableFile> unreadables) {
-    super("Unreadable Files.");
-    this.unreadables = unreadables;
-  }
-
-  @Override
-  public String getMessage() {
-    return Joiner.on("\n").join(unreadables);
-  }
-
-  @Override
-  public String toString() {
-    return Joiner.on("\n").join(unreadables);
+  public ConfigurationException(String message) {
+    super(message);
   }
 }

@@ -252,4 +252,73 @@ public class YamlParserTest extends TestCase {
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     assertEquals(0, config.getProxyConfiguration().size());
   }
+  
+  public void testParseDoctype_strict() throws Exception {
+    String configFile =
+        "doctype: strict\n"+
+        "load:\n" +
+        " - code/*.js\n" +
+        " - test/*.js\n" +
+        "exclude:\n" +
+        " - code/code2.js\n" +
+        " - test/test2.js";
+    ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
+    YamlParser parser = new YamlParser();
+
+    Configuration config = parser.parse(new InputStreamReader(bais), null);
+    assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">",
+      config.getDocType().toHtml());
+  }
+
+  public void testParseDoctype_quirks() throws Exception {
+    String configFile =
+      "doctype: quirks\n"+
+      "load:\n" +
+      " - code/*.js\n" +
+      " - test/*.js\n" +
+      "exclude:\n" +
+      " - code/code2.js\n" +
+      " - test/test2.js";
+    ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
+    YamlParser parser = new YamlParser();
+    
+    Configuration config = parser.parse(new InputStreamReader(bais), null);
+    assertEquals("<!DOCTYPE html PUBLIC>", config.getDocType().toHtml());
+  }
+
+  public void testParseDoctype_unknown() throws Exception {
+    String configFile =
+      "doctype: keriks\n"+
+      "load:\n" +
+      " - code/*.js\n" +
+      " - test/*.js\n" +
+      "exclude:\n" +
+      " - code/code2.js\n" +
+      " - test/test2.js";
+    ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
+    YamlParser parser = new YamlParser();
+
+    try {
+      parser.parse(new InputStreamReader(bais), null);
+      fail("expected configuration exception");
+    } catch (ConfigurationException e) {
+      
+    }
+  }
+
+  public void testParseDoctype_custom() throws Exception {
+    String configFile =
+      "doctype: <!DOCTYPE zubzub>\n"+
+      "load:\n" +
+      " - code/*.js\n" +
+      " - test/*.js\n" +
+      "exclude:\n" +
+      " - code/code2.js\n" +
+      " - test/test2.js";
+    ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
+    YamlParser parser = new YamlParser();
+
+    Configuration config = parser.parse(new InputStreamReader(bais), null);
+    assertEquals("<!DOCTYPE zubzub>", config.getDocType().toHtml());
+  }
 }
