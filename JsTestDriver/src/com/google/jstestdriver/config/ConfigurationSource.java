@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 public interface ConfigurationSource {
 
   /**
-   * @return The parent direcotry of the configuration, used as the default base path.
+   * @return The parent directory of the configuration, used as the default base path.
    */
   File getParentFile();
 
