@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpServletResponse;
@@ -37,7 +36,6 @@ import com.google.inject.Inject;
 import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.FileResult;
 import com.google.jstestdriver.FileSource;
-import com.google.jstestdriver.FileUploader;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.JsonCommand;
 import com.google.jstestdriver.LoadedFiles;

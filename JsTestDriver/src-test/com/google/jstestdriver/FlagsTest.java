@@ -20,10 +20,9 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.kohsuke.args4j.CmdLineException;
-
 import com.google.jstestdriver.browser.BrowserRunner;
 import com.google.jstestdriver.browser.CommandLineBrowserRunner;
+import com.google.jstestdriver.config.InvalidFlagException;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -32,7 +31,7 @@ public class FlagsTest extends TestCase {
 
   public void testFlagsAreSet() throws Exception {
     Flags flags;
-    FlagsParser parser = new Args4jFlagsParser(null);
+    FlagsParser parser = new Args4jFlagsParser();
 
     try {
       flags = parser.parseArgument(new String[] { "--port", "1234", "--server", "http://localhost:1234" });
@@ -61,14 +60,14 @@ public class FlagsTest extends TestCase {
       assertNotNull(tests);
       assertEquals(1, tests.size());
       assertEquals("testCase.testName", tests.get(0));
-    } catch (CmdLineException e) {
+    } catch (InvalidFlagException e) {
       fail("Unexpected exception thrown: " + e);
     }
   }
 
   public void testDefaultFlagsAreSet() throws Exception {
     Flags flags;
-    FlagsParser parser = new Args4jFlagsParser(null);
+    FlagsParser parser = new Args4jFlagsParser();
 
     try {
       flags = parser.parseArgument(new String[]{"--browser", "foo"});
@@ -80,7 +79,7 @@ public class FlagsTest extends TestCase {
       assertNotNull(flags.getBrowser());
       assertFalse(flags.getReset());
       assertNotNull(flags.getTests());
-    } catch (CmdLineException e) {
+    } catch (InvalidFlagException    e) {
       fail("Unexpected exception thrown: " + e);
     }
   }

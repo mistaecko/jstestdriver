@@ -27,7 +27,7 @@ import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 
-import com.google.jstestdriver.config.CmdFlags;
+import com.google.jstestdriver.config.InvalidFlagException;
 
 /**
  * Parsers the Flags from args.
@@ -35,8 +35,6 @@ import com.google.jstestdriver.config.CmdFlags;
  *
  */
 public class Args4jFlagsParser implements FlagsParser {
-
-  private final CmdFlags cmdLineFlags;
 
   public static class StringListOptionHandler extends OptionHandler<List<String>> {
   
@@ -85,17 +83,10 @@ public class Args4jFlagsParser implements FlagsParser {
         throw new CmdLineException(e);
       }
     }
-
   }
 
-  /**
-   * @param cmdLineFlags The additional flags not handled by the Args4jFlagsParser.
-   */
-  public Args4jFlagsParser(CmdFlags cmdLineFlags) {
-    this.cmdLineFlags = cmdLineFlags;
-  }
 
-  public Flags parseArgument(String[] strings) throws CmdLineException {
+  public Flags parseArgument(String[] strings) {
     FlagsImpl flags = new FlagsImpl();
     CmdLineParser.registerHandler(List.class, StringListOptionHandler.class);
     CmdLineParser.registerHandler(Long.class, LongOptionHandler.class);
@@ -105,13 +96,12 @@ public class Args4jFlagsParser implements FlagsParser {
     } catch (CmdLineException e) {
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
       cmdLineParser.printUsage(stream);
-      throw new CmdLineException(e.getMessage() + "\n" + stream.toString());
+      throw new InvalidFlagException(e.getMessage(), stream.toString());
     }
     if (strings.length == 0 || flags.getDisplayHelp()) {
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
       cmdLineParser.printUsage(stream);
-      cmdLineFlags.printUsage(stream);
-      throw new CmdLineException(stream.toString());
+      throw new InvalidFlagException("", stream.toString());
     }
     return flags;
   }

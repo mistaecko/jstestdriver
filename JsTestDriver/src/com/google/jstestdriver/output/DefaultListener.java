@@ -19,7 +19,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.jstestdriver.FileResult;
-import com.google.jstestdriver.FileUploader;
 import com.google.jstestdriver.TestResult;
 import com.google.jstestdriver.TestRunResult;
 

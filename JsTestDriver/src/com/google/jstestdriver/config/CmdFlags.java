@@ -1,8 +1,8 @@
 package com.google.jstestdriver.config;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -110,12 +110,12 @@ public class CmdFlags {
     }
     return args.toArray(new String[args.size()]);
   }
-  
-  public void printUsage(ByteArrayOutputStream stream) {
+
+  public static void printUsage(PrintStream out) {
     for (CmdLineFlagMetaData meta : PREPARSE_FLAGS.values()) {
       try {
-        meta.printUsage(stream);
-        stream.write('\n');
+        meta.printUsage(out);
+        out.write('\n');
       } catch (IOException e) {
         e.printStackTrace();
       }

@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.List;
 import java.util.logging.LogManager;
 
-import org.kohsuke.args4j.CmdLineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +33,7 @@ import com.google.jstestdriver.config.CmdLineFlagsFactory;
 import com.google.jstestdriver.config.Configuration;
 import com.google.jstestdriver.config.InitializeModule;
 import com.google.jstestdriver.config.Initializer;
+import com.google.jstestdriver.config.InvalidFlagException;
 import com.google.jstestdriver.config.UnreadableFilesException;
 import com.google.jstestdriver.config.YamlParser;
 import com.google.jstestdriver.guice.TestResultPrintingModule.TestResultPrintingInitializer;
@@ -68,7 +68,7 @@ public class JsTestDriver {
       initializeModules.add(
           new InitializeModule(pluginLoader,
           basePath,
-          new Args4jFlagsParser(cmdLineFlags),
+          new Args4jFlagsParser(),
           cmdLineFlags.getRunnerMode()));
       initializeModules.add(new Module() {
         public void configure(Binder binder) {
@@ -86,8 +86,9 @@ public class JsTestDriver {
       Injector injector = Guice.createInjector(actionRunnerModules);
       injector.getInstance(ActionRunner.class).runActions();
       logger.info("Finished action run.");
-    } catch (CmdLineException e) {
-      System.out.println(e.getMessage());
+    } catch (InvalidFlagException e) {
+      e.printErrorMessages(System.out);
+      CmdFlags.printUsage(System.out);
       System.exit(1);
     } catch (UnreadableFilesException e) {
       System.out.println("Configuration Error: \n" + e.getMessage());

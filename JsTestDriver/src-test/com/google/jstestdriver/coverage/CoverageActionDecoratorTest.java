@@ -15,7 +15,6 @@
  */
 package com.google.jstestdriver.coverage;
 
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;

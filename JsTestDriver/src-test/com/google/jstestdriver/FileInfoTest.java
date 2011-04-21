@@ -17,8 +17,6 @@ package com.google.jstestdriver;
 
 import junit.framework.TestCase;
 
-import java.io.File;
-
 /**
  * @author andrewtrenk
  */

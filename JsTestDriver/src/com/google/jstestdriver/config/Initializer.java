@@ -16,6 +16,12 @@
 
 package com.google.jstestdriver.config;
 
+import java.io.File;
+import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Module;
@@ -30,14 +36,6 @@ import com.google.jstestdriver.guice.DebugModule;
 import com.google.jstestdriver.hooks.PluginInitializer;
 import com.google.jstestdriver.html.HtmlDocModule;
 import com.google.jstestdriver.runner.RunnerMode;
-
-import org.kohsuke.args4j.CmdLineException;
-
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Handles the creation the list of modules necessary to create an ActionRunner.
@@ -71,7 +69,7 @@ public class Initializer {
   public List<Module> initialize(List<Module> pluginModules,
       Configuration configuration,
       RunnerMode runnerMode,
-      String[] args) throws CmdLineException {
+      String[] args) {
 
     // TODO(corysmith): Figure out how to allow custom plugin flags
     // Might delegate to the flag parser to remove them, before creating Flags
