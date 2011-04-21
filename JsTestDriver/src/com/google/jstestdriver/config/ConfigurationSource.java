@@ -37,7 +37,7 @@ public interface ConfigurationSource {
    * @return The parsed configuration object.
    * @throws FileNotFoundException If the configuration file does not exist.
    */
-  Configuration parse(File basePath, YamlParser configParser) throws FileNotFoundException;
+  Configuration parse(File basePath, ConfigurationParser configParser) throws FileNotFoundException;
 
   /** Returns the name of the current configuration. */
   String getName();

@@ -36,7 +36,7 @@ public class DefaultConfigurationSource implements ConfigurationSource {
   }
 
   /** {@inheritDoc} */
-  public Configuration parse(File basePath, YamlParser configParser) {
+  public Configuration parse(File basePath, ConfigurationParser configParser) {
     File configFile = new File(Flags.DEFAULT_CONFIG_NAME).getAbsoluteFile();
     if (!configFile.exists()) {
       return new DefaultConfiguration(basePath);

@@ -42,7 +42,7 @@ public class YamlParserTest extends TestCase {
     String configFile = "load:\n - code/*.js\n - test/*.js\nexclude:\n"
       + " - code/code2.js\n - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     Set<FileInfo> files = config.getFilesList();
@@ -65,7 +65,7 @@ public class YamlParserTest extends TestCase {
       "- code/code2.js\n" +
       "- test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse( new InputStreamReader(bais), null);
     Set<FileInfo> files = config.getFilesList();
@@ -84,7 +84,7 @@ public class YamlParserTest extends TestCase {
     String configFile = "plugin:\n" + "  - name: test\n"
       + "    jar: \"pathtojar\"\n" + "    module: \"com.test.PluginModule\"\n";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     List<Plugin> plugins = config.getPlugins();
@@ -103,7 +103,7 @@ public class YamlParserTest extends TestCase {
       + "    module: \"com.test.PluginModule2\"\n"
       + "    args: hello, world, some/file.js\n";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     List<Plugin> plugins = config.getPlugins();
@@ -119,7 +119,7 @@ public class YamlParserTest extends TestCase {
       + "    jar: \"pathtojar\"\n" + "    module: \"com.test.PluginModule\"\n"
       + "    args: hello, mooh, some/file.js, another/file.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     List<Plugin> plugins = config.getPlugins();
@@ -137,7 +137,7 @@ public class YamlParserTest extends TestCase {
     String configFile = "plugin:\n" + "  - name: test\n"
       + "    jar: \"pathtojar\"\n" + "    module: \"com.test.PluginModule\"\n";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     List<Plugin> plugins = config.getPlugins();
@@ -152,7 +152,7 @@ public class YamlParserTest extends TestCase {
       + "serve:\n" + " - serve/serve1.js\n" + "exclude:\n"
       + " - code/code2.js\n" + " - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     Set<FileInfo> serveFilesSet = config.getFilesList();
@@ -177,7 +177,7 @@ public class YamlParserTest extends TestCase {
         + " - code/code2.js\n"
         + " - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
     
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     Set<FileInfo> serveFilesSet = config.getFilesList();
@@ -204,7 +204,7 @@ public class YamlParserTest extends TestCase {
       + " - code/code2.js\n"
       + " - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
     
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     Set<FileInfo> serveFilesSet = config.getFilesList();
@@ -226,7 +226,7 @@ public class YamlParserTest extends TestCase {
       + " - {matcher: /asdf*, server: \"http://www.google.com\"}\n"
       + " - {matcher: /two, server: \"http://docs.google.com\"}\n";
     ByteArrayInputStream bias = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bias), null);
     JsonArray proxyConfig = config.getProxyConfiguration();
@@ -247,7 +247,7 @@ public class YamlParserTest extends TestCase {
     String configFile = "load:\n - code/*.js\n - test/*.js\nexclude:\n"
       + " - code/code2.js\n - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     assertEquals(0, config.getProxyConfiguration().size());
@@ -263,7 +263,7 @@ public class YamlParserTest extends TestCase {
         " - code/code2.js\n" +
         " - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">",
@@ -280,7 +280,7 @@ public class YamlParserTest extends TestCase {
       " - code/code2.js\n" +
       " - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
     
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     assertEquals("<!DOCTYPE html PUBLIC>", config.getDocType().toHtml());
@@ -296,7 +296,7 @@ public class YamlParserTest extends TestCase {
       " - code/code2.js\n" +
       " - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     try {
       parser.parse(new InputStreamReader(bais), null);
@@ -316,7 +316,7 @@ public class YamlParserTest extends TestCase {
       " - code/code2.js\n" +
       " - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
-    YamlParser parser = new YamlParser();
+    ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
     assertEquals("<!DOCTYPE zubzub>", config.getDocType().toHtml());

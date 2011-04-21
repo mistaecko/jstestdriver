@@ -38,7 +38,7 @@ import java.util.Set;
  * 
  * @author corysmith@google.com (Cory Smith)
  */
-public class YamlParser {
+public class YamlParser implements ConfigurationParser {
 
   private DocTypeParser docTypeParser = new DocTypeParser();
 

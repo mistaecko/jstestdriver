@@ -43,7 +43,7 @@ public class UserConfigurationSource implements ConfigurationSource {
   }
 
   /** {@inheritDoc} */
-  public Configuration parse(File basePath, YamlParser configParser) throws FileNotFoundException {
+  public Configuration parse(File basePath, ConfigurationParser configParser) throws FileNotFoundException {
     return configParser.parse(
         new InputStreamReader(new FileInputStream(configurationFile), Charset.defaultCharset()),
         basePath);
