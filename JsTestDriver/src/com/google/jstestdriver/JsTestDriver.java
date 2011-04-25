@@ -15,7 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.io.File;
 import java.util.List;
 import java.util.logging.LogManager;
 
@@ -23,29 +22,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.google.inject.Binder;
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.multibindings.Multibinder;
 import com.google.jstestdriver.config.CmdFlags;
 import com.google.jstestdriver.config.CmdLineFlagsFactory;
 import com.google.jstestdriver.config.Configuration;
-import com.google.jstestdriver.config.InitializeModule;
-import com.google.jstestdriver.config.Initializer;
 import com.google.jstestdriver.config.InvalidFlagException;
 import com.google.jstestdriver.config.UnreadableFilesException;
-import com.google.jstestdriver.config.YamlParser;
+import com.google.jstestdriver.embedded.JsTestDriverBuilder;
 import com.google.jstestdriver.guice.TestResultPrintingModule.TestResultPrintingInitializer;
-import com.google.jstestdriver.hooks.PluginInitializer;
 import com.google.jstestdriver.util.RetryException;
 
 public class JsTestDriver {
 
   private static final Logger logger = LoggerFactory.getLogger(JsTestDriver.class);
+  private final Injector injector;
+
+  /**
+   * @param injector
+   */
+  public JsTestDriver(Injector injector) {
+    // TODO(corysmith): Stop passing the injector around! This is a temporary step
+    // in refactoring the action based system to be controlled by the JsTestDriver
+    // interface.
+    this.injector = injector;
+  }
 
   public static void main(String[] args) {
     try {
+      
       // pre-parse parsing... These are the flags
       // that must be dealt with before we parse the flags.
       CmdFlags cmdLineFlags = new CmdLineFlagsFactory().create(args);
@@ -54,6 +59,7 @@ public class JsTestDriver {
       // configure logging before we start seriously processing.
       LogManager.getLogManager().readConfiguration(cmdLineFlags.getRunnerMode().getLogConfig());
 
+
       final PluginLoader pluginLoader = new PluginLoader();
 
       // load all the command line plugins.
@@ -61,30 +67,16 @@ public class JsTestDriver {
       logger.debug("loaded plugins %s", pluginModules);
       List<Module> initializeModules = Lists.newLinkedList(pluginModules);
 
-      Configuration configuration =
-          cmdLineFlags.getConfigurationSource().parse(cmdLineFlags.getBasePath(), new YamlParser());
+      JsTestDriverBuilder builder = new JsTestDriverBuilder();
+      builder.setBaseDir(cmdLineFlags.getBasePath().getCanonicalFile());
+      builder.setConfigurationSource(cmdLineFlags.getConfigurationSource());
+      builder.addPluginModules(pluginModules);
+      builder.withPluginInitializer(TestResultPrintingInitializer.class);
+      builder.setRunnerMode(cmdLineFlags.getRunnerMode());
+      builder.setCmdLineFlags(cmdLineFlags);
+      JsTestDriver jstd = builder.build();
+      jstd.runConfiguration();
 
-      File basePath = configuration.getBasePath().getCanonicalFile();
-      initializeModules.add(
-          new InitializeModule(pluginLoader,
-          basePath,
-          new Args4jFlagsParser(),
-          cmdLineFlags.getRunnerMode()));
-      initializeModules.add(new Module() {
-        public void configure(Binder binder) {
-          Multibinder.newSetBinder(binder, PluginInitializer.class).addBinding()
-              .to(TestResultPrintingInitializer.class);
-        }
-      });
-      Injector initializeInjector = Guice.createInjector(initializeModules);
-
-      final List<Module> actionRunnerModules =
-          initializeInjector.getInstance(Initializer.class)
-              .initialize(pluginModules, configuration, cmdLineFlags.getRunnerMode(),
-                  cmdLineFlags.getUnusedFlagsAsArgs());
-
-      Injector injector = Guice.createInjector(actionRunnerModules);
-      injector.getInstance(ActionRunner.class).runActions();
       logger.info("Finished action run.");
     } catch (InvalidFlagException e) {
       e.printErrorMessages(System.out);
@@ -110,11 +102,20 @@ public class JsTestDriver {
   }
   
   public void startServer() {
-    
+    injector.getInstance(ServerStartupAction.class).run(null);
   }
 
   public void stopServer() {
-    
+    injector.getInstance(ServerShutdownAction.class).run(null);
+  }
+  
+  /**
+   * Runs the built in confiugration.
+   * @return
+   */
+  public List<TestCase> runConfiguration() {
+    injector.getInstance(ActionRunner.class).runActions();
+    return null;
   }
   
   public List<TestCase> runConfiguration(String path) {

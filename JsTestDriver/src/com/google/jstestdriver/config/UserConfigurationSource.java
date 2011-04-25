@@ -43,10 +43,15 @@ public class UserConfigurationSource implements ConfigurationSource {
   }
 
   /** {@inheritDoc} */
-  public Configuration parse(File basePath, ConfigurationParser configParser) throws FileNotFoundException {
-    return configParser.parse(
-        new InputStreamReader(new FileInputStream(configurationFile), Charset.defaultCharset()),
-        basePath);
+
+  public Configuration parse(File basePath, ConfigurationParser configParser) throws ConfigurationException {
+    try {
+      return configParser.parse(
+          new InputStreamReader(new FileInputStream(configurationFile), Charset.defaultCharset()),
+          basePath);
+    } catch (FileNotFoundException e) {
+      throw new ConfigurationException("Unable to read configuration file.", e);
+    }
   }
 
   /** {@inheritDoc} */

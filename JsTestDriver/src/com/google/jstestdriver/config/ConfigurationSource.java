@@ -16,28 +16,30 @@
 package com.google.jstestdriver.config;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
  * The source of the configuration.
- *
- * @author Cory Smith (corbinrsmith@gmail.com) 
+ * 
+ * @author Cory Smith (corbinrsmith@gmail.com)
  */
 public interface ConfigurationSource {
 
   /**
-   * @return The parent directory of the configuration, used as the default base path.
+   * @return The parent directory of the configuration, used as the default base
+   *         path.
    */
   File getParentFile();
 
   /**
    * Parses the Configuration from the source.
+   * 
    * @param basePath The base path for all the test resources.
    * @param configParser the parser of the configuration.
    * @return The parsed configuration object.
-   * @throws FileNotFoundException If the configuration file does not exist.
+   * @throws ConfigurationException If the configuration file does not exist.
    */
-  Configuration parse(File basePath, ConfigurationParser configParser) throws FileNotFoundException;
+  Configuration parse(File basePath, ConfigurationParser configParser)
+      throws ConfigurationException;
 
   /** Returns the name of the current configuration. */
   String getName();
