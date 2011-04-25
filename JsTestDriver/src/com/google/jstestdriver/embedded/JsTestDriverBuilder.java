@@ -6,19 +6,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.kohsuke.args4j.CmdLineException;
-
+import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.internal.Lists;
+import com.google.inject.multibindings.Multibinder;
 import com.google.jstestdriver.ActionRunner;
 import com.google.jstestdriver.Args4jFlagsParser;
 import com.google.jstestdriver.JsTestDriver;
 import com.google.jstestdriver.PluginLoader;
 import com.google.jstestdriver.config.CmdFlags;
 import com.google.jstestdriver.config.Configuration;
-import com.google.jstestdriver.config.ConfigurationException;
 import com.google.jstestdriver.config.ConfigurationSource;
 import com.google.jstestdriver.config.InitializeModule;
 import com.google.jstestdriver.config.Initializer;
@@ -30,20 +29,22 @@ import com.google.jstestdriver.output.TestResultListener;
 import com.google.jstestdriver.runner.RunnerMode;
 
 /**
- * @author corysmith@google.com (Your Name Here)
+ * @author corbinrsmith@gmail.com (Cory Smith)
  *
  */
 public class JsTestDriverBuilder {
 
   private File baseDir;
-  private List<Module> pluginModules;
+  private List<Module> pluginModules = Lists.newArrayList();
   private CmdFlags cmdLineFlags;
   private Configuration configuration;
   private final PluginLoader pluginLoader = new PluginLoader();
   private int port;
   private List<ServerListener> serverListeners = Lists.newArrayList();
   private List<TestResultListener> testListeners = Lists.newArrayList();
-  private RunnerMode runnerMode;
+  private RunnerMode runnerMode = RunnerMode.QUIET;
+  private String serverAddress;
+  final private List<Class<? extends PluginInitializer>> initializers =  Lists.newArrayList();
 
   /**
    * @param absolutePath
@@ -69,7 +70,6 @@ public class JsTestDriverBuilder {
    */
   public JsTestDriverBuilder setPort(int port) {
     this.port = port;
-    // TODO Auto-generated method stub
     return this;
   }
 
@@ -96,6 +96,15 @@ public class JsTestDriverBuilder {
               basePath,
               new Args4jFlagsParser(),
               runnerMode));
+      initializeModules.add(new Module() {
+        public void configure(Binder binder) {
+          Multibinder<PluginInitializer> setBinder=
+              Multibinder.newSetBinder(binder, PluginInitializer.class);
+          for (Class<? extends PluginInitializer> initializer : initializers) {
+            setBinder.addBinding().to(initializer);
+          }
+        }
+      });
       Injector initializeInjector = Guice.createInjector(initializeModules);
 
       List<Module> actionRunnerModules;
@@ -103,10 +112,9 @@ public class JsTestDriverBuilder {
           initializeInjector.getInstance(Initializer.class).initialize(pluginModules,
               configuration, cmdLineFlags.getRunnerMode(), cmdLineFlags.getUnusedFlagsAsArgs());
       Injector injector = Guice.createInjector(actionRunnerModules);
-      injector.getInstance(ActionRunner.class).runActions();
       return new JsTestDriver(injector);
     } catch (IOException e) {
-      throw new ConfigurationException("failure during build", e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -116,6 +124,7 @@ public class JsTestDriverBuilder {
    */
   public JsTestDriverBuilder withPluginInitializer(
         Class<? extends PluginInitializer> initializer) {
+    initializers.add(initializer);
     return this;
   }
 
@@ -142,6 +151,7 @@ public class JsTestDriverBuilder {
    * @return
    */
   public JsTestDriverBuilder setServer(String serverAddress) {
+    this.serverAddress = serverAddress;
     return this;
   }
 
