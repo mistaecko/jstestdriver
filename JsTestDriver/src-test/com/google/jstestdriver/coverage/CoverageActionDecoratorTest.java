@@ -22,8 +22,6 @@ import junit.framework.TestCase;
 import com.google.common.collect.Lists;
 import com.google.jstestdriver.Action;
 import com.google.jstestdriver.ServerStartupAction;
-import com.google.jstestdriver.SlaveBrowser;
-import com.google.jstestdriver.model.NullPathPrefix;
 
 /**
  * @author corysmith@google.com (Cory Smith)
@@ -32,8 +30,8 @@ public class CoverageActionDecoratorTest extends TestCase {
   public void testDecorate() throws Exception {
     CoverageReporterAction reporter = new CoverageReporterAction(null, null, null);
     List<Action> actions =
-        Lists.<Action>newArrayList(new ServerStartupAction(0, null, null,
-            SlaveBrowser.TIMEOUT, false, null, new NullPathPrefix()));
+        Lists.<Action>newArrayList(new ServerStartupAction(0, null, false,
+            null, null));
     List<Action> actual = new CoverageActionDecorator(reporter).process(actions);
     assertEquals(2, actual.size());
     assertTrue(actual.get(0) instanceof ServerStartupAction);

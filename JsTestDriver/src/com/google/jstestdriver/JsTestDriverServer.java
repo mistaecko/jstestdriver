@@ -16,12 +16,19 @@
 
 package com.google.jstestdriver;
 
+
+
 public interface JsTestDriverServer {
+  
+  public interface Factory {
+    JsTestDriverServer create(int port,
+                              FilesCache preloadedFilesCache);
+  }
 
   void start();
 
   void stop();
-  
+
   /**
    * Gets /hello to see if the server is active.
    */

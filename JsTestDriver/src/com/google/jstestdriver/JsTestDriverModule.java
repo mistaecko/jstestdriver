@@ -38,6 +38,7 @@ import com.google.jstestdriver.browser.BrowserRunner;
 import com.google.jstestdriver.config.DefaultConfiguration;
 import com.google.jstestdriver.guice.BrowserActionProvider;
 import com.google.jstestdriver.guice.FlagsModule;
+import com.google.jstestdriver.hooks.ServerListener;
 
 /**
  * Guice module for configuring JsTestDriver.
@@ -134,9 +135,16 @@ public class JsTestDriverModule extends AbstractModule {
     bind(Integer.class).annotatedWith(BrowserCount.class).
         toProvider(BrowserCountProvider.class).in(Singleton.class);
     bind(JsonArray.class).annotatedWith(Names.named("proxy")).toInstance(proxyConfig);
+
+    Multibinder.newSetBinder(binder(), ServerListener.class);
+
     bind(ConfigureProxyAction.Factory.class).toProvider(
         FactoryProvider.newFactory(ConfigureProxyAction.Factory.class,
             ConfigureProxyAction.class));
+
+    bind(JsTestDriverServer.Factory.class).toProvider(
+      FactoryProvider.newFactory(JsTestDriverServer.Factory.class,
+        JsTestDriverServerImpl.class));
   }
 
   /**

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import junit.framework.TestCase;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
@@ -42,11 +42,11 @@ public class JsTestDriverServerTest extends TestCase {
 
   private JsTestDriverServerImpl createServer(ServerListener listener) {
     server = new JsTestDriverServerImpl(4224,
-        browsers,
         new FilesCache(new HashMap<String, FileInfo>()),
+        browsers,
         SlaveBrowser.TIMEOUT,
         new NullPathPrefix(),
-        Lists.newArrayList(listener));
+        Sets.newHashSet(listener));
     return server;
   }
 

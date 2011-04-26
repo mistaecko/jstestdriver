@@ -29,10 +29,14 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryProvider;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import com.google.jstestdriver.action.ConfigureProxyAction;
 import com.google.jstestdriver.config.DefaultConfiguration;
 import com.google.jstestdriver.guice.BrowserActionProvider;
 import com.google.jstestdriver.guice.FlagsModule;
+import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.html.HtmlDocModule;
 
 /**
@@ -161,6 +165,12 @@ public class IDEPluginActionBuilder {
           .toInstance(DefaultConfiguration.DEFAULT_TEST_TIMEOUT);
 
       bind(Time.class).to(TimeImpl.class);
+      
+      Multibinder.newSetBinder(binder(), ServerListener.class);
+
+      bind(JsTestDriverServer.Factory.class).toProvider(
+        FactoryProvider.newFactory(JsTestDriverServer.Factory.class,
+          JsTestDriverServerImpl.class));
 
       for (Module module : modules) {
         install(module);

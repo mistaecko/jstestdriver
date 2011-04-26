@@ -15,7 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observer;
@@ -23,8 +22,9 @@ import java.util.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
+import com.google.jstestdriver.JsTestDriverServer.Factory;
 import com.google.jstestdriver.hooks.ServerListener;
-import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.model.RunData;
 
@@ -34,14 +34,12 @@ import com.google.jstestdriver.model.RunData;
 public class ServerStartupAction implements ObservableAction {
   private static final Logger logger = LoggerFactory.getLogger(ServerStartupAction.class);
   private final int port;
-  private final CapturedBrowsers capturedBrowsers;
   private final FilesCache preloadedFilesCache;
-  private JsTestDriverServerImpl server;
+  private JsTestDriverServer server;
   private List<Observer> observerList = new LinkedList<Observer>();
-  private final long browserTimeout;
   private final boolean preloadFiles;
   private final FileLoader fileLoader;
-  private final HandlerPathPrefix handlerPrefix;
+  private final Factory serverFactory;
 
   /**
    * Exists for backwards compatibility.
@@ -50,24 +48,21 @@ public class ServerStartupAction implements ObservableAction {
   @Deprecated
   public ServerStartupAction(int port, CapturedBrowsers capturedBrowsers,
       FilesCache preloadedFilesCache, URLTranslator urlTranslator, URLRewriter urlRewriter) {
-    this(port, capturedBrowsers, preloadedFilesCache, SlaveBrowser.TIMEOUT, false, null, new NullPathPrefix());
+    this(port, preloadedFilesCache, false, null, new DefaultServerFactory(capturedBrowsers,
+        SlaveBrowser.TIMEOUT, new NullPathPrefix()));
   }
 
   public ServerStartupAction(
       int port,
-      CapturedBrowsers capturedBrowsers,
       FilesCache preloadedFilesCache,
-      long browserTimeout,
       boolean preloadFiles,
       FileLoader fileLoader,
-      HandlerPathPrefix handlerPrefix) {
+      Factory serverFactory) {
     this.port = port;
-    this.capturedBrowsers = capturedBrowsers;
     this.preloadedFilesCache = preloadedFilesCache;
-    this.browserTimeout = browserTimeout;
     this.preloadFiles = preloadFiles;
     this.fileLoader = fileLoader;
-    this.handlerPrefix = handlerPrefix;
+    this.serverFactory = serverFactory;
   }
 
   public JsTestDriverServer getServer() {
@@ -84,16 +79,10 @@ public class ServerStartupAction implements ObservableAction {
       }
     }
 
-    server = new JsTestDriverServerImpl(
-        port,
-        capturedBrowsers,
-        preloadedFilesCache,
-        browserTimeout,
-        handlerPrefix, Collections.<ServerListener>emptyList());
+    server = serverFactory.create(port, preloadedFilesCache);
 
     if (!observerList.isEmpty()) {
-      throw new RuntimeException("Observers not supported during the transition to listners.");
-      
+      throw new RuntimeException("Observers not supported during the transition to listeners.");
     }
     try {
       server.start();
@@ -117,6 +106,25 @@ public class ServerStartupAction implements ObservableAction {
 
   public void addObservers(List<Observer> observers) {
     observerList.addAll(observers);
+  }
+
+  private static final class DefaultServerFactory implements JsTestDriverServer.Factory {
+    private final CapturedBrowsers capturedBrowsers;
+    private final long timeout;
+    private final NullPathPrefix nullPathPrefix;
+
+
+    public DefaultServerFactory(CapturedBrowsers capturedBrowsers, long timeout,
+        NullPathPrefix nullPathPrefix) {
+      this.capturedBrowsers = capturedBrowsers;
+      this.timeout = timeout;
+      this.nullPathPrefix = nullPathPrefix;
+    }
+
+    public JsTestDriverServer create(int port, FilesCache preloadedFilesCache) {
+      return new JsTestDriverServerImpl(port, preloadedFilesCache, capturedBrowsers, timeout,
+          nullPathPrefix, Sets.<ServerListener>newHashSet());
+    }
   }
 
   public static class ServerStartupException extends RuntimeException {

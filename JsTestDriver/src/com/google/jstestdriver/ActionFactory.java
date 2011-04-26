@@ -26,6 +26,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.google.jstestdriver.JsTestDriverServer.Factory;
 import com.google.jstestdriver.hooks.TestsPreProcessor;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 
@@ -45,6 +46,7 @@ public class ActionFactory {
   private final boolean preloadFiles;
   private final FileLoader fileLoader;
   private final HandlerPathPrefix serverHandlerPrefix;
+  private final Factory serverFactory;
 
   @Inject
   public ActionFactory(Provider<JsTestDriverClient> clientProvider,
@@ -52,25 +54,25 @@ public class ActionFactory {
                        @Named("browserTimeout") long browserTimeout,
                        @Named("preloadFiles") boolean preloadFiles,
                        FileLoader fileLoader,
-                       @Named("serverHandlerPrefix") HandlerPathPrefix serverHandlerPrefix) {
+                       @Named("serverHandlerPrefix") HandlerPathPrefix serverHandlerPrefix,
+                       Factory serverFactory) {
     this.clientProvider = clientProvider;
     this.testPreProcessors = testPreProcessors;
     this.browserTimeout = browserTimeout;
     this.preloadFiles = preloadFiles;
     this.fileLoader = fileLoader;
     this.serverHandlerPrefix = serverHandlerPrefix;
+    this.serverFactory = serverFactory;
   }
 
   public ServerStartupAction getServerStartupAction(Integer port,
       CapturedBrowsers capturedBrowsers, FilesCache preloadedFilesCache) {
     ServerStartupAction serverStartupAction =
         new ServerStartupAction(port,
-                                capturedBrowsers,
                                 preloadedFilesCache,
-                                browserTimeout,
                                 preloadFiles,
                                 fileLoader,
-                                serverHandlerPrefix);
+                                serverFactory);
 
     if (observers.containsKey(CapturedBrowsers.class)) {
       for (Observer o : observers.get(CapturedBrowsers.class)) {

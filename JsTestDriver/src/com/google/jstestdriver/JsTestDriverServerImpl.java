@@ -19,9 +19,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import java.util.Timer;
 
 import org.mortbay.component.LifeCycle;
@@ -31,6 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.name.Named;
 import com.google.jstestdriver.browser.BrowserCaptureEvent;
 import com.google.jstestdriver.browser.BrowserReaper;
 import com.google.jstestdriver.hooks.ServerListener;
@@ -56,10 +59,15 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
 
   private final HandlerPathPrefix handlerPrefix;
 
-  private final List<ServerListener> listeners;
+  private final Set<ServerListener> listeners;
 
-  public JsTestDriverServerImpl(int port, CapturedBrowsers capturedBrowsers,
-      FilesCache preloadedFilesCache, long browserTimeout, HandlerPathPrefix handlerPrefix, List<ServerListener> listeners) {
+  @Inject
+  public JsTestDriverServerImpl(@Assisted int port,
+                                @Assisted FilesCache preloadedFilesCache,
+                                CapturedBrowsers capturedBrowsers,
+                                @Named("browserTimeout") long browserTimeout,
+                                @Named("serverHandlerPrefix") HandlerPathPrefix handlerPrefix,
+                                Set<ServerListener> listeners) {
     this.port = port;
     this.capturedBrowsers = capturedBrowsers;
     this.filesCache = preloadedFilesCache;
