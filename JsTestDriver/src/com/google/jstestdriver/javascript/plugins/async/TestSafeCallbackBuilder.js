@@ -47,6 +47,7 @@ jstestdriver.plugins.async.TestSafeCallbackBuilder = function(
   this.clearTimeout_ = opt_clearTimeout || jstestdriver.clearTimeout;
   this.timeoutConstructor_ = opt_timeoutConstructor ||
       jstestdriver.plugins.async.Timeout;
+  this.stepDescription_ = 'Unknown step.';
   this.pool_ = null;
   this.remainingUses_ = null;
   this.testCase_ = null;
@@ -70,7 +71,13 @@ jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.build =
   var finiteUseCallback = new jstestdriver.plugins.async.FiniteUseCallback(
       catchingCallback, onDepleted, this.remainingUses_);
   return new jstestdriver.plugins.async.ExpiringCallback(
-      this.pool_, finiteUseCallback, timeout);
+      this.pool_, finiteUseCallback, timeout, this.stepDescription_);
+};
+
+
+jstestdriver.plugins.async.TestSafeCallbackBuilder.prototype.setStepDescription = function(stepDescription) {
+  this.stepDescription_ = stepDescription;
+  return this;
 };
 
 

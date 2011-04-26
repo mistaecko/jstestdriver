@@ -66,7 +66,7 @@ jstestdriver.plugins.async.DeferredQueue = function(setTimeout, testCase,
  * @private
  */
 jstestdriver.plugins.async.DeferredQueue.prototype.execute_ = function(
-    operation, onQueueComplete) {
+    description, operation, onQueueComplete) {
   var queue = new (this.queueConstructor_)(this.setTimeout_,
       this.testCase_, onQueueComplete, this.armor_, this.pauseForHuman_);
   this.armor_.setQueue(queue);
@@ -75,7 +75,7 @@ jstestdriver.plugins.async.DeferredQueue.prototype.execute_ = function(
     queue.finishStep_(errors);
   };
   var pool = new (this.poolConstructor_)(
-      this.setTimeout_, this.testCase_, onPoolComplete, this.pauseForHuman_);
+      this.setTimeout_, this.testCase_, onPoolComplete, description, this.pauseForHuman_);
   var poolArmor = new (this.poolArmorConstructor_)(pool);
 
   if (operation) {
@@ -110,7 +110,7 @@ jstestdriver.plugins.async.DeferredQueue.prototype.startStep = function() {
   var nextOp = this.operations_.shift();
   if (nextOp) {
     var q = this;
-    this.execute_(nextOp, function(errors) {
+    this.execute_(nextDescription, nextOp, function(errors) {
       q.finishStep_(errors);
     });
   } else {

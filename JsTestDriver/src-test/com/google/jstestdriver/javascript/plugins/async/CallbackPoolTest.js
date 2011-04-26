@@ -251,8 +251,10 @@ callbackPoolTest.prototype.testAddWithTimeout = function() {
     callback();
   }, {}, function(errors) {
     assertEquals(1, errors.length);
+    assertTrue('Error should contain step description.',
+        errors[0].message.indexOf('Step 1.') > -1)
     complete = true;
-  }, false /* pauseForHuman */, function() {
+  }, 'Step 1.', false /* pauseForHuman */, function() {
     // Force callbacks to expire immediately when armed
     return new jstestdriver.plugins.async.TestSafeCallbackBuilder(function(callback) {
       callback();
@@ -280,7 +282,7 @@ callbackPoolTest.prototype.testAddWithTimeoutDisabledForDebugging = function() {
   }, {}, function(errors) {
     assertEquals(0, errors.length);
     complete = true;
-  }, true /* pauseForHuman */, function() {
+  }, '', true /* pauseForHuman */, function() {
     // Force callbacks to expire immediately when armed
     return new jstestdriver.plugins.async.TestSafeCallbackBuilder(function(callback) {
       callback();

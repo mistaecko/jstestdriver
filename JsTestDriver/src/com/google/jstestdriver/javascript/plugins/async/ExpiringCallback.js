@@ -32,13 +32,15 @@
  * @param {jstestdriver.plugins.async.FiniteUseCallback} callback A
  *     FiniteUseCallback.
  * @param {jstestdriver.plugins.async.Timeout} timeout A Timeout object.
+ * @param {string} stepDescription A description of the current test step.
  * @constructor
  */
 jstestdriver.plugins.async.ExpiringCallback = function(
-    pool, callback, timeout) {
+    pool, callback, timeout, stepDescription) {
   this.pool_ = pool;
   this.callback_ = callback;
   this.timeout_ = timeout;
+  this.stepDescription_ = stepDescription;
 };
 
 
@@ -50,7 +52,8 @@ jstestdriver.plugins.async.ExpiringCallback = function(
 jstestdriver.plugins.async.ExpiringCallback.prototype.arm = function(delay) {
   var callback = this;
   this.timeout_.arm(function() {
-    callback.pool_.onError(new Error('expired.'));
+    callback.pool_.onError(new Error('Callback expired after ' + delay +
+        ' ms during test step: ' + callback.stepDescription_));
     callback.pool_.remove('expired.', callback.callback_.getRemainingUses());
     callback.callback_.deplete();
   }, delay);

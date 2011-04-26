@@ -29,16 +29,19 @@
  * @param {Function} setTimeout The global setTimeout function.
  * @param {Object} testCase The test case instance.
  * @param {Function} onPoolComplete A function to call when the pool empties.
+ * @param {string} stepDescription A description of the current test step.
  * @param {boolean} opt_pauseForHuman Whether or not to pause for debugging.
  * @param {Function} opt_callbackBuilderConstructor An optional constructor for
  *     a callback builder.
  * @constructor
  */
 jstestdriver.plugins.async.CallbackPool = function(setTimeout, testCase,
-      onPoolComplete, opt_pauseForHuman, opt_callbackBuilderConstructor) {
+      onPoolComplete, stepDescription, opt_pauseForHuman,
+      opt_callbackBuilderConstructor) {
   this.setTimeout_ = setTimeout;
   this.testCase_ = testCase;
   this.onPoolComplete_ = onPoolComplete;
+  this.stepDescription_ = stepDescription;
   this.pauseForHuman_ = !!opt_pauseForHuman;
   this.callbackBuilderConstructor_ = opt_callbackBuilderConstructor ||
       jstestdriver.plugins.async.TestSafeCallbackBuilder;
@@ -106,6 +109,7 @@ jstestdriver.plugins.async.CallbackPool.prototype.addCallback = function(
     wrapped, opt_n) {
   this.count_ += opt_n || 1;
   var callback = new (this.callbackBuilderConstructor_)()
+      .setStepDescription(this.stepDescription_)
       .setPool(this)
       .setRemainingUses(opt_n)
       .setTestCase(this.testCase_)
