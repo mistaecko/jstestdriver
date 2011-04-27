@@ -47,6 +47,7 @@ jstestdriver.plugins.async.CallbackPool = function(setTimeout, testCase,
       jstestdriver.plugins.async.TestSafeCallbackBuilder;
   this.errors_ = [];
   this.count_ = 0;
+  this.callbackIndex_ = 1;
   this.active_ = false;
 };
 
@@ -107,9 +108,10 @@ jstestdriver.plugins.async.CallbackPool.prototype.onError = function(error) {
  * @return {Function} A test safe callback.
  */
 jstestdriver.plugins.async.CallbackPool.prototype.addCallback = function(
-    wrapped, opt_n, opt_timeout) {
+    wrapped, opt_n, opt_timeout, opt_description) {
   this.count_ += opt_n || 1;
   var callback = new (this.callbackBuilderConstructor_)()
+      .setCallbackDescription(opt_description || '#' + this.callbackIndex_++)
       .setStepDescription(this.stepDescription_)
       .setPool(this)
       .setRemainingUses(opt_n)

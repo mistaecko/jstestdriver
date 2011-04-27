@@ -83,7 +83,7 @@ jstestdriver.plugins.async.DeferredQueueArmor.prototype.call = function(
  */
 jstestdriver.plugins.async.DeferredQueueArmor.prototype.nextDescription_ =
     function() {
-  return 'Step ' + this.step_;
+  return '#' + this.step_;
 };
 
 

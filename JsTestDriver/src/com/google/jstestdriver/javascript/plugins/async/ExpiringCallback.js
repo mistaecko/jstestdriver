@@ -36,11 +36,12 @@
  * @constructor
  */
 jstestdriver.plugins.async.ExpiringCallback = function(
-    pool, callback, timeout, stepDescription) {
+    pool, callback, timeout, stepDescription, callbackDescription) {
   this.pool_ = pool;
   this.callback_ = callback;
   this.timeout_ = timeout;
   this.stepDescription_ = stepDescription;
+  this.callbackDescription_ = callbackDescription;
 };
 
 
@@ -52,8 +53,9 @@ jstestdriver.plugins.async.ExpiringCallback = function(
 jstestdriver.plugins.async.ExpiringCallback.prototype.arm = function(delay) {
   var callback = this;
   this.timeout_.arm(function() {
-    callback.pool_.onError(new Error('Callback expired after ' + delay +
-        ' ms during test step: ' + callback.stepDescription_));
+    callback.pool_.onError(new Error('Callback \'' +
+        callback.callbackDescription_ + '\' expired after ' + delay +
+        ' ms during test step \'' + callback.stepDescription_ + '\''));
     callback.pool_.remove('expired.', callback.callback_.getRemainingUses());
     callback.callback_.deplete();
   }, delay);

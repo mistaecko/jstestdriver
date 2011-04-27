@@ -37,15 +37,15 @@ deferredQueueArmorTest.prototype.testDeferWithoutName = function() {
 
   q.defer(function() {});
 
-  assertEquals('Step 1', capturedDescription);
+  assertEquals('#1', capturedDescription);
 
   q.defer(function() {});
 
-  assertEquals('Step 2', capturedDescription);
+  assertEquals('#2', capturedDescription);
 
   q.defer(function() {});
 
-  assertEquals('Step 3', capturedDescription);
+  assertEquals('#3', capturedDescription);
 };
 
 
@@ -104,5 +104,5 @@ deferredQueueArmorTest.prototype.testChainedDeferCalls = function() {
    .defer(function() {})
    .defer(function() {});
 
-  assertEquals(['Step 1', 'Step 2', 'Step 3'], capturedDescriptions);
+  assertEquals(['#1', '#2', '#3'], capturedDescriptions);
 };

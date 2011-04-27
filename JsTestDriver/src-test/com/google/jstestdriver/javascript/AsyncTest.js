@@ -98,8 +98,9 @@ asyncTest.prototype.testSeriesOfAsyncSteps = function(q) {
 
 asyncTest.prototype.testAddCallbackWithNamedParameters = function(queue) {
   queue.call('Old, concise syntax.', function(callbacks) {
-    var callback0 = callbacks.addCallback(function() {}, 2, 1000);
-    var callback1 = callbacks.noop(2, 1000);
+    var callback0 = callbacks.addCallback(
+        function() {}, 2, 1000, 'Serve some users.');
+    var callback1 = callbacks.noop(2, 1000, 'Noop.');
     window.setTimeout(function() {
       callback0(); callback0();
       callback1(); callback1();
@@ -109,11 +110,13 @@ asyncTest.prototype.testAddCallbackWithNamedParameters = function(queue) {
     description: 'New, descriptive syntax.',
     operation: function(callbacks) {
       var callback0 = callbacks.addCallback({
+        description: 'Serve some users.',
         callback: function() {},
         invocations: 2,
         timeout: 1
       });
       var callback1 = callbacks.noop({
+        description: 'Noop.',
         invocations: 2,
         timeout: 1
       });
