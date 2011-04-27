@@ -96,6 +96,36 @@ asyncTest.prototype.testSeriesOfAsyncSteps = function(q) {
 };
 
 
+asyncTest.prototype.testAddCallbackWithNamedParameters = function(queue) {
+  queue.call('Old, concise syntax.', function(callbacks) {
+    var callback0 = callbacks.addCallback(function() {}, 2, 1000);
+    var callback1 = callbacks.noop(2, 1000);
+    window.setTimeout(function() {
+      callback0(); callback0();
+      callback1(); callback1();
+    }, 100);
+  });
+  queue.call({
+    description: 'New, descriptive syntax.',
+    operation: function(callbacks) {
+      var callback0 = callbacks.addCallback({
+        callback: function() {},
+        invocations: 2,
+        timeout: 1
+      });
+      var callback1 = callbacks.noop({
+        invocations: 2,
+        timeout: 1
+      });
+      window.setTimeout(function() {
+        callback0(); callback0();
+        callback1(); callback1();
+      }, 100);
+    }
+  });
+};
+
+
 asyncTest.prototype.testNewNames = function(driver) {
   driver.call(function(callbacks) {
     window.setTimeout(callbacks.noop(), 250);

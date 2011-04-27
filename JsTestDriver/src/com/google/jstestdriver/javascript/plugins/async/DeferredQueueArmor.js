@@ -57,7 +57,16 @@ jstestdriver.plugins.async.DeferredQueueArmor.prototype.call = function(
 
   if (typeof description == 'function') {
     operation = description;
-    description = 'Step ' + this.step_;
+    description = this.nextDescription_();
+  }
+
+  if (typeof description == 'object') {
+    operation = description.operation;
+    description = description.description;
+  }
+
+  if (!description) {
+    description = this.nextDescription_();
   }
 
   if (operation) {
@@ -66,6 +75,15 @@ jstestdriver.plugins.async.DeferredQueueArmor.prototype.call = function(
   }
 
   return this;
+};
+
+
+/**
+ * @return {string} A description for the next step.
+ */
+jstestdriver.plugins.async.DeferredQueueArmor.prototype.nextDescription_ =
+    function() {
+  return 'Step ' + this.step_;
 };
 
 

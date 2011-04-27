@@ -38,12 +38,20 @@ jstestdriver.plugins.async.CallbackPoolArmor = function(pool) {
  * @param {Function} callback The callback to wrap.
  * @param {number} opt_n An optional number of times to wait for the callback to
  *     be called.
+ * @param {number} opt_timeout The timeout in milliseconds.
  * @return {Function} The wrapped callback.
  */
 jstestdriver.plugins.async.CallbackPoolArmor.prototype.addCallback = function(
-    callback, opt_n) {
-  if (callback) {
-    return this.pool_.addCallback(callback, opt_n);
+    callback, opt_n, opt_timeout) {
+  if (typeof callback == 'object') {
+    var params = callback;
+    callback = params.callback;
+    opt_n = params.invocations;
+    opt_timeout = params.timeout ? params.timeout * 1000 : null;
+  }
+
+  if (typeof callback == 'function' && callback) {
+    return this.pool_.addCallback(callback, opt_n, opt_timeout);
   }
 };
 
@@ -76,8 +84,14 @@ jstestdriver.plugins.async.CallbackPoolArmor.prototype.add =
  * completes without performing any action.
  * @param {Number} opt_n An optional number of times to wait for the callback to
  *     be called.
+ * @param {number} opt_timeout The timeout in milliseconds.
  * @return {Function} A noop callback.
  */
-jstestdriver.plugins.async.CallbackPoolArmor.prototype.noop = function(opt_n) {
-  return this.pool_.addCallback(jstestdriver.EMPTY_FUNC, opt_n);
+jstestdriver.plugins.async.CallbackPoolArmor.prototype.noop = function(
+    opt_n, opt_timeout) {
+  if (typeof opt_n == 'object') {
+    opt_timeout = opt_n.timeout ? opt_n.timeout * 1000 : null;
+    opt_n = opt_n.invocations;
+  }
+  return this.pool_.addCallback(jstestdriver.EMPTY_FUNC, opt_n, opt_timeout);
 };

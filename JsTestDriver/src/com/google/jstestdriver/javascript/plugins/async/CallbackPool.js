@@ -103,10 +103,11 @@ jstestdriver.plugins.async.CallbackPool.prototype.onError = function(error) {
  *     and to add to the pool.
  * @param {number} opt_n The number of permitted uses of the given callback;
  *     defaults to one.
+ * @param {number} opt_timeout The timeout in milliseconds.
  * @return {Function} A test safe callback.
  */
 jstestdriver.plugins.async.CallbackPool.prototype.addCallback = function(
-    wrapped, opt_n) {
+    wrapped, opt_n, opt_timeout) {
   this.count_ += opt_n || 1;
   var callback = new (this.callbackBuilderConstructor_)()
       .setStepDescription(this.stepDescription_)
@@ -116,7 +117,8 @@ jstestdriver.plugins.async.CallbackPool.prototype.addCallback = function(
       .setWrapped(wrapped)
       .build();
   if (!this.pauseForHuman_) {
-    callback.arm(jstestdriver.plugins.async.CallbackPool.TIMEOUT);
+    callback.arm(opt_timeout ||
+        jstestdriver.plugins.async.CallbackPool.TIMEOUT);
   }
   return function() {
     return callback.invoke.apply(callback, arguments);
