@@ -301,8 +301,8 @@ deferredQueueTest.prototype.testMultipleStepsWithAsynchronousCallsWithFailure = 
   var stepOneCallbackTwo;
   q.defer('Step 1', function(pool) {
     stepOneCalled = true;
-    stepOneCallbackOne = pool.add(function() {throw 'error';});
-    stepOneCallbackTwo = pool.add(function() {});
+    stepOneCallbackOne = pool.add(function() {throw 'error1';});
+    stepOneCallbackTwo = pool.add(function() {throw 'error2';});
   });
   var stepTwoCalled = false;
   q.defer('Step 2', function() {
@@ -318,12 +318,60 @@ deferredQueueTest.prototype.testMultipleStepsWithAsynchronousCallsWithFailure = 
     stepOneCallbackOne();
   } catch (expected) {}
 
-  assertFalse(queueComplete);
+  assertTrue(queueComplete);
   assertTrue(stepOneCalled);
   assertFalse(stepTwoCalled);
-  assertEquals(0, caughtErrors.length);
+  assertEquals(1, caughtErrors.length);
 
-  stepOneCallbackTwo();
+  try {
+    stepOneCallbackTwo();
+  } catch (expected) {}
+
+  assertTrue(queueComplete);
+  assertTrue(stepOneCalled);
+  assertFalse(stepTwoCalled);
+  assertEquals(1, caughtErrors.length);
+};
+
+
+/**
+ * Tests that exceptions thrown during a test step cause the test to end
+ * immediately rather than waiting for any outstanding callbacks to expire.
+ * Added to fix Issue 234.
+ * @bug 234
+ */
+deferredQueueTest.prototype.testStepFailureIgnoresOutstandingCallbacks = function() {
+  var queueComplete = false;
+  var caughtErrors = [];
+  var onQueueComplete = function(errors) {
+    queueComplete = true;
+    caughtErrors = errors;
+  };
+  var armor = new jstestdriver.plugins.async.DeferredQueueArmor();
+  var q = new jstestdriver.plugins.async.DeferredQueue(
+      function(callback) {callback();}, {}, onQueueComplete, armor);
+  armor.setQueue(q);
+  var stepOneCalled = false;
+  var stepOneCallbackOne;
+  var stepOneCallbackTwo;
+  q.defer('Step 1', function(pool) {
+    stepOneCalled = true;
+    stepOneCallbackOne = pool.add(function() {});
+    throw new Error('asdf');
+  });
+  var stepTwoCalled = false;
+  q.defer('Step 2', function() {
+    stepTwoCalled = true;
+  });
+  q.startStep();
+  assertTrue(queueComplete);
+  assertTrue(stepOneCalled);
+  assertFalse(stepTwoCalled);
+  assertEquals(1, caughtErrors.length);
+
+  try {
+    stepOneCallbackOne();
+  } catch (expected) {}
 
   assertTrue(queueComplete);
   assertTrue(stepOneCalled);

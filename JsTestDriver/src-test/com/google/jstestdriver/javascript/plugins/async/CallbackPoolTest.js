@@ -52,13 +52,16 @@ callbackPoolTest.prototype.testActivate = function() {
     complete = true;
   });
 
-  var callbackA = pool.add(function() {});
+  var poolWasActive = false;
+  var callbackA = pool.add(function() {poolWasActive = pool.active_;});
   assertFalse(pool.active_);
 
   pool.activate();
+  assertTrue(pool.active_);
   callbackA();
 
-  assertTrue(pool.active_);
+  assertTrue(poolWasActive);
+  assertFalse(pool.active_);
   assertTrue(complete);
 };
 

@@ -65,6 +65,7 @@ jstestdriver.plugins.async.CallbackPool.prototype.maybeComplete = function() {
   if (this.active_ && this.count_ == 0 && this.onPoolComplete_) {
     var pool = this;
     this.setTimeout_(function() {
+      pool.active_ = false;
       pool.onPoolComplete_(pool.errors_);
     }, 0);
   }
@@ -94,6 +95,8 @@ jstestdriver.plugins.async.CallbackPool.prototype.count = function() {
  */
 jstestdriver.plugins.async.CallbackPool.prototype.onError = function(error) {
   this.errors_.push(error);
+  this.count_ = 0;
+  this.maybeComplete();
 };
 
 
@@ -153,8 +156,6 @@ jstestdriver.plugins.async.CallbackPool.prototype.addErrback = function(
     pool.onError(new Error(
         'Errback ' + message + ' called with arguments: ' +
             Array.prototype.slice.call(arguments)));
-    pool.count_ = 0;
-    pool.maybeComplete();
   };
 };
 
