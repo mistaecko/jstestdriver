@@ -14,16 +14,11 @@ public enum HttpMethod {
    * ANY is a wildcard that matches any other method.
    */
   ANY,
-
   DELETE,
-
   GET,
-
+  HEAD,
   OPTIONS,
-
   POST,
-
   PUT,
-
   TRACE
 }

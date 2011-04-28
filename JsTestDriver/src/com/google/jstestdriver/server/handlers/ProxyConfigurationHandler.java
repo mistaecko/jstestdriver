@@ -53,7 +53,7 @@ public class ProxyConfigurationHandler implements RequestHandler {
 
   public void handleIt() throws IOException {
     if (method.equals(HttpMethod.GET)) {
-      response.getWriter().println(proxyConfiguration.getProxyConfig());
+      responseWriter.println(proxyConfiguration.getProxyConfig());
     } else {
       try {
         proxyConfiguration.updateConfiguration(
