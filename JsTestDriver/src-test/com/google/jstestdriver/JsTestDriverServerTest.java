@@ -179,7 +179,7 @@ public class JsTestDriverServerTest extends TestCase {
     context.addServlet(new ServletHolder(servlet), "/");
     dummy.start();
     final PrintStream out = System.out;
-    final int N = 8000;
+    final int N = 100;
     Thread[] threads = new Thread[2*N];
     final AtomicInteger a = new AtomicInteger(0);
     for (int i = 0; i < 2*N; ++i) {
