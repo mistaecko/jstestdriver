@@ -42,8 +42,10 @@ jstestdriver.TestCaseBuilder = function(testCaseManager) {
  */
 jstestdriver.TestCaseBuilder.prototype.TestCase =
     function(testCaseName, opt_proto, opt_type) {
+  this.checkNotBeginsWith_(testCaseName, '-');
+  this.checkNotContains_(testCaseName, ',');
+  this.checkNotContains_(testCaseName, '#');
   var testCaseClass = function() {};
-
   if (opt_proto) {
     testCaseClass.prototype = opt_proto;
   }
@@ -61,6 +63,23 @@ jstestdriver.TestCaseBuilder.prototype.TestCase =
   this.testCaseManager_.add(
       new jstestdriver.TestCaseInfo(testCaseName, testCaseClass, opt_type));
   return testCaseClass;
+};
+
+
+jstestdriver.TestCaseBuilder.prototype.checkNotBeginsWith_ = function(
+    testCaseName, illegalString) {
+  if (testCaseName.indexOf(illegalString) == 0) {
+    throw new Error('Test case names must not begin with \'' +
+        illegalString + '\'');
+  }
+};
+
+
+jstestdriver.TestCaseBuilder.prototype.checkNotContains_= function(
+    testCaseName, illegalString) {
+  if (testCaseName.indexOf(illegalString) > -1) {
+    throw new Error('Test case names must not contain \'' + illegalString + '\'');
+  }
 };
 
 

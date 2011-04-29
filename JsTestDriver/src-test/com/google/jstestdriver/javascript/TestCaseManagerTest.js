@@ -111,8 +111,8 @@ TestCaseManagerTest.prototype.testCurrentlyLoadedTestForExpressionsInfoAreCorrec
   testCase2.prototype.testFu = function() {};
   var expressions = [];
 
-  expressions.push('testCase1.prototype.testFoo');
-  expressions.push('testCase2.testFu');
+  expressions.push('testCase1#testFoo');
+  expressions.push('testCase2#testFu');
   var currentlyLoadedTest = testCaseManager.getCurrentlyLoadedTestFor(expressions);
   var testNames = currentlyLoadedTest.testNames;
 
