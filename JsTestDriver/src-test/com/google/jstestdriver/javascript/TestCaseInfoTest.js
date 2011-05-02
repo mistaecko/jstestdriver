@@ -167,3 +167,46 @@ TestCaseInfoTest.prototype.testGetTestRunConfigurationFor = function() {
   assertEquals(2, runs[1].getTests().length);
   assertEquals(2, runs[2].getTests().length);
 };
+
+
+TestCaseInfoTest.prototype.testRegexMatcher = function() {
+  var testCaseInfo = new jstestdriver.TestCaseInfo();
+  var matcher = testCaseInfo.regexMatcher_(/^asdf.*/);
+  assertTrue(matcher('asdf1234'));
+  assertFalse(matcher('abcdasdf1234'));
+};
+
+
+TestCaseInfoTest.prototype.testBuildTestMethodMap = function() {
+  var template = function() {};
+  template.prototype.testSomething = function() {};
+  template.prototype.testSomethingElse = function() {};
+  var testCaseInfo = new jstestdriver.TestCaseInfo('asdf.Test', template);
+  var testMethodMap = testCaseInfo.buildTestMethodMap_();
+  assertEquals('testSomething', testMethodMap['asdf.Test#testSomething']);
+  assertEquals('testSomethingElse', testMethodMap['asdf.Test#testSomethingElse']);
+};
+
+
+TestCaseInfoTest.prototype.testIsTestMethod = function() {
+  var testCaseInfo = new jstestdriver.TestCaseInfo();
+  assertFalse(testCaseInfo.isTestMethod_('myMethod'));
+  assertFalse(testCaseInfo.isTestMethod_('mytestMethod'));
+  assertTrue(testCaseInfo.isTestMethod_('testMyTestMethod'));
+};
+
+
+TestCaseInfoTest.prototype.testBuildTestMethodId = function() {
+  var testCaseInfo = new jstestdriver.TestCaseInfo('asdf.Test');
+  assertEquals('asdf.Test#myTestMethod', testCaseInfo.buildTestMethodId_('myTestMethod'));
+};
+
+
+TestCaseInfoTest.prototype.testFilter = function() {
+  var testCaseInfo = new jstestdriver.TestCaseInfo();
+  var source = [0, 1, 2, 3, 4, 5]
+  var evens = testCaseInfo.filter_(source, function(item) {return item % 2 == 0;});
+  var odds = testCaseInfo.filter_(source, function(item) {return item % 2 == 1;});
+  assertEquals([0, 2, 4], evens);
+  assertEquals([1, 3, 5], odds);
+};
