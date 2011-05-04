@@ -62,12 +62,12 @@ jstestdriver.StreamingService.prototype.streamResponse = function(response,
  * Callback command for the stream acknowledge to a streamed responses.
  * @param {Array.<string>} received A list of received ids for the currently open stream.
  */
-jstestdriver.StreamingService.prototype.streamAcknowledged = function(recieved) {
-  for (var i = 0; recieved && recieved[i]; i++) {
-    if (this.activeResponses_[recieved[i]]) {
+jstestdriver.StreamingService.prototype.streamAcknowledged = function(received) {
+  for (var i = 0; received && received[i]; i++) {
+    if (this.activeResponses_[received[i]]) {
       // cut down on memory goof ups....
-      this.activeResponses_[recieved[i]] = null;
-      delete this.activeResponses_[recieved[i]];
+      this.activeResponses_[received[i]] = null;
+      delete this.activeResponses_[received[i]];
     }
   }
 

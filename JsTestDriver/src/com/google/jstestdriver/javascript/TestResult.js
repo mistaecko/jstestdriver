@@ -21,6 +21,7 @@
  * @param {Array.<string>} log
  * @param {Number} time
  * @param {Object.<string, Object>} opt_data A map of arbitrary value pairs representing test meta data.
+ * @constructor
  */
 jstestdriver.TestResult = function(testCaseName, testName, result, message, log, time, opt_data) {
   this.testCaseName = testCaseName;
