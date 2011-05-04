@@ -103,3 +103,17 @@ TestCaseBuilderTest.prototype.testConditionalAsyncTestCasesAddedToManager =
   assertEquals(
       jstestdriver.TestCaseBuilder.PlaceHolderCase, falseTestInfo.getTemplate());
 };
+
+
+TestCaseBuilderTest.prototype.testTestCaseWithInvalidName = function() {
+  var builder = new jstestdriver.TestCaseBuilder();
+  assertException(function() {
+    builder.TestCase('-asdf.MyTest');
+  });
+  assertException(function() {
+    builder.TestCase('asdf,MyTest');
+  });
+  assertException(function() {
+    builder.TestCase('asdf.MyTest#testMethod');
+  });
+};
