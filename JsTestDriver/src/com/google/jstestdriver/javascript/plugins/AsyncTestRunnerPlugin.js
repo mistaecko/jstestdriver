@@ -46,6 +46,7 @@
  *     DeferredQueues.
  * @param {Function} opt_armorConstructor a constructor for obtaining new
  *     DeferredQueueArmors.
+ * @constructor
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody,
       opt_pauseForHuman, opt_setTimeout, opt_queueConstructor,

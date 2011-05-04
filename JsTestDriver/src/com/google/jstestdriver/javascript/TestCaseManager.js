@@ -16,6 +16,7 @@
 
 /**
  * Handles the TestCases
+ * @constructor
  */
 jstestdriver.TestCaseManager = function(pluginRegistrar) {
   this.testCasesInfo_ = [];

@@ -13,6 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+/**
+ * @param pluginRegistrar
+ * @constructor
+ */
 jstestdriver.TestRunner = function(pluginRegistrar) {
   this.pluginRegistrar_ = pluginRegistrar;
 
@@ -23,7 +28,7 @@ jstestdriver.TestRunner = function(pluginRegistrar) {
 
 /**
  * Runs all TestRunConfigurations.
- * @param {Array.<TestRunConfiguration>} testRunsConfiguration Configurations to
+ * @param {Array.<jstestdriver.TestRunConfiguration>} testRunsConfiguration Configurations to
  *      run. This array willl be modified...
  * @param {function(jstestdriver.TestResult):null} onTestDone
  * 
@@ -68,7 +73,7 @@ jstestdriver.TestRunner.prototype.runNextConfiguration_ = function() {
 /**
  * Runs a test configuration.
  * @param {jstestdriver.TestRunConfiguration} config
- * @param {function(jstestdriver.TestCaseResult):null} onTestDone
+ * @param {function(jstestdriver.TestResult):null} onTestDone
  *     Function to be called when test is done.
  * @param {Function} onComplete Function to be called when all tests are done.
  */
@@ -117,6 +122,7 @@ jstestdriver.TestRunner.prototype.resetConsole_ = function() {
 
 /**
  * A map to manage the state of running TestCases.
+ * @constructor
  */
 jstestdriver.TestRunner.TestCaseMap = function() {
   this.testCases_ = {};
@@ -143,7 +149,6 @@ jstestdriver.TestRunner.TestCaseMap.prototype.stopCase = function(testCaseName) 
 
 /**
  * Indicates if there are still cases running.
- * @param {String} testCaseName The name of the test case to stop.
  */
 jstestdriver.TestRunner.TestCaseMap.prototype.hasActiveCases = function() {
   for (var testCase in this.testCases_) {

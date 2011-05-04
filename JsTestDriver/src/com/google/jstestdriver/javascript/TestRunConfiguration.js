@@ -17,6 +17,7 @@
  * Represents all of the necessary information to run a test case.
  * @param {jstestdriver.TestCaseInfo} testCaseInfo The test case information, containing
  * @param {Array.<String>} tests The names of all the tests to run.
+ * @constructor
  */
 jstestdriver.TestRunConfiguration = function(testCaseInfo, tests) {
   this.testCaseInfo_ = testCaseInfo;

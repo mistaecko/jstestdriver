@@ -13,6 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+/**
+ * @param fileSrc
+ * @param timestamp
+ * @param basePath
+ * @constructor
+ */
 jstestdriver.FileSource = function(fileSrc, timestamp, basePath) {
   this.fileSrc = fileSrc;
   this.timestamp = timestamp;

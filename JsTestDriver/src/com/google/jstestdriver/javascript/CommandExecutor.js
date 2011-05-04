@@ -53,6 +53,7 @@ jstestdriver.NOOP_COMMAND = {
  * @param {jstestdriver.TestRunner} testRunner Runs the tests...
  * @param {jstestdriver.PluginRegistrar} pluginRegistrar The plugin service,
  *     for post processing test results.
+ * @constructor
  */
 jstestdriver.CommandExecutor = function(streamingService,
                                         testCaseManager,

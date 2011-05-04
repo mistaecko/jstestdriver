@@ -14,25 +14,28 @@
  * the License.
  */
 /**
- * @param {String} testCaseName
- * @param {String} testName
+ * @param {string} testCaseName
+ * @param {string} testName
  * @param {jstestdriver.TestResult.RESULT} result
- * @param {String} message
- * @param {Array.<String>} log
+ * @param {string} message
+ * @param {Array.<string>} log
  * @param {Number} time
- * @param {Object.<String, Object>} data A map of arbitrary value pairs representing test meta data.
+ * @param {Object.<string, Object>} opt_data A map of arbitrary value pairs representing test meta data.
  */
-jstestdriver.TestResult = function(testCaseName, testName, result, message, log, time, data) {
+jstestdriver.TestResult = function(testCaseName, testName, result, message, log, time, opt_data) {
   this.testCaseName = testCaseName;
   this.testName = testName;
   this.result = result;
   this.message = message;
   this.log = log;
   this.time = time;
-  this.data = data || {};
+  this.data = opt_data || {};
 };
 
 
+/**
+ * @enum {string}
+ */
 jstestdriver.TestResult.RESULT = {
   PASSED : 'passed',
   ERROR : 'error',

@@ -15,7 +15,7 @@
  */
 
 /**
- * @fileDesc Configuration namespace for setting up JsTD runners.
+ * @fileoverview Configuration namespace for setting up JsTD runners.
  */
 jstestdriver.config = (function(module) {
   var config = module || {};
@@ -101,7 +101,6 @@ jstestdriver.config = (function(module) {
    * @static
    * 
    * @param {jstestdriver.TestCaseManager} testCaseManager
-   * @param {jstestdriver.TestRunner} streamingService
    * @param {jstestdriver.PluginRegistrar} pluginRegistrar
    * @param {function():Number} now
    * @param {String} location The current window location
@@ -210,11 +209,9 @@ jstestdriver.config = (function(module) {
    * @static
    * 
    * @param {jstestdriver.TestCaseManager} testCaseManager
-   * @param {jstestdriver.TestRunner} streamingService
    * @param {jstestdriver.PluginRegistrar} pluginRegistrar
    * @param {function():Number} now
    * @param {String} location The current window location
-   * @param {jstestdriver.TestReporter} reporter Reports test results.
    * 
    * @return {jstestdriver.CommandExecutor}
    */
@@ -243,11 +240,9 @@ jstestdriver.config = (function(module) {
    * @static
    * 
    * @param {jstestdriver.TestCaseManager} testCaseManager
-   * @param {jstestdriver.TestRunner} streamingService
    * @param {jstestdriver.PluginRegistrar} pluginRegistrar
    * @param {function():Number} now
    * @param {String} location The current window location
-   * @param {jstestdriver.TestReporter} reporter Reports test results.
    * 
    * @return {jstestdriver.CommandExecutor}
    */
@@ -271,11 +266,9 @@ jstestdriver.config = (function(module) {
    * @static
    * 
    * @param {jstestdriver.TestCaseManager} testCaseManager
-   * @param {jstestdriver.TestRunner} streamingService
    * @param {jstestdriver.PluginRegistrar} pluginRegistrar
    * @param {function():Number} now
    * @param {String} location The current window location
-   * @param {jstestdriver.TestReporter} reporter Reports test results.
    * 
    * @return {jstestdriver.CommandExecutor}
    */

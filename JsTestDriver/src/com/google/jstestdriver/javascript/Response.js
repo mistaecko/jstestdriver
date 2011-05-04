@@ -14,11 +14,15 @@
  * the License.
  */
 /**
- * A series of constants to correlate to the type of responses between the
- * browser and the server.
+ * @fileoverview A series of constants to correlate to the type of responses
+ * between the browser and the server.
  * 
  * See com.google.jstestdriver.Response.GSON_TYPES.
  * @author corbinrsmith@gmail.com (Cory Smith)
+ */
+
+/**
+ * @enum {string}
  */
 jstestdriver.RESPONSE_TYPES = {
   FILE_LOAD_RESULT: 'FILE_LOAD_RESULT',
@@ -42,6 +46,7 @@ jstestdriver.RESPONSE_TYPES = {
  * @param {String} response The serialized contents of the response.
  * @param {jstestdriver.BrowserInfo} browser The browser information. 
  * @param {Boolean} start Is this the first response from the browser.
+ * @constructor
  */
 jstestdriver.Response = function(type, response, browser, start) {
   this.type = type;
@@ -61,6 +66,7 @@ jstestdriver.Response.prototype.toString = function() {
 /**
  * @param {String} done Indicates if this is the last streamed message.
  * @param {jstestdriver.Response} response The response.
+ * @constructor
  */
 jstestdriver.CommandResponse = function (done, response) {
   this.done = done;
@@ -72,6 +78,7 @@ jstestdriver.CommandResponse = function (done, response) {
 /**
  * Represents the information about the browser.
  * @param {Number} id The unique id of this browser.
+ * @constructor
  */
 jstestdriver.BrowserInfo = function(id) {
   this.id = id;
@@ -81,6 +88,7 @@ jstestdriver.BrowserInfo = function(id) {
 /**
  * Coincides with java class com.google.jstestdriver.protocol.BrowserLog.
  * @param {Number} level 1-5, the level of the message.
+ * @constructor
  */
 jstestdriver.BrowserLog = function(level, source, message, browser) {
   this.level = level;

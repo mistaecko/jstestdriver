@@ -16,10 +16,11 @@
 
 /**
  * Service for streaming information to the server.
- * @param {String} url The server url.
+ * @param {string} url The server url.
  * @param {function():Number} now Returns the current time in ms.
  * @param {function(String, Object, function():null)} post Posts to the server.
  * @param {function(String, Object)} synchPost Posts synchronously to the server.
+ * @constructor
  */
 // TODO(corysmith): Separate the state from the service.
 jstestdriver.StreamingService = function(url, now, post, synchPost) {
@@ -59,7 +60,7 @@ jstestdriver.StreamingService.prototype.streamResponse = function(response,
 
 /**
  * Callback command for the stream acknowledge to a streamed responses.
- * @param {Array.<String>} A list of received ids for the currently open stream.
+ * @param {Array.<string>} received A list of received ids for the currently open stream.
  */
 jstestdriver.StreamingService.prototype.streamAcknowledged = function(recieved) {
   for (var i = 0; recieved && recieved[i]; i++) {
@@ -83,7 +84,7 @@ jstestdriver.StreamingService.prototype.streamAcknowledged = function(recieved) 
  * Closes the current streaming session, sending the final response after all
  * other Responses are finished.
  * @param {!jstestdriver.Response} finalResponse The final response to send.
- * @param {!Function} The callback when the post is finished.
+ * @param {!Function} callback The callback when the post is finished.
  */
 jstestdriver.StreamingService.prototype.close =
     function(finalResponse, callback) {

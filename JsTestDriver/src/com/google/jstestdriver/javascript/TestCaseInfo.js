@@ -13,6 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+/**
+ * @param testCaseName
+ * @param template
+ * @param opt_type
+ * @constructor
+ */
 jstestdriver.TestCaseInfo = function(testCaseName, template, opt_type) {
   this.testCaseName_ = testCaseName;
   this.template_ = template;

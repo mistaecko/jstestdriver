@@ -37,6 +37,7 @@
  * 
  * For more information regarding the supported method just read the documentation for the method
  * in this class.
+ * @constructor
  */
 jstestdriver.PluginRegistrar = function() {
   this.plugins_ = [];

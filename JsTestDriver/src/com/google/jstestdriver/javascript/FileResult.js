@@ -13,6 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+/**
+ * @param file
+ * @param success
+ * @param message
+ * @param elapsed
+ * @constructor
+ */
 jstestdriver.FileResult = function(file, success, message, elapsed) {
   this.file = file;
   this.success = success;
