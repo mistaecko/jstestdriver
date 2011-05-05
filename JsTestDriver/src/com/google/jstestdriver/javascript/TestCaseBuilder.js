@@ -75,7 +75,7 @@ jstestdriver.TestCaseBuilder.prototype.checkNotBeginsWith_ = function(
 };
 
 
-jstestdriver.TestCaseBuilder.prototype.checkNotContains_= function(
+jstestdriver.TestCaseBuilder.prototype.checkNotContains_ = function(
     testCaseName, illegalString) {
   if (testCaseName.indexOf(illegalString) > -1) {
     throw new Error('Test case names must not contain \'' + illegalString + '\'');
