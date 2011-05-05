@@ -137,7 +137,6 @@
     <copy  todir="${export-js.dir}">
       <fileset  dir="${src.dir}/${javascript-resources}">
         <include name="**/*.js" />
-        <exclude name="lib/**/*.js" />
       </fileset>
     </copy>
   </target>
