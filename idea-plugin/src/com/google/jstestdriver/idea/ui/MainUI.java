@@ -122,7 +122,7 @@ public class MainUI {
       initializeModules.add(
           new InitializeModule(new PluginLoader(),
               preparsedFlags.getBasePath(),
-              new Args4jFlagsParser(preparsedFlags),
+              new Args4jFlagsParser(),
               preparsedFlags.getRunnerMode()));
       initializeModules.add(new Module() {
         public void configure(Binder binder) {
