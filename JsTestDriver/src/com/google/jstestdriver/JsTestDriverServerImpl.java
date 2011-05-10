@@ -51,6 +51,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
   private Server server;
 
   private final int port;
+  private final int sslPort;
   private final CapturedBrowsers capturedBrowsers;
   private final FilesCache filesCache;
   private final long browserTimeout;
@@ -62,13 +63,15 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
   private final Set<ServerListener> listeners;
 
   @Inject
-  public JsTestDriverServerImpl(@Assisted int port,
+  public JsTestDriverServerImpl(@Assisted("port") int port,
+                                @Assisted("sslPort") int sslPort,
                                 @Assisted FilesCache preloadedFilesCache,
                                 CapturedBrowsers capturedBrowsers,
                                 @Named("browserTimeout") long browserTimeout,
                                 @Named("serverHandlerPrefix") HandlerPathPrefix handlerPrefix,
                                 Set<ServerListener> listeners) {
     this.port = port;
+    this.sslPort = sslPort;
     this.capturedBrowsers = capturedBrowsers;
     this.filesCache = preloadedFilesCache;
     this.browserTimeout = browserTimeout;
@@ -85,7 +88,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
       capturedBrowsers.deleteObserver(this);
       capturedBrowsers.addObserver(this);
       server =
-          Guice.createInjector(new JettyModule(port, handlerPrefix), new JstdHandlersModule(
+          Guice.createInjector(new JettyModule(port, sslPort, handlerPrefix), new JstdHandlersModule(
               capturedBrowsers, filesCache, browserTimeout, handlerPrefix))
               .getInstance(Server.class);
       server.addLifeCycleListener(new JettyLifeCycleLogger());

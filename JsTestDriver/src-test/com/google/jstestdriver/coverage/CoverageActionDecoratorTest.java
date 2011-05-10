@@ -30,7 +30,7 @@ public class CoverageActionDecoratorTest extends TestCase {
   public void testDecorate() throws Exception {
     CoverageReporterAction reporter = new CoverageReporterAction(null, null, null);
     List<Action> actions =
-        Lists.<Action>newArrayList(new ServerStartupAction(0, null, false,
+        Lists.<Action>newArrayList(new ServerStartupAction(0, 0, null, false,
             null, null));
     List<Action> actual = new CoverageActionDecorator(reporter).process(actions);
     assertEquals(2, actual.size());

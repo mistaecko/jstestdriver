@@ -50,7 +50,7 @@ public class DefaultActionListProviderTest extends TestCase {
 
   public void testParseFlagsAndCreateActionQueue() throws Exception {
     DefaultActionListProvider provider =
-        createProvider(9876, false, Collections.<String> emptyList(), Collections
+        createProvider(9876, 9877, false, Collections.<String> emptyList(), Collections
             .<ActionListProcessor> emptySet(), "", null);
     List<Action> actions = provider.get();
 
@@ -63,6 +63,7 @@ public class DefaultActionListProviderTest extends TestCase {
   }
 
   private DefaultActionListProvider createProvider(int port,
+                                                   int sslPort,
                                                    boolean reset,
                                                    List<String> tests,
                                                    Set<ActionListProcessor> processors,
@@ -78,6 +79,7 @@ public class DefaultActionListProviderTest extends TestCase {
         Collections.<String>emptyList(),
         false,
         port,
+        sslPort,
         Collections.<FileInfo>emptySet(),
         testOutput,
         processors,
@@ -114,7 +116,7 @@ public class DefaultActionListProviderTest extends TestCase {
   public void testParseWithServerAndReset() throws Exception {
     String serverAddress = "http://otherserver:8989";
     DefaultActionListProvider parser =
-        createProvider(-1, true, Collections
+        createProvider(-1, -1, true, Collections
             .<String> emptyList(), Collections.<ActionListProcessor>emptySet(), "", null);
 
     FlagsImpl flags = new FlagsImpl();
@@ -135,7 +137,7 @@ public class DefaultActionListProviderTest extends TestCase {
   public void testParseFlagsAndCreateTestActions() throws Exception {
     List<String> tests = Arrays.asList("foo.testBar");
     DefaultActionListProvider parser =
-        createProvider(9876, false, tests, Collections
+        createProvider(9876, 9877, false, tests, Collections
             .<ActionListProcessor> emptySet(), "", null);
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
@@ -153,7 +155,7 @@ public class DefaultActionListProviderTest extends TestCase {
   public void testXmlTestResultsActionIsAddedIfTestOutputFolderIsSet() throws Exception {
     List<String> tests = Arrays.asList("foo.testBar");
     DefaultActionListProvider parser =
-        createProvider(9876, false, tests, Collections
+        createProvider(9876, 9877, false, tests, Collections
             .<ActionListProcessor> emptySet(), ".", new XmlPrinterImpl(null, null, new FileNameFormatter()));
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();

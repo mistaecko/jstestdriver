@@ -44,6 +44,7 @@ public class ActionSequenceBuilder {
   private HashMap<String, FileInfo> files = new LinkedHashMap<String, FileInfo>();
   private Set<FileInfo> fileSet;
   private int localServerPort = -1;
+  private int localServerSslPort = -1;
   private boolean preloadFiles = false;
   private boolean reset;
   private List<String> tests = new LinkedList<String>();
@@ -96,8 +97,8 @@ public class ActionSequenceBuilder {
       }
     }
     ServerStartupAction serverStartupAction =
-        actionFactory.getServerStartupAction(localServerPort, capturedBrowsers,
-            new FilesCache(files));
+        actionFactory.getServerStartupAction(localServerPort, localServerSslPort,
+            capturedBrowsers, new FilesCache(files));
     actions.add(0, serverStartupAction);
     // add browser startup here.
     if (!leaveServerRunning) {
@@ -184,6 +185,14 @@ public class ActionSequenceBuilder {
    */
   public ActionSequenceBuilder withLocalServerPort(int localServerPort) {
     this.localServerPort = localServerPort;
+    return this;
+  }
+
+  /**
+   * Indicates that a local server should be started on the provided ssl port.
+   */
+  public ActionSequenceBuilder withLocalServerSslPort(int localServerSslPort) {
+    this.localServerSslPort = localServerSslPort;
     return this;
   }
 

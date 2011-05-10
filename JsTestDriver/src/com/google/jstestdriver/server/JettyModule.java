@@ -15,6 +15,9 @@
  */
 package com.google.jstestdriver.server;
 
+import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URL;
 import java.util.Random;
 
 import javax.servlet.Servlet;
@@ -22,6 +25,7 @@ import javax.servlet.Servlet;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.HashSessionIdManager;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -41,11 +45,17 @@ import com.google.jstestdriver.model.HandlerPathPrefix;
  */
 public class JettyModule extends AbstractModule {
 
+  private static final URL KEYSTORE =
+      ClassLoader.getSystemResource("com/google/jstestdriver/keystore");
+  private static final String KEY_PASSWORD = "asdfgh";
+
   private final int port;
+  private final int sslPort;
   private final HandlerPathPrefix handlerPrefix;
 
-  public JettyModule(int port, HandlerPathPrefix handlerPrefix) {
+  public JettyModule(int port, int sslPort, HandlerPathPrefix handlerPrefix) {
     this.port = port;
+    this.sslPort = sslPort;
     this.handlerPrefix = handlerPrefix;
   }
 
@@ -53,6 +63,15 @@ public class JettyModule extends AbstractModule {
   protected void configure() {
     bindConstant().annotatedWith(Port.class).to(port);
     bindConstant().annotatedWith(MaxFormContentSize.class).to(Integer.MAX_VALUE);
+  }
+
+  @Provides @Singleton SslSocketConnector provideSslSocketConnector(@Port Integer port)
+      throws IOException {
+    SslSocketConnector connector = new SslSocketConnector();
+    connector.setKeystore(KEYSTORE.toString());
+    connector.setKeyPassword(KEY_PASSWORD);
+    connector.setPort(sslPort == -1 ? port + 1 : sslPort);
+    return connector;
   }
 
   @Provides @Singleton SocketConnector provideSocketConnector(@Port Integer port) {
@@ -67,11 +86,13 @@ public class JettyModule extends AbstractModule {
 
   @Provides @Singleton Server provideJettyServer(
       SocketConnector connector,
+      SslSocketConnector sslConnector,
       @MaxFormContentSize Integer maxFormContentSize,
       ServletHolder servletHolder) {
     Server server = new Server();
     server.setGracefulShutdown(1);
     server.addConnector(connector);
+    server.addConnector(sslConnector);
     server.setSessionIdManager(new HashSessionIdManager(new Random()));
 
     Context context = new Context(server, "/", Context.SESSIONS);

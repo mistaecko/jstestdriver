@@ -39,6 +39,7 @@ public class DefaultActionListProvider implements ActionListProvider {
   private final boolean reset;
   private final List<String> dryRunFor;
   private final int port;
+  private final int sslPort;
   private final boolean preloadFiles;
   private final Set<FileInfo> fileSet;
   private final String testOutput;
@@ -57,6 +58,7 @@ public class DefaultActionListProvider implements ActionListProvider {
       @Named("dryRunFor") List<String> dryRunFor,
       @Named("preloadFiles") boolean preloadFiles,
       @Named("port") int port,
+      @Named("sslPort") int sslPort,
       @Named("fileSet") Set<FileInfo> fileSet,
       @Named("testOutput") String testOutput,
       Set<ActionListProcessor> processors,
@@ -69,6 +71,7 @@ public class DefaultActionListProvider implements ActionListProvider {
     this.dryRunFor = dryRunFor;
     this.preloadFiles = preloadFiles;
     this.port = port;
+    this.sslPort = sslPort;
     this.fileSet = fileSet;
     this.testOutput = testOutput;
     this.processors = processors;
@@ -84,7 +87,8 @@ public class DefaultActionListProvider implements ActionListProvider {
            .addCommands(arguments)
            .reset(reset)
            .asDryRunFor(dryRunFor)
-           .withLocalServerPort(port);
+           .withLocalServerPort(port)
+           .withLocalServerSslPort(sslPort);
     if (raiseOnFailure) {
       builder.raiseOnFailure();
     }

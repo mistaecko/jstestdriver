@@ -32,6 +32,9 @@ public interface Flags {
   @GuiceBinding(name="port")
   public Integer getPort();
 
+  @GuiceBinding(name="sslPort")
+  public Integer getSslPort();
+
   // server is not bound into Guice.
   public String getServer();
 

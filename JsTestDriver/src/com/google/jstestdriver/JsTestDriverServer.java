@@ -16,12 +16,14 @@
 
 package com.google.jstestdriver;
 
+import com.google.inject.assistedinject.Assisted;
 
 
 public interface JsTestDriverServer {
   
   public interface Factory {
-    JsTestDriverServer create(int port,
+    JsTestDriverServer create(@Assisted("port") int port,
+                              @Assisted("sslPort") int sslPort,
                               FilesCache preloadedFilesCache);
   }
 

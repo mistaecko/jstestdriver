@@ -34,6 +34,7 @@ import com.google.jstestdriver.model.RunData;
 public class ServerStartupAction implements ObservableAction {
   private static final Logger logger = LoggerFactory.getLogger(ServerStartupAction.class);
   private final int port;
+  private final int sslPort;
   private final FilesCache preloadedFilesCache;
   private JsTestDriverServer server;
   private List<Observer> observerList = new LinkedList<Observer>();
@@ -46,19 +47,21 @@ public class ServerStartupAction implements ObservableAction {
    * @deprecated Use other constructor.
    */
   @Deprecated
-  public ServerStartupAction(int port, CapturedBrowsers capturedBrowsers,
+  public ServerStartupAction(int port, int sslPort, CapturedBrowsers capturedBrowsers,
       FilesCache preloadedFilesCache, URLTranslator urlTranslator, URLRewriter urlRewriter) {
-    this(port, preloadedFilesCache, false, null, new DefaultServerFactory(capturedBrowsers,
+    this(port, sslPort, preloadedFilesCache, false, null, new DefaultServerFactory(capturedBrowsers,
         SlaveBrowser.TIMEOUT, new NullPathPrefix()));
   }
 
   public ServerStartupAction(
       int port,
+      int sslPort,
       FilesCache preloadedFilesCache,
       boolean preloadFiles,
       FileLoader fileLoader,
       Factory serverFactory) {
     this.port = port;
+    this.sslPort = sslPort;
     this.preloadedFilesCache = preloadedFilesCache;
     this.preloadFiles = preloadFiles;
     this.fileLoader = fileLoader;
@@ -70,7 +73,7 @@ public class ServerStartupAction implements ObservableAction {
   }
 
   public RunData run(RunData runData) {
-    logger.info("Starting server on {}", port);
+    logger.info("Starting server on {}, ssl on {}", port, sslPort);
 
     if (preloadFiles) {
       logger.debug("Preloading files...", port);
@@ -79,7 +82,7 @@ public class ServerStartupAction implements ObservableAction {
       }
     }
 
-    server = serverFactory.create(port, preloadedFilesCache);
+    server = serverFactory.create(port, sslPort, preloadedFilesCache);
 
     if (!observerList.isEmpty()) {
       throw new RuntimeException("Observers not supported during the transition to listeners.");
@@ -121,8 +124,8 @@ public class ServerStartupAction implements ObservableAction {
       this.nullPathPrefix = nullPathPrefix;
     }
 
-    public JsTestDriverServer create(int port, FilesCache preloadedFilesCache) {
-      return new JsTestDriverServerImpl(port, preloadedFilesCache, capturedBrowsers, timeout,
+    public JsTestDriverServer create(int port, int sslPort, FilesCache preloadedFilesCache) {
+      return new JsTestDriverServerImpl(port, sslPort, preloadedFilesCache, capturedBrowsers, timeout,
           nullPathPrefix, Sets.<ServerListener>newHashSet());
     }
   }

@@ -8,4 +8,6 @@ import org.mortbay.servlet.ProxyServlet;
  * intercept various headers.
  * @author rdionne@google.com (Robert Dionne)
  */
-public class JstdProxyServlet extends ProxyServlet.Transparent {}
+public class JstdProxyServlet extends ProxyServlet.Transparent {
+  {_DontProxyHeaders.add("host");}
+}

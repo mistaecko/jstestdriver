@@ -66,9 +66,11 @@ public class ActionFactory {
   }
 
   public ServerStartupAction getServerStartupAction(Integer port,
-      CapturedBrowsers capturedBrowsers, FilesCache preloadedFilesCache) {
+      Integer sslPort, CapturedBrowsers capturedBrowsers,
+      FilesCache preloadedFilesCache) {
     ServerStartupAction serverStartupAction =
         new ServerStartupAction(port,
+                                sslPort,
                                 preloadedFilesCache,
                                 preloadFiles,
                                 fileLoader,

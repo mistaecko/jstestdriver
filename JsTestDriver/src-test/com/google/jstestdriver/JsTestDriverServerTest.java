@@ -56,7 +56,7 @@ public class JsTestDriverServerTest extends TestCase {
   private JsTestDriverServerImpl server;
 
   private JsTestDriverServerImpl createServer(ServerListener listener) {
-    server = new JsTestDriverServerImpl(4224,
+    server = new JsTestDriverServerImpl(4224, 4225,
         new FilesCache(new HashMap<String, FileInfo>()),
         browsers,
         SlaveBrowser.TIMEOUT,

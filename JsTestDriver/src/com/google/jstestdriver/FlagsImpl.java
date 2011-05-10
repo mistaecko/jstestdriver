@@ -42,6 +42,7 @@ import com.google.jstestdriver.runner.RunnerMode;
 public class FlagsImpl implements Flags {
 
   private Integer port = -1;
+  private Integer sslPort = -1;
   private String server;
   private String testOutput = "";
   private Set<BrowserRunner> browser = Sets.newHashSet();
@@ -67,6 +68,10 @@ public class FlagsImpl implements Flags {
 
   public Integer getPort() {
     return port;
+  }
+
+  public Integer getSslPort() {
+    return sslPort;
   }
 
   @Option(name="--server", usage="The server to which to send the command")
