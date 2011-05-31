@@ -17,16 +17,10 @@ package com.google.eclipse.javascript.jstestdriver.core;
 
 import static java.lang.String.format;
 
-import com.google.common.collect.Maps;
-import com.google.eclipse.javascript.jstestdriver.core.model.SlaveBrowserRootData;
-import com.google.jstestdriver.CapturedBrowsers;
-import com.google.jstestdriver.DefaultURLRewriter;
-import com.google.jstestdriver.DefaultURLTranslator;
-import com.google.jstestdriver.FileInfo;
-import com.google.jstestdriver.FilesCache;
-import com.google.jstestdriver.ServerStartupAction;
-import com.google.jstestdriver.TimeImpl;
-import com.google.jstestdriver.browser.BrowserIdStrategy;
+import com.google.eclipse.javascript.jstestdriver.core.model.JstdServerListener;
+import com.google.jstestdriver.JsTestDriver;
+import com.google.jstestdriver.embedded.JsTestDriverBuilder;
+
 
 /**
  * TODO: This should not use CaptureBrowsers and ServerStartupAction directly but go through the
@@ -38,52 +32,61 @@ import com.google.jstestdriver.browser.BrowserIdStrategy;
  * @author shyamseshadri@gmail.com (Shyam Seshadri)
  */
 public class Server {
+  
+  public static enum State {
+    STOPPED, STARTED
+  }
 
   /**
    * URL Format of the server. Needs to be injected with an integer port number.
    */
-  private static final String SERVER_URL_FORMAT = "http://localhost:%d";
+  private static final String SERVER_URL_FORMAT = "http://127.0.0.1:%d";
 
   /**
    * URL Format of the browser capture url. Needs to be injected with a integer port number.
    */
-  private static final String SERVER_CAPTURE_URL_FORMAT = "http://localhost:%d/capture";
+  private static final String SERVER_CAPTURE_URL_FORMAT = "http://127.0.0.1:%d/capture";
 
-  private final ServerStartupAction startupAction;
-  private final CapturedBrowsers capturedBrowsers;
   private boolean started = false;
 
   private static volatile Server instance;
   private final int port;
+
+  private final JsTestDriver jstd;
 
   /**
    * Creates a Server at the given port and returns it the first time. Every call after the first
    * returns the instance created initially, ignoring the port value passed to it.
    *
    * @param port the integer port at which to create the server on.
+   * @param jstdServerListener 
    * @return an initialized server.
    */
-  public static Server getInstance(int port) {
-    // TODO(shyamseshadri): Handle the port ugliness separately. Try to move to a nicer singleton
-    // pattern.
-    if (instance == null) {
+  public static Server getInstance(int port, JstdServerListener jstdServerListener) {
+    if (instance == null || instance.getPort() != port) {
       synchronized (Server.class) {
+        if (instance != null && instance.getPort() != port) {
+          instance.stop();
+        }
         if (instance == null) {
-          instance = new Server(port);
+          JsTestDriver jstd = new JsTestDriverBuilder()
+              .setDefaultConfiguration(new EclipseServerConfiguration())
+              .addServerListener(jstdServerListener)
+              .setPort(port).build();
+          instance = new Server(jstd, port);
         }
       }
     }
     return instance;
   }
 
-  private Server(int port) {
+  private int getPort() {
+    return port;
+  }
+
+  private Server(JsTestDriver jstd, int port) {
+    this.jstd = jstd;
     this.port = port;
-    capturedBrowsers = new CapturedBrowsers(new BrowserIdStrategy(new TimeImpl()));
-    this.startupAction =
-      new ServerStartupAction(port, port +1, capturedBrowsers, new FilesCache(
-          Maps.<String, FileInfo>newHashMap()),
-          new DefaultURLTranslator(),
-          new DefaultURLRewriter());
   }
 
   /**
@@ -95,15 +98,6 @@ public class Server {
   }
 
   /**
-   * @return the captured browsers
-   */
-  public CapturedBrowsers getCapturedBrowsers() {
-    synchronized (this) {
-      return capturedBrowsers;
-    }
-  }
-
-  /**
    * @return true if the server has been started
    */
   public synchronized boolean isStarted() {
@@ -111,18 +105,11 @@ public class Server {
   }
 
   /**
-   * @return if there is at least one captured browser to run the tests on
-   */
-  public boolean isReadyToRunTests() {
-    return capturedBrowsers.getSlaveBrowsers().size() > 0;
-  }
-
-  /**
    * Starts the JS Test Driver server
    */
   public synchronized void start() {
     if (!started) {
-      startupAction.run(null);
+      jstd.startServer();
       started = true;
     }
   }
@@ -140,11 +127,7 @@ public class Server {
    */
   public synchronized void stop() {
     if (started) {
-      startupAction.getServer().stop();
-      // TODO(shyamseshadri): captured browsers should have a clear method
-      capturedBrowsers.getSlaveBrowsers().clear();
-      capturedBrowsers.getBrowsers().clear();
-      SlaveBrowserRootData.getInstance().clear();
+      jstd.stopServer();
       started = false;
     }
   }

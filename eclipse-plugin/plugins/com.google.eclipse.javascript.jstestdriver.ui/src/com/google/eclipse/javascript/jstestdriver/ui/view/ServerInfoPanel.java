@@ -15,7 +15,7 @@
  */
 package com.google.eclipse.javascript.jstestdriver.ui.view;
 
-import com.google.eclipse.javascript.jstestdriver.core.model.SlaveBrowserRootData;
+import com.google.eclipse.javascript.jstestdriver.core.model.JstdServerListener;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -72,7 +72,7 @@ public class ServerInfoPanel extends Composite implements Observer {
    */
   @Override
   public void update(Observable o, final Object arg) {
-    final SlaveBrowserRootData data = (SlaveBrowserRootData) arg;
+    final JstdServerListener data = (JstdServerListener) arg;
     Display.getDefault().asyncExec(new Runnable() {
       public void run() {
         if (data.hasSlaves()) {

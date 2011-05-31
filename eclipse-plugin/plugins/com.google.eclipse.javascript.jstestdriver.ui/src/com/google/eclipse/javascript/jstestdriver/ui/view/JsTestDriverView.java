@@ -39,7 +39,6 @@ public class JsTestDriverView extends ViewPart {
 
   private ServerInfoPanel serverInfoPanel;
   private TestResultsPanel testResultsPanel;
-  private final ServerController serverController = new ServerController();
 
   private JavascriptOnSaveTestRunner resourceListener;
 
@@ -48,7 +47,7 @@ public class JsTestDriverView extends ViewPart {
     parent.setLayout(new GridLayout(1, false));
     serverInfoPanel = new ServerInfoPanel(parent, SWT.NONE);
     testResultsPanel = new TestResultsPanel(parent, SWT.NONE);
-    serverController.connectObservers(serverInfoPanel);
+    ServerController.getInstance().connectObservers(serverInfoPanel);
     resourceListener = new JavascriptOnSaveTestRunner();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener);
   }
@@ -75,11 +74,8 @@ public class JsTestDriverView extends ViewPart {
   @Override
   public void dispose() {
     ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
-    serverController.disconnectObservers(serverInfoPanel);
-    Server server = Server.getInstance();
-    if (server != null && server.isStarted()) {
-      server.stop();
-    }
+    ServerController.getInstance().disconnectObservers(serverInfoPanel);
+    // stop server here?
     serverInfoPanel.dispose();
     testResultsPanel.dispose();
   }

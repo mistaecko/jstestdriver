@@ -19,6 +19,7 @@ import com.google.eclipse.javascript.jstestdriver.core.Server;
 import com.google.eclipse.javascript.jstestdriver.ui.Activator;
 import com.google.eclipse.javascript.jstestdriver.ui.Icons;
 import com.google.eclipse.javascript.jstestdriver.ui.view.JsTestDriverView;
+import com.google.eclipse.javascript.jstestdriver.ui.view.ServerController;
 import com.google.eclipse.javascript.jstestdriver.ui.view.ServerInfoPanel;
 
 import org.eclipse.core.runtime.IStatus;
@@ -39,15 +40,14 @@ public class ServerStartStopViewActionDelegate implements IViewActionDelegate {
 
   private final Icons icons;
   private ServerInfoPanel view;
-  private final Server server;
-
+  private final ServerController serverController;
   public ServerStartStopViewActionDelegate() {
-    this(Server.getInstance(), Activator.getDefault().getIcons());
+    this(Activator.getDefault().getIcons(), ServerController.getInstance());
   }
   
-  public ServerStartStopViewActionDelegate(Server server, Icons icons) {
-    this.server = server;
+  public ServerStartStopViewActionDelegate(Icons icons, ServerController serverController) {
     this.icons = icons;
+    this.serverController = serverController;
   }
 
   @Override
@@ -59,23 +59,21 @@ public class ServerStartStopViewActionDelegate implements IViewActionDelegate {
 
   @Override
   public void run(IAction action) {
-    // TODO(shyamseshadri): The following is causing a bug, where changing the port in the
-    // preferences does not reflect until the view is restarted. Need to change to create the
-    // server every time with the port gotten from the preference store. Yeesh
-    
-    if (!server.isStarted()) {
+    // TODO(corysmith): replace Server with ServerController?
+    if (!serverController.isServerStarted()) {
       try {
-        server.start();
-        setStopServerState(action);
+        serverController.startServer();
+        setStartServerState(action);
       } catch (RuntimeException e) {
+        e.printStackTrace();
         IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
           e.getMessage());
         ErrorDialog.openError(Display.getCurrent().getActiveShell(),
             "JS Test Driver", "JS Test Driver Error", status);
       }
     } else {
-      server.stop();
-      setStartServerState(action);
+      ServerController.getInstance().stopServer();
+      setStopServerState(action);
     }
   }
 

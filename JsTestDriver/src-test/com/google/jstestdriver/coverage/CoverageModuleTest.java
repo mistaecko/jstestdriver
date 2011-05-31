@@ -52,7 +52,7 @@ public class CoverageModuleTest extends TestCase {
     JsTestDriverModule jsTestDriverModule =
         new JsTestDriverModule(flags,
             Collections.<FileInfo> emptySet(),
-            "",
+            "http://127.0.0.1:42242",
             System.out,
             new File(""),
             2 * 60 * 60,

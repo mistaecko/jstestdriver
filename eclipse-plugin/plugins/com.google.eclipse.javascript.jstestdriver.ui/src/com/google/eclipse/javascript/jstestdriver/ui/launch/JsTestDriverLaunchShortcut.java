@@ -56,6 +56,7 @@ import com.google.eclipse.javascript.jstestdriver.core.Server;
 import com.google.eclipse.javascript.jstestdriver.ui.Activator;
 import com.google.eclipse.javascript.jstestdriver.ui.runner.ActionRunnerFactory;
 import com.google.eclipse.javascript.jstestdriver.ui.view.JsTestDriverView;
+import com.google.eclipse.javascript.jstestdriver.ui.view.ServerController;
 import com.google.eclipse.javascript.jstestdriver.ui.view.TestResultsPanel;
 
 /**
@@ -77,7 +78,7 @@ public class JsTestDriverLaunchShortcut implements ILaunchShortcut {
       ErrorDialog.openError(Display.getCurrent().getActiveShell(),
           "JS Test Driver", "JS Test Driver Error", status);
       return;
-    } else if (!Server.getInstance().isReadyToRunTests()) {
+    } else if (!ServerController.getInstance().isServerReady()) {
       IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
           "Cannot run tests if no browsers captured");
       ErrorDialog.openError(Display.getCurrent().getActiveShell(),
@@ -125,7 +126,7 @@ public class JsTestDriverLaunchShortcut implements ILaunchShortcut {
       ErrorDialog.openError(Display.getCurrent().getActiveShell(),
           "JS Test Driver", "JS Test Driver Error", status);
       return;
-    } else if (!Server.getInstance().isReadyToRunTests()) {
+    } else if (!ServerController.getInstance().isServerReady()) {
       IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
           "Cannot run tests if no browsers captured");
       ErrorDialog.openError(Display.getCurrent().getActiveShell(),

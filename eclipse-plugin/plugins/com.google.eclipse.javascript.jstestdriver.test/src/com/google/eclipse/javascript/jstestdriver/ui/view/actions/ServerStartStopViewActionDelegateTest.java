@@ -15,54 +15,60 @@
  */
 package com.google.eclipse.javascript.jstestdriver.ui.view.actions;
 
+import com.google.eclipse.javascript.jstestdriver.ui.Icons;
+import com.google.eclipse.javascript.jstestdriver.ui.view.PortSupplier;
+import com.google.eclipse.javascript.jstestdriver.ui.view.ServerController;
+
 import junit.framework.TestCase;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-
-import com.google.eclipse.javascript.jstestdriver.core.Server;
-import com.google.eclipse.javascript.jstestdriver.ui.Icons;
-import com.google.eclipse.javascript.jstestdriver.ui.view.actions.ServerStartStopViewActionDelegate;
 
 public class ServerStartStopViewActionDelegateTest extends TestCase {
 
   protected boolean startServerIconCalled = false;
   protected boolean stopServerIconCalled = false;
 
-  public void testClickingOnActionToglesIconAndTextBetweenStartStop() {
-    Server server = Server.getInstance(4224);
+  public void testClickingOnActionTogglesIconAndTextBetweenStartStop() {
+    Icons icons = new Icons() {
+
+      @Override
+      public ImageDescriptor startServerIcon() {
+        startServerIconCalled = true;
+        stopServerIconCalled = false;
+        return null;
+      }
+
+      @Override
+      public ImageDescriptor stopServerIcon() {
+        startServerIconCalled = false;
+        stopServerIconCalled = true;
+        return null;
+      }
+    };
+    
+    
     ServerStartStopViewActionDelegate delegate = new ServerStartStopViewActionDelegate(
-        server, new Icons() {
-
+        icons, ServerController.getInstanceForTest(new PortSupplier() {
           @Override
-          public ImageDescriptor startServerIcon() {
-            startServerIconCalled = true;
-            stopServerIconCalled = false;
-            return null;
+          public int getPort() {
+            return 42242;
           }
-
-          @Override
-          public ImageDescriptor stopServerIcon() {
-            startServerIconCalled = false;
-            stopServerIconCalled = true;
-            return null;
-          }
-
-        });
+        }));
     Action action = new Action() {
     };
 
     delegate.run(action);
 
-    assertEquals("Stop Server", action.getText());
-    assertTrue(stopServerIconCalled);
-    assertFalse(startServerIconCalled);
+    assertFalse("Stop icon not called", stopServerIconCalled);
+    assertTrue("Start icon called", startServerIconCalled);
+    assertEquals("Start Server", action.getText());
 
     delegate.run(action);
 
-    assertEquals("Start Server", action.getText());
-    assertTrue(startServerIconCalled);
-    assertFalse(stopServerIconCalled);
+    assertEquals("Stop Server", action.getText());
+    assertFalse("Start icon not called", startServerIconCalled);
+    assertTrue("Stop icon called", stopServerIconCalled);
   }
 
 }

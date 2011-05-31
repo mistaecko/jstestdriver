@@ -20,6 +20,7 @@ import com.google.eclipse.javascript.jstestdriver.core.JstdLaunchListener;
 import com.google.eclipse.javascript.jstestdriver.core.Server;
 import com.google.eclipse.javascript.jstestdriver.ui.Activator;
 import com.google.eclipse.javascript.jstestdriver.ui.runner.ActionRunnerFactory;
+import com.google.eclipse.javascript.jstestdriver.ui.view.ServerController;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -104,6 +105,6 @@ public class JsTestDriverLaunchConfigurationDelegate extends LaunchConfiguration
     Server server = Server.getInstance();
     return super.preLaunchCheck(configuration, mode, monitor)
         && mode.equals(ILaunchManager.RUN_MODE) && !monitor.isCanceled()
-        && server != null && server.isStarted() && server.isReadyToRunTests();
+        && ServerController.getInstance().isServerReady();
   }
 }

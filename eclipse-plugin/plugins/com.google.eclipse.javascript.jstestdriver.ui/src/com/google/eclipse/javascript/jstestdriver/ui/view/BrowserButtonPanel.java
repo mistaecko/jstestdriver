@@ -16,7 +16,7 @@
 package com.google.eclipse.javascript.jstestdriver.ui.view;
 
 import com.google.eclipse.javascript.jstestdriver.core.model.Browser;
-import com.google.eclipse.javascript.jstestdriver.core.model.SlaveBrowserRootData;
+import com.google.eclipse.javascript.jstestdriver.core.model.JstdServerListener;
 import com.google.eclipse.javascript.jstestdriver.ui.Activator;
 import com.google.eclipse.javascript.jstestdriver.ui.Icons;
 import com.google.eclipse.javascript.jstestdriver.ui.prefs.WorkbenchPreferencePage;
@@ -98,12 +98,12 @@ public class BrowserButtonPanel extends Composite implements Observer {
   }
 
   /**
-   * Gets notified when the {@link SlaveBrowserRootData} changes. It is passed a reference of
+   * Gets notified when the {@link JstdServerListener} changes. It is passed a reference of
    * the same, and is expected to update the images based on whether browsers are captured or not.
    */
   @Override
   public void update(Observable o, Object arg) {
-    final SlaveBrowserRootData data = (SlaveBrowserRootData) arg;
+    final JstdServerListener data = (JstdServerListener) arg;
     Display.getDefault().asyncExec(new Runnable() {
       public void run() {
         if (!ffIcon.isDisposed()) {

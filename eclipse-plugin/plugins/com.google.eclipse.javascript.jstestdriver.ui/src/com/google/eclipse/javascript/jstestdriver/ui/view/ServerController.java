@@ -17,37 +17,71 @@
 package com.google.eclipse.javascript.jstestdriver.ui.view;
 
 import com.google.eclipse.javascript.jstestdriver.core.Server;
-import com.google.eclipse.javascript.jstestdriver.core.model.SlaveBrowserRootData;
+import com.google.eclipse.javascript.jstestdriver.core.model.JstdServerListener;
 import com.google.eclipse.javascript.jstestdriver.ui.Activator;
 import com.google.eclipse.javascript.jstestdriver.ui.prefs.WorkbenchPreferencePage;
 
 /**
+ * Controls the server. There can be only one!
  * @author shyamseshadri@gmail.com (Shyam Seshadri)
  *
  */
 public class ServerController {
+  private static ServerController instance = null;
+  private final JstdServerListener listener;
+  private final PortSupplier portSupplier;
 
-  public ServerController() {
-    int port = Activator.getDefault().getPreferenceStore().getInt(
-        WorkbenchPreferencePage.PREFERRED_SERVER_PORT);
-    // make sure the server is started.
-    Server.getInstance(port);
+  public static synchronized ServerController getInstance() {
+    if (instance == null) {
+      instance = new ServerController(new JstdServerListener(), new PreferenceStorePortSupplier());
+    }
+    return instance;
+  }
+  
+  public static synchronized ServerController getInstanceForTest(PortSupplier supplier) {
+    if (instance == null) {
+      instance = new ServerController(new JstdServerListener(), supplier);
+    }
+    return instance;
+  }
+
+  ServerController(JstdServerListener listener, PortSupplier portSupplier) {
+    this.listener = listener;
+    this.portSupplier = portSupplier;
+  }
+
+  public void startServer() {
+    Server.getInstance(portSupplier.getPort(), listener).start();
+  }
+
+  public void stopServer() {
+    Server.getInstance().stop();
+  }
+  
+  public boolean isServerReady() {
+    return listener.hasSlaves();
+  }
+  
+  public boolean isServerStarted() {
+    return listener.getServerState() == Server.State.STARTED;
   }
 
   public void connectObservers(ServerInfoPanel view) {
-    SlaveBrowserRootData data = SlaveBrowserRootData.getInstance();
-    Server.getInstance().getCapturedBrowsers().addObserver(data);
-    data.addObserver(view);
-    data.addObserver(view.getBrowserButtonPanel());
+    listener.addObserver(view);
+    listener.addObserver(view.getBrowserButtonPanel());
+  }
 
+  public static class PreferenceStorePortSupplier implements PortSupplier {
+    @Override
+    public int getPort() {
+      int port = Activator.getDefault().getPreferenceStore().getInt(
+        WorkbenchPreferencePage.PREFERRED_SERVER_PORT);
+      return port;
+    }
   }
 
   public void disconnectObservers(ServerInfoPanel view) {
-    SlaveBrowserRootData data = SlaveBrowserRootData.getInstance();
-    if (Server.getInstance() != null) {
-      Server.getInstance().getCapturedBrowsers().deleteObserver(data);
-    }
-    data.deleteObserver(view);
-    data.deleteObserver(view.getBrowserButtonPanel());
+    listener.deleteObserver(view);
+    listener.deleteObserver(view.getBrowserButtonPanel());
   }
 }
