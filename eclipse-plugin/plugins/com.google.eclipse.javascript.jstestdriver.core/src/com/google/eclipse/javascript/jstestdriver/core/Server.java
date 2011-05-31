@@ -80,7 +80,7 @@ public class Server {
     this.port = port;
     capturedBrowsers = new CapturedBrowsers(new BrowserIdStrategy(new TimeImpl()));
     this.startupAction =
-      new ServerStartupAction(port, capturedBrowsers, new FilesCache(
+      new ServerStartupAction(port, port +1, capturedBrowsers, new FilesCache(
           Maps.<String, FileInfo>newHashMap()),
           new DefaultURLTranslator(),
           new DefaultURLRewriter());

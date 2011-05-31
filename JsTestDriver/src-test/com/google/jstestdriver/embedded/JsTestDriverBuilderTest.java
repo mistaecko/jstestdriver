@@ -97,9 +97,8 @@ public class JsTestDriverBuilderTest extends TestCase {
     JsTestDriver server =
         new JsTestDriverBuilder()
             .setBaseDir(tmpDir)
-            .setCmdLineFlags(
-                new CmdFlags(Lists.<CmdLineFlag>newArrayList(new CmdLineFlag("--port", "8080"))))
-            .setConfiguration(configuration.getAbsolutePath())
+            .setFlags(new String[]{"--port", "8080"})
+            .setDefaultConfiguration(configuration.getAbsolutePath())
             .setRunnerMode(RunnerMode.QUIET)
             .setPort(8080)
             .addServerListener(new TestServerListener())
@@ -114,11 +113,8 @@ public class JsTestDriverBuilderTest extends TestCase {
     JsTestDriver client =
         new JsTestDriverBuilder()
             .setBaseDir(tmpDir)
-            .setCmdLineFlags(
-                new CmdFlags(Lists.<CmdLineFlag>newArrayList(
-                  new CmdLineFlag("--tests", "all"),
-                  new CmdLineFlag("--browser", "foo"))))
-            .setConfiguration(configuration.getAbsolutePath())
+            .setFlags(new String[]{"--tests", "all", "--browser", "foo"})
+            .setDefaultConfiguration(configuration.getAbsolutePath())
             .setServer("http://localhost:8080")
             .withPluginInitializer(TestInitializer.class)
             .addTestListener(new TestTestResultsListener())

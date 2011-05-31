@@ -78,7 +78,7 @@ public class ParsedConfiguration implements Configuration {
       return handlerPrefix.suffixServer(server);
     }
     if (port == -1) {
-      throw new RuntimeException("Oh Snap! No server defined!");
+      throw new ConfigurationException("Oh Snap! No server defined!");
     }
 
     return handlerPrefix.suffixServer(String.format("http://%s:%d", "127.0.0.1", port));

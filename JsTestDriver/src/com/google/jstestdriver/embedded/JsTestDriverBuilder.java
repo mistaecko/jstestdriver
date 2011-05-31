@@ -2,31 +2,23 @@
 
 package com.google.jstestdriver.embedded;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.internal.Lists;
 import com.google.inject.multibindings.Multibinder;
-import com.google.jstestdriver.ActionRunner;
-import com.google.jstestdriver.Args4jFlagsParser;
 import com.google.jstestdriver.JsTestDriver;
 import com.google.jstestdriver.PluginLoader;
-import com.google.jstestdriver.config.CmdFlags;
 import com.google.jstestdriver.config.Configuration;
 import com.google.jstestdriver.config.ConfigurationSource;
-import com.google.jstestdriver.config.InitializeModule;
-import com.google.jstestdriver.config.Initializer;
 import com.google.jstestdriver.config.UserConfigurationSource;
 import com.google.jstestdriver.config.YamlParser;
 import com.google.jstestdriver.hooks.PluginInitializer;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.output.TestResultListener;
 import com.google.jstestdriver.runner.RunnerMode;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * @author corbinrsmith@gmail.com (Cory Smith)
@@ -36,37 +28,37 @@ public class JsTestDriverBuilder {
 
   private File baseDir;
   private List<Module> pluginModules = Lists.newArrayList();
-  private CmdFlags cmdLineFlags;
+  private String[] flags;
   private Configuration configuration;
   private final PluginLoader pluginLoader = new PluginLoader();
-  private int port;
-  private List<ServerListener> serverListeners = Lists.newArrayList();
-  private List<TestResultListener> testListeners = Lists.newArrayList();
+  private int port = -1;
+  private final List<ServerListener> serverListeners = Lists.newArrayList();
+  private final List<TestResultListener> testListeners = Lists.newArrayList();
   private RunnerMode runnerMode = RunnerMode.QUIET;
   private String serverAddress;
   final private List<Class<? extends PluginInitializer>> initializers =  Lists.newArrayList();
 
   /**
    * @param absolutePath
-   * @return
+   * @return The builder.
    */
-  public JsTestDriverBuilder setConfiguration(String configPath) {
+  public JsTestDriverBuilder setDefaultConfiguration(String configPath) {
     setConfigurationSource(new UserConfigurationSource(new File(configPath)));
     return this;
   }
   
   /**
    * @param absolutePath
-   * @return
+   * @return The builder.
    */
-  public JsTestDriverBuilder setConfiguration(Configuration configuration) {
+  public JsTestDriverBuilder setDefaultConfiguration(Configuration configuration) {
     this.configuration = configuration;
     return this;
   }
 
   /**
-   * @param i
-   * @return
+   * @param port
+   * @return The builder.
    */
   public JsTestDriverBuilder setPort(int port) {
     this.port = port;
@@ -75,47 +67,32 @@ public class JsTestDriverBuilder {
 
   /**
    * @param testServerListener
-   * @return
+   * @return The builder.
    */
   public JsTestDriverBuilder addServerListener(ServerListener testServerListener) {
     serverListeners.add(testServerListener);
     return this;
   }
 
+
   /**
    * 
    */
   public JsTestDriver build() {
-    List<Module> initializeModules = Lists.newArrayList();
-    File basePath;
-    try {
-      basePath = configuration.getBasePath().getCanonicalFile();
-      initializeModules.add(
-          new InitializeModule(
-              pluginLoader,
-              basePath,
-              new Args4jFlagsParser(),
-              runnerMode));
-      initializeModules.add(new Module() {
-        public void configure(Binder binder) {
-          Multibinder<PluginInitializer> setBinder=
-              Multibinder.newSetBinder(binder, PluginInitializer.class);
-          for (Class<? extends PluginInitializer> initializer : initializers) {
-            setBinder.addBinding().to(initializer);
-          }
-        }
-      });
-      Injector initializeInjector = Guice.createInjector(initializeModules);
-
-      List<Module> actionRunnerModules;
-      actionRunnerModules =
-          initializeInjector.getInstance(Initializer.class).initialize(pluginModules,
-              configuration, cmdLineFlags.getRunnerMode(), cmdLineFlags.getUnusedFlagsAsArgs());
-      Injector injector = Guice.createInjector(actionRunnerModules);
-      return new JsTestDriver(injector);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    // TODO(corysmith): add check to resolve the serverAddress and port issues.
+    List<Module> modules = Lists.newArrayList(pluginModules);
+    modules.add(new ListenersModule(serverListeners, testListeners));
+    return new JsTestDriver(configuration,
+        pluginLoader,
+        initializers,
+        runnerMode,
+        flags,
+        port,
+        modules,
+        serverListeners,
+        testListeners,
+        baseDir,
+        serverAddress);
   }
 
   /**
@@ -168,7 +145,7 @@ public class JsTestDriverBuilder {
    * @param configurationSource
    */
   public JsTestDriverBuilder setConfigurationSource(ConfigurationSource source) {
-    setConfiguration(source.parse(baseDir, new YamlParser()));
+    setDefaultConfiguration(source.parse(baseDir, new YamlParser()));
     return this;
   }
 
@@ -176,7 +153,7 @@ public class JsTestDriverBuilder {
    * Modules for the plugins.
    * @param pluginModules
    * @return 
-   * @deprecated
+   * @deprecated In favor of passing in {@link PluginInitializer}s
    */
   public JsTestDriverBuilder addPluginModules(List<Module> pluginModules) {
     this.pluginModules = pluginModules;
@@ -185,14 +162,37 @@ public class JsTestDriverBuilder {
 
   /**
    * Don't pass in the commandline flags.
-   * @param cmdLineFlags
+   * @param flags
    * @return 
    * @deprecated
    */
-  // TODO(corysmith): Move the error handling out of the Args4jFlagsParser.
-  public JsTestDriverBuilder setCmdLineFlags(CmdFlags cmdLineFlags) {
-    this.cmdLineFlags = cmdLineFlags;
+  public JsTestDriverBuilder setFlags(String[] flags) {
+    this.flags = flags;
     return this;
   }
 
+  private static class ListenersModule implements Module {
+    private final List<ServerListener> serverListeners;
+    private final List<TestResultListener> testListeners;
+
+    public ListenersModule(List<ServerListener> serverListeners,
+        List<TestResultListener> testListeners) {
+      this.serverListeners = serverListeners;
+      this.testListeners = testListeners;
+    }
+
+    public void configure(Binder binder) {
+      Multibinder<ServerListener> serverSetBinder =
+          Multibinder.newSetBinder(binder, ServerListener.class);
+      for (ServerListener listener : serverListeners) {
+        serverSetBinder.addBinding().toInstance(listener);
+      }
+      Multibinder<TestResultListener> testSetBinder =
+        Multibinder.newSetBinder(binder, TestResultListener.class);
+      for (TestResultListener listener : testListeners) {
+        testSetBinder.addBinding().toInstance(listener);
+      }
+    }
+  }
+  
 }

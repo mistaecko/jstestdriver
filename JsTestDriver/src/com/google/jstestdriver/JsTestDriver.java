@@ -15,37 +15,104 @@
  */
 package com.google.jstestdriver;
 
-import java.util.List;
-import java.util.logging.LogManager;
+import com.google.common.collect.Lists;
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.multibindings.Multibinder;
+import com.google.jstestdriver.config.CmdFlags;
+import com.google.jstestdriver.config.CmdLineFlagsFactory;
+import com.google.jstestdriver.config.Configuration;
+import com.google.jstestdriver.config.ConfigurationException;
+import com.google.jstestdriver.config.InitializeModule;
+import com.google.jstestdriver.config.Initializer;
+import com.google.jstestdriver.config.InvalidFlagException;
+import com.google.jstestdriver.config.UnreadableFilesException;
+import com.google.jstestdriver.config.UserConfigurationSource;
+import com.google.jstestdriver.config.YamlParser;
+import com.google.jstestdriver.embedded.JsTestDriverBuilder;
+import com.google.jstestdriver.guice.TestResultPrintingModule.TestResultPrintingInitializer;
+import com.google.jstestdriver.hooks.PluginInitializer;
+import com.google.jstestdriver.hooks.ServerListener;
+import com.google.jstestdriver.output.TestResultListener;
+import com.google.jstestdriver.runner.RunnerMode;
+import com.google.jstestdriver.util.RetryException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.jstestdriver.config.CmdFlags;
-import com.google.jstestdriver.config.CmdLineFlagsFactory;
-import com.google.jstestdriver.config.Configuration;
-import com.google.jstestdriver.config.InvalidFlagException;
-import com.google.jstestdriver.config.UnreadableFilesException;
-import com.google.jstestdriver.embedded.JsTestDriverBuilder;
-import com.google.jstestdriver.guice.TestResultPrintingModule.TestResultPrintingInitializer;
-import com.google.jstestdriver.util.RetryException;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.LogManager;
 
 public class JsTestDriver {
 
+  /**
+   * @author corysmith@google.com (Cory Smith)
+   *
+   */
+  private final class PluginInitializerModule implements Module {
+    public void configure(Binder binder) {
+      Multibinder<PluginInitializer> setBinder =
+          Multibinder.newSetBinder(binder, PluginInitializer.class);
+      for (Class<? extends PluginInitializer> initializer : initializers) {
+        setBinder.addBinding().to(initializer);
+      }
+    }
+  }
+
   private static final Logger logger = LoggerFactory.getLogger(JsTestDriver.class);
-  private final Injector injector;
+  private final Configuration defaultConfiguration;
+  private final PluginLoader pluginLoader;
+  private final List<Class<? extends PluginInitializer>> initializers;
+  private final String[] defaultFlags;
+  private final RunnerMode runnerMode;
+  private final int port;
+  private final List<Module> pluginModules;
+  private final List<ServerListener> serverListeners;
+  private final List<TestResultListener> testListeners;
+  private final File baseDir;
+  private final String serverAddress;
 
   /**
+   * @param strings
+   * @param runnerMode
+   * @param initializers
+   * @param pluginLoader
+   * @param configuration
+   * @param testListeners 
+   * @param serverListeners 
+   * @param pluginModules 
+   * @param port 
+   * @param baseDir 
+   * @param serverAddress 
    * @param injector
    */
-  public JsTestDriver(Injector injector) {
-    // TODO(corysmith): Stop passing the injector around! This is a temporary step
-    // in refactoring the action based system to be controlled by the JsTestDriver
-    // interface.
-    this.injector = injector;
+  public JsTestDriver(Configuration configuration,
+                      PluginLoader pluginLoader,
+                      List<Class<? extends PluginInitializer>> initializers,
+                      RunnerMode runnerMode,
+                      String[] flags,
+                      int port,
+                      List<Module> pluginModules,
+                      List<ServerListener> serverListeners,
+                      List<TestResultListener> testListeners,
+                      File baseDir,
+                      String serverAddress) {
+    this.defaultConfiguration = configuration;
+    this.pluginLoader = pluginLoader;
+    this.initializers = initializers;
+    this.runnerMode = runnerMode;
+    this.defaultFlags = flags;
+    this.port = port;
+    this.pluginModules = pluginModules;
+    this.serverListeners = serverListeners;
+    this.testListeners = testListeners;
+    this.baseDir = baseDir;
+    this.serverAddress = serverAddress;
+
   }
 
   public static void main(String[] args) {
@@ -72,7 +139,7 @@ public class JsTestDriver {
       builder.addPluginModules(pluginModules);
       builder.withPluginInitializer(TestResultPrintingInitializer.class);
       builder.setRunnerMode(cmdLineFlags.getRunnerMode());
-      builder.setCmdLineFlags(cmdLineFlags);
+      builder.setFlags(cmdLineFlags.getUnusedFlagsAsArgs());
       JsTestDriver jstd = builder.build();
       jstd.runConfiguration();
 
@@ -99,37 +166,91 @@ public class JsTestDriver {
       System.exit(1);
     }
   }
-  
+
   public void startServer() {
-    injector.getInstance(ServerStartupAction.class).run(null);
+    // TODO(corysmith): refactor these to do less hacking.
+    if (port == -1) {
+      throw new ConfigurationException("Port not defined, cannot start local server.");
+    }
+    runConfigurationWithFlags(defaultConfiguration, new String[] {"--port ", String.valueOf(port),
+        findServerHandlerPrefix()});
   }
 
   public void stopServer() {
-    injector.getInstance(ServerShutdownAction.class).run(null);
+    // TODO(corysmith): refactor these to do less hacking.
+    StringBuilder urlBuilder = new StringBuilder(serverAddress);
+    String prefixFlag = findServerHandlerPrefix();
+    if (!prefixFlag.isEmpty()) {
+      urlBuilder.append(prefixFlag).append("/");
+    }
+    urlBuilder.append("quit");
+    new HttpServer().fetch(urlBuilder.toString());
   }
   
   /**
-   * Runs the built in confiugration.
-   * @return
+   * Runs the default configuration with the default flags.
    */
   public List<TestCase> runConfiguration() {
-    injector.getInstance(ActionRunner.class).runActions();
+    runConfigurationWithFlags(defaultConfiguration, defaultFlags);
     return null;
   }
-  
-  public List<TestCase> runConfiguration(String path) {
+
+  public List<TestCase> runAllTests(String path) {
+    return runAllTests(parseConfiguration(path));
+  }
+
+  public List<TestCase> runAllTests(Configuration config) {
+    // TODO(corysmith): Refactor to avoid passing string flags.
+    runConfigurationWithFlags(config, new String[]{"--tests","all"});
     return null;
   }
-  
-  public List<TestCase> runConfiguration(Configuration config) {
-    return null;
-  }
-  
+
   public List<TestCase> getTestCasesFor(String path) {
+    return getTestCasesFor(parseConfiguration(path));
+  }
+
+  public List<TestCase> getTestCasesFor(Configuration config) {
+    // TODO(corysmith): Refactor to avoid passing string flags.
+    runConfigurationWithFlags(config, new String[]{"--dryRunFor","all"});
     return null;
   }
-  
-  public List<TestCase> getTestCasesFor(Configuration conifg) {
-    return null;
+
+  private Configuration parseConfiguration(String path) {
+    File configFile = new File(path);
+    if (!configFile.exists()) {
+      throw new ConfigurationException("Could not find " + configFile);
+    }
+    return new UserConfigurationSource(configFile).parse(baseDir,
+        new YamlParser());
+  }
+
+  private void runConfigurationWithFlags(Configuration config, String[] flags) {
+    List<Module> initializeModules = Lists.newArrayList();
+    File basePath;
+    try {
+      basePath = config.getBasePath().getCanonicalFile();
+      initializeModules.add(new InitializeModule(pluginLoader, basePath, new Args4jFlagsParser(),
+          runnerMode));
+      initializeModules.add(new PluginInitializerModule());
+    } catch (IOException e) {
+      throw new ConfigurationException("Could not find " + config.getBasePath(), e);
+    }
+    Injector initializeInjector = Guice.createInjector(initializeModules);
+
+    List<Module> actionRunnerModules;
+    actionRunnerModules =
+        initializeInjector.getInstance(Initializer.class).initialize(pluginModules,
+            defaultConfiguration, runnerMode, flags);
+    Injector injector = Guice.createInjector(actionRunnerModules);
+    injector.getInstance(ActionRunner.class).runActions();
+  }
+
+  private String findServerHandlerPrefix() {
+    for (String flag : defaultFlags) {
+      if (flag.startsWith("--serverHandlerPrefix")) {
+        return flag;
+      }
+    }
+    return "";
   }
 }
