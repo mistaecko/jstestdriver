@@ -55,10 +55,12 @@ public class BrowserStartupAction implements Action {
       this.executor = executor;
   }
 
+  @Override
   public RunData run(RunData runData) {
     List<Future<String>> browserIds = Lists.newArrayListWithCapacity(browsers.size());
     for (final BrowserRunner browser : browsers) {
       browserIds.add(executor.submit(new Callable<String>() {
+        @Override
         public String call() throws Exception {
           return new BrowserControl(browser, serverAddress, stopWatch, client)
               .captureBrowser(client.getNextBrowserId());

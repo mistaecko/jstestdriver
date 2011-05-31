@@ -51,9 +51,9 @@ public class QuitHandler implements RequestHandler {
     writer.flush();
     // TODO(corysmith): figure out how to stop without a cyclical ref
     try {
-      cyclicalReferenceProvider.get().stop();
-      holder.doStop();
-      connector.stop();
+      Server server = cyclicalReferenceProvider.get();
+      server.stop();
+      server.join();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

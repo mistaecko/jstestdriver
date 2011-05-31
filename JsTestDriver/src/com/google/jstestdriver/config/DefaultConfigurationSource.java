@@ -28,6 +28,14 @@ import com.google.jstestdriver.Flags;
  *
  * @author Cory Smith (corbinrsmith@gmail.com) 
  */
+/**
+ * @author corysmith@google.com (Cory Smith)
+ *
+ */
+/**
+ * @author corysmith@google.com (Cory Smith)
+ *
+ */
 public class DefaultConfigurationSource implements ConfigurationSource {
 
   /** {@inheritDoc} */
@@ -54,4 +62,13 @@ public class DefaultConfigurationSource implements ConfigurationSource {
   public String getName() {
     return Flags.DEFAULT_CONFIG_NAME;
   }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "DefaultConfigurationSource [name=" + Flags.DEFAULT_CONFIG_NAME + "]";
+  }
+
 }

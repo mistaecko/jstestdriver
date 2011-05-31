@@ -39,6 +39,10 @@ import com.google.jstestdriver.runner.RunnerMode;
  * FlagsParser for the JsTestDriver.
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
+/**
+ * @author corysmith@google.com (Cory Smith)
+ *
+ */
 public class FlagsImpl implements Flags {
 
   private Integer port = -1;
@@ -215,5 +219,16 @@ public class FlagsImpl implements Flags {
 
   public HandlerPathPrefix getServerHandlerPrefix() {
     return serverHandlerPrefix;
+  }
+
+  @Override
+  public String toString() {
+    return "FlagsImpl [port=" + port + ",\n sslPort=" + sslPort + ",\n server=" + server
+        + ",\n testOutput=" + testOutput + ",\n browser=" + browser + ",\n reset=" + reset
+        + ",\n browserTimeout=" + browserTimeout + ",\n config=" + config + ",\n tests=" + tests
+        + ",\n displayHelp=" + displayHelp + ",\n verbose=" + verbose + ",\n captureConsole="
+        + captureConsole + ",\n preloadFiles=" + preloadFiles + ",\n dryRunFor=" + dryRunFor
+        + ",\n arguments=" + arguments + ",\n runnerMode=" + runnerMode + ",\n requiredBrowsers="
+        + requiredBrowsers + ",\n serverHandlerPrefix=" + serverHandlerPrefix + "]";
   }
 }

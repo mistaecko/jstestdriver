@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -40,6 +41,10 @@ import com.google.jstestdriver.guice.BrowserActionProvider;
 import com.google.jstestdriver.guice.FlagsModule;
 import com.google.jstestdriver.hooks.ServerListener;
 
+import org.mortbay.util.UrlEncoded;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Guice module for configuring JsTestDriver.
  * 
@@ -47,6 +52,8 @@ import com.google.jstestdriver.hooks.ServerListener;
  * 
  */
 public class JsTestDriverModule extends AbstractModule {
+  private static final Logger logger =
+      LoggerFactory.getLogger(JsTestDriverModule.class);
 
   private final Flags flags;
   private final Set<FileInfo> fileSet;
@@ -96,8 +103,34 @@ public class JsTestDriverModule extends AbstractModule {
 
   @Override
   protected void configure() {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Configured with:\n"
+          + "flags:{}\n"
+          + "Files:{}\nserver:{}\n"
+          + "outputStream:{}\n"
+          + "basePath:{}\n"
+          + "testSuiteTimeout:{}\n"
+          + "tests:{}\n"
+          + "plugins:{}\n"
+          + "proxy:{}", new Object[]{
+         flags,
+         fileSet,
+         serverAddress,
+         outputStream,
+         basePath,
+         testSuiteTimeout,
+         tests,
+         plugins,
+         proxyConfig
+      });
+    }
+
     bind(PrintStream.class)
          .annotatedWith(Names.named("outputStream")).toInstance(outputStream);
+    Preconditions.checkArgument(serverAddress != null
+        && serverAddress.length() > 0
+        && serverAddress.startsWith("http"),
+        "The server address cannot be empty, null, or missing the protocol:" + serverAddress);
     bind(String.class)
          .annotatedWith(Names.named("server")).toInstance(serverAddress);
     bind(Boolean.class)

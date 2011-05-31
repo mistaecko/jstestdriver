@@ -37,13 +37,13 @@ import com.google.gson.JsonElement;
 public class HttpServer implements Server {
   private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
+  @Override
   public String fetch(String url) {
     HttpURLConnection connection = null;
     logger.trace("Fetching {}", url);
 
     try {
       connection = (HttpURLConnection) new URL(url).openConnection();
-
       connection.connect();
       String response = toString(connection.getInputStream());
       logger.trace("Fetch response {}", response);
@@ -58,6 +58,29 @@ public class HttpServer implements Server {
       }
     }
   }
+
+  public void ping(String url) {
+    HttpURLConnection connection = null;
+    logger.trace("Pinging {}", url);
+    
+    try {
+      connection = (HttpURLConnection) new URL(url).openConnection();
+      
+      connection.connect();
+      connection.getInputStream();
+      logger.trace("Pinged {}", url);
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (connection != null) {
+        connection.disconnect();
+      }
+    }
+  }
+  
+  
 
   private String toString(InputStream inputStream) throws IOException {
     StringBuilder sb = new StringBuilder();

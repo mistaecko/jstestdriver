@@ -95,11 +95,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.jstestdriver.JsTestDriverServer#start()
-   */
+  @Override
   public void start() {
     try {
       initServer();
@@ -109,20 +105,13 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
       timer.schedule(new BrowserReaper(capturedBrowsers), browserTimeout * 2, browserTimeout * 2);
 
       server.start();
-
-      notifyListeners(STARTED_NOTIFICATION);
-
       logger.info("Started the JsTD server on {}", port);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.google.jstestdriver.JsTestDriverServer#stop()
-   */
+  @Override
   public void stop() {
     try {
       timer.cancel();
@@ -131,7 +120,6 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
         server.join();
         server = null;
       }
-      notifyListeners(STOPPED_NOTIFICATION);
 
       logger.debug("Stopped the server.");
     } catch (Exception e) {
@@ -151,8 +139,9 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
    *
    * @see com.google.jstestdriver.JsTestDriverServer#isHealthy()
    */
+  @Override
   public boolean isHealthy() {
-    String url = "http://localhost:" + port + handlerPrefix.prefixPath("/hello");
+    String url = "http://127.0.0.1:" + port + handlerPrefix.prefixPath("/hello");
     HttpURLConnection connection;
     try {
       connection = (HttpURLConnection) new URL(url).openConnection();
@@ -171,23 +160,30 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
     return false;
   }
 
-  private static final class JettyLifeCycleLogger implements Listener {
+  private final class JettyLifeCycleLogger implements Listener {
+    @Override
     public void lifeCycleStopping(LifeCycle arg0) {
       logger.debug("Server stopping");
     }
 
+    @Override
     public void lifeCycleStopped(LifeCycle arg0) {
+      notifyListeners(STOPPED_NOTIFICATION);
       logger.debug("Server stopped");
     }
 
+    @Override
     public void lifeCycleStarting(LifeCycle arg0) {
       logger.debug("Server starting");
     }
 
+    @Override
     public void lifeCycleStarted(LifeCycle arg0) {
+      notifyListeners(STARTED_NOTIFICATION);
       logger.debug("Server started");
     }
 
+    @Override
     public void lifeCycleFailure(LifeCycle arg0, Throwable arg1) {
       logger.warn("Server failed", arg1);
     }
@@ -196,6 +192,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
   /**
    * Receives updates from the CapturedBrowsers.
    */
+  @Override
   public void update(Observable o, Object arg) {
     // TODO(corysmith): Cleanup browser capture event.
     BrowserCaptureEvent event = (BrowserCaptureEvent) arg;
@@ -220,6 +217,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
       this.info = info;
     }
 
+    @Override
     public void notify(ServerListener listener) {
       listener.browserPanicked(info);
     }
@@ -234,6 +232,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
       this.info = info;
     }
 
+    @Override
     public void notify(ServerListener listener) {
       listener.browserCaptured(info);
     }
@@ -241,6 +240,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
 
   private static final ServerNotification<ServerListener> STARTED_NOTIFICATION =
       new ServerNotification<ServerListener>() {
+        @Override
         public void notify(ServerListener listener) {
           listener.serverStarted();
         }
@@ -248,6 +248,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
 
   private static final ServerNotification<ServerListener> STOPPED_NOTIFICATION =
       new ServerNotification<ServerListener>() {
+        @Override
         public void notify(ServerListener listener) {
           listener.serverStopped();
         }

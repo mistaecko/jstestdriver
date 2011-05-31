@@ -60,7 +60,18 @@ public class ResolvedConfiguration implements Configuration {
 
   // TODO(corysmith): fix this interface to not require extra information.
   public String getServer(String flagValue, int port, HandlerPathPrefix handlerPrefix) {
-    return server;
+    System.out.printf("ParsedConfiguration: %s %s %s", server, flagValue, port);
+    if (flagValue != null && flagValue.length() != 0) {
+      return handlerPrefix.suffixServer(flagValue);
+    }
+    if (server.length() > 0) {
+      return handlerPrefix.suffixServer(server);
+    }
+    if (port == -1) {
+      throw new ConfigurationException("Oh Snap! No server defined!");
+    }
+
+    return handlerPrefix.suffixServer(String.format("http://%s:%d", "127.0.0.1", port));
   }
 
   public Set<FileInfo> getFilesList() {

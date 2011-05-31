@@ -16,12 +16,6 @@
 
 package com.google.jstestdriver.config;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Module;
@@ -37,12 +31,22 @@ import com.google.jstestdriver.hooks.PluginInitializer;
 import com.google.jstestdriver.html.HtmlDocModule;
 import com.google.jstestdriver.runner.RunnerMode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Handles the creation the list of modules necessary to create an ActionRunner.
  * @author corbinrsmith@gmail.com
  *
  */
 public class Initializer {
+  private static final Logger logger = LoggerFactory.getLogger(Initializer.class);
   private final PluginLoader pluginLoader;
   private final PathResolver pathResolver;
   private final FlagsParser flagsParser;
@@ -75,10 +79,13 @@ public class Initializer {
     // Might delegate to the flag parser to remove them, before creating Flags
     // Then, flags can have a method to retrieve them.
     Flags flags = flagsParser.parseArgument(args);
+    logger.debug("Flags: {}", flags);
+
     final List<Module> modules = Lists.newLinkedList();
     Configuration resolvedConfiguration =
         configuration.resolvePaths(pathResolver, flags);
 
+    modules.addAll(pluginModules);
     modules.addAll(pluginLoader.load(resolvedConfiguration.getPlugins()));
 
     for (PluginInitializer initializer : initializers) {

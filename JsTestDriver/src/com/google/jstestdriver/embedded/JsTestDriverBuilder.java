@@ -28,7 +28,7 @@ public class JsTestDriverBuilder {
 
   private File baseDir;
   private List<Module> pluginModules = Lists.newArrayList();
-  private String[] flags;
+  private String[] flags = new String[]{};
   private Configuration configuration;
   private final PluginLoader pluginLoader = new PluginLoader();
   private int port = -1;
@@ -36,10 +36,10 @@ public class JsTestDriverBuilder {
   private final List<TestResultListener> testListeners = Lists.newArrayList();
   private RunnerMode runnerMode = RunnerMode.QUIET;
   private String serverAddress;
-  final private List<Class<? extends PluginInitializer>> initializers =  Lists.newArrayList();
+  final private List<Class<? extends PluginInitializer>> pluginInitializers =  Lists.newArrayList();
 
   /**
-   * @param absolutePath
+   * @param configPath
    * @return The builder.
    */
   public JsTestDriverBuilder setDefaultConfiguration(String configPath) {
@@ -48,7 +48,7 @@ public class JsTestDriverBuilder {
   }
   
   /**
-   * @param absolutePath
+   * @param configuration
    * @return The builder.
    */
   public JsTestDriverBuilder setDefaultConfiguration(Configuration configuration) {
@@ -80,15 +80,15 @@ public class JsTestDriverBuilder {
    */
   public JsTestDriver build() {
     // TODO(corysmith): add check to resolve the serverAddress and port issues.
-    List<Module> modules = Lists.newArrayList(pluginModules);
-    modules.add(new ListenersModule(serverListeners, testListeners));
+    List<Module> plugins = Lists.newArrayList(pluginModules);
+    plugins.add(new ListenerBindingModule(serverListeners, testListeners));
     return new JsTestDriver(configuration,
         pluginLoader,
-        initializers,
+        pluginInitializers,
         runnerMode,
         flags,
         port,
-        modules,
+        plugins,
         serverListeners,
         testListeners,
         baseDir,
@@ -101,7 +101,7 @@ public class JsTestDriverBuilder {
    */
   public JsTestDriverBuilder withPluginInitializer(
         Class<? extends PluginInitializer> initializer) {
-    initializers.add(initializer);
+    pluginInitializers.add(initializer);
     return this;
   }
 
@@ -171,16 +171,16 @@ public class JsTestDriverBuilder {
     return this;
   }
 
-  private static class ListenersModule implements Module {
-    private final List<ServerListener> serverListeners;
-    private final List<TestResultListener> testListeners;
-
-    public ListenersModule(List<ServerListener> serverListeners,
-        List<TestResultListener> testListeners) {
+  private static class ListenerBindingModule implements Module {
+    private final List<? extends ServerListener> serverListeners;
+    private final List<? extends TestResultListener>testListeners;
+    ListenerBindingModule(List<? extends ServerListener> serverListeners,
+        List<? extends TestResultListener> testListeners) {
       this.serverListeners = serverListeners;
       this.testListeners = testListeners;
     }
 
+    @Override
     public void configure(Binder binder) {
       Multibinder<ServerListener> serverSetBinder =
           Multibinder.newSetBinder(binder, ServerListener.class);

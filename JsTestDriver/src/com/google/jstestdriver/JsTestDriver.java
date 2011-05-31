@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 Google Inc.
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -22,6 +22,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
 import com.google.jstestdriver.config.CmdFlags;
+import com.google.jstestdriver.config.CmdLineFlag;
 import com.google.jstestdriver.config.CmdLineFlagsFactory;
 import com.google.jstestdriver.config.Configuration;
 import com.google.jstestdriver.config.ConfigurationException;
@@ -35,6 +36,9 @@ import com.google.jstestdriver.embedded.JsTestDriverBuilder;
 import com.google.jstestdriver.guice.TestResultPrintingModule.TestResultPrintingInitializer;
 import com.google.jstestdriver.hooks.PluginInitializer;
 import com.google.jstestdriver.hooks.ServerListener;
+import com.google.jstestdriver.model.ConcretePathPrefix;
+import com.google.jstestdriver.model.HandlerPathPrefix;
+import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.output.TestResultListener;
 import com.google.jstestdriver.runner.RunnerMode;
 import com.google.jstestdriver.util.RetryException;
@@ -51,7 +55,7 @@ public class JsTestDriver {
 
   /**
    * @author corysmith@google.com (Cory Smith)
-   *
+   * 
    */
   private final class PluginInitializerModule implements Module {
     public void configure(Binder binder) {
@@ -82,25 +86,18 @@ public class JsTestDriver {
    * @param initializers
    * @param pluginLoader
    * @param configuration
-   * @param testListeners 
-   * @param serverListeners 
-   * @param pluginModules 
-   * @param port 
-   * @param baseDir 
-   * @param serverAddress 
+   * @param testListeners
+   * @param serverListeners
+   * @param pluginModules
+   * @param port
+   * @param baseDir
+   * @param serverAddress
    * @param injector
    */
-  public JsTestDriver(Configuration configuration,
-                      PluginLoader pluginLoader,
-                      List<Class<? extends PluginInitializer>> initializers,
-                      RunnerMode runnerMode,
-                      String[] flags,
-                      int port,
-                      List<Module> pluginModules,
-                      List<ServerListener> serverListeners,
-                      List<TestResultListener> testListeners,
-                      File baseDir,
-                      String serverAddress) {
+  public JsTestDriver(Configuration configuration, PluginLoader pluginLoader,
+      List<Class<? extends PluginInitializer>> initializers, RunnerMode runnerMode, String[] flags,
+      int port, List<Module> pluginModules, List<ServerListener> serverListeners,
+      List<TestResultListener> testListeners, File baseDir, String serverAddress) {
     this.defaultConfiguration = configuration;
     this.pluginLoader = pluginLoader;
     this.initializers = initializers;
@@ -152,8 +149,8 @@ public class JsTestDriver {
       System.out.println("Configuration Error: \n" + e.getMessage());
       System.exit(1);
     } catch (RetryException e) {
-      System.out.println(
-          "Tests failed due to unexpected environment issue: " + e.getCause().getMessage());
+      System.out.println("Tests failed due to unexpected environment issue: "
+          + e.getCause().getMessage());
       System.exit(1);
     } catch (FailureException e) {
       System.out.println("Tests failed: " + e.getMessage());
@@ -172,21 +169,37 @@ public class JsTestDriver {
     if (port == -1) {
       throw new ConfigurationException("Port not defined, cannot start local server.");
     }
-    runConfigurationWithFlags(defaultConfiguration, new String[] {"--port ", String.valueOf(port),
-        findServerHandlerPrefix()});
+    runConfigurationWithFlags(defaultConfiguration,
+        createFlagsArray("--port", String.valueOf(port)));
+  }
+
+  /**
+   * @return
+   */
+  private String[] createFlagsArray(String...coreflags) {
+    List<String> flags = Lists.newArrayList(coreflags);
+    CmdLineFlag handlerPrefixFlag = findServerHandlerPrefixFlag();
+    if (handlerPrefixFlag != null) {
+      handlerPrefixFlag.addToArgs(flags);
+    }
+    String[] flagsArray = flags.toArray(new String[flags.size()]);
+    return flagsArray;
   }
 
   public void stopServer() {
     // TODO(corysmith): refactor these to do less hacking.
-    StringBuilder urlBuilder = new StringBuilder(serverAddress);
-    String prefixFlag = findServerHandlerPrefix();
-    if (!prefixFlag.isEmpty()) {
-      urlBuilder.append(prefixFlag).append("/");
+    CmdLineFlag handlerPrefixFlag = findServerHandlerPrefixFlag();
+    HandlerPathPrefix prefix = new NullPathPrefix();
+    if (handlerPrefixFlag != null) {
+      prefix = new ConcretePathPrefix(handlerPrefixFlag.value);
     }
+    StringBuilder urlBuilder =
+        new StringBuilder(defaultConfiguration.getServer(serverAddress, port, prefix));
+    urlBuilder.append("/");
     urlBuilder.append("quit");
-    new HttpServer().fetch(urlBuilder.toString());
+    new HttpServer().ping(urlBuilder.toString());
   }
-  
+
   /**
    * Runs the default configuration with the default flags.
    */
@@ -201,7 +214,7 @@ public class JsTestDriver {
 
   public List<TestCase> runAllTests(Configuration config) {
     // TODO(corysmith): Refactor to avoid passing string flags.
-    runConfigurationWithFlags(config, new String[]{"--tests","all"});
+    runConfigurationWithFlags(config, createFlagsArray("--tests", "all"));
     return null;
   }
 
@@ -211,7 +224,7 @@ public class JsTestDriver {
 
   public List<TestCase> getTestCasesFor(Configuration config) {
     // TODO(corysmith): Refactor to avoid passing string flags.
-    runConfigurationWithFlags(config, new String[]{"--dryRunFor","all"});
+    runConfigurationWithFlags(config, createFlagsArray("--dryRunFor", "all"));
     return null;
   }
 
@@ -220,14 +233,15 @@ public class JsTestDriver {
     if (!configFile.exists()) {
       throw new ConfigurationException("Could not find " + configFile);
     }
-    return new UserConfigurationSource(configFile).parse(baseDir,
-        new YamlParser());
+    return new UserConfigurationSource(configFile).parse(baseDir, new YamlParser());
   }
 
   private void runConfigurationWithFlags(Configuration config, String[] flags) {
     List<Module> initializeModules = Lists.newArrayList();
     File basePath;
     try {
+      // configure logging before we start seriously processing.
+      LogManager.getLogManager().readConfiguration(runnerMode.getLogConfig());
       basePath = config.getBasePath().getCanonicalFile();
       initializeModules.add(new InitializeModule(pluginLoader, basePath, new Args4jFlagsParser(),
           runnerMode));
@@ -245,12 +259,18 @@ public class JsTestDriver {
     injector.getInstance(ActionRunner.class).runActions();
   }
 
-  private String findServerHandlerPrefix() {
-    for (String flag : defaultFlags) {
-      if (flag.startsWith("--serverHandlerPrefix")) {
-        return flag;
+  private CmdLineFlag findServerHandlerPrefixFlag() {
+    // TODO(corysmith): refactor these to do less hacking.
+    for (int i = 0; i < defaultFlags.length; i++) {
+      if (defaultFlags[i].startsWith("--serverHandlerPrefix")) {
+        String flag = defaultFlags[i];
+        String value = "";
+        if (i + 1 < defaultFlags.length) {
+          value = defaultFlags[i + 1];
+        }
+        return new CmdLineFlag(flag, value);
       }
     }
-    return "";
+    return null;
   }
 }

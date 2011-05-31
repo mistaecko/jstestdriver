@@ -80,6 +80,7 @@ public class DefaultActionListProvider implements ActionListProvider {
     this.raiseOnFailure = raiseOnFailure;
   }
 
+  @Override
   @Provides
   public List<Action> get() {
     builder.usingFiles(fileSet, preloadFiles)
