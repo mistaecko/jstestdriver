@@ -24,19 +24,22 @@ import java.util.regex.Pattern;
 public class UserAgentParser {
 
   private static final Pattern BROWSER_NAME_AND_VERSION =
-      Pattern.compile("(Safari|Firefox|Opera|Konqueror)/([0-9\\.]+)");
+      Pattern.compile("(Safari|Firefox|Konqueror)/([0-9\\.]+)");
   private static final Pattern CHROME_VERSION = Pattern.compile("Chrome/([0-9\\.]+)");
   private static final Pattern MSIE_VERSION = Pattern.compile("; MSIE ([0-9\\.]+);");
+  private static final Pattern OPERA_VERSION = Pattern.compile("Opera(?:.*Version)?[ /]([0-9\\.]+)");
 
   private String userAgentName = "";
   private String userAgentVersion = "";
   private String userAgentOs = "";
 
-  public void parse(String userAgent) {    
+  public void parse(String userAgent) {
     String lowerCaseUserAgent = userAgent.toLowerCase();
 
     if (lowerCaseUserAgent.contains("windows")) {
       userAgentOs = "Windows";
+    } else if (lowerCaseUserAgent.contains("android")) {
+      userAgentOs = "Android";
     } else if (lowerCaseUserAgent.contains("linux")) {
       userAgentOs = "Linux";
     } else if (lowerCaseUserAgent.contains("iphone")) {
@@ -54,6 +57,13 @@ public class UserAgentParser {
     } else if (userAgent.contains("MSIE")) {
       userAgentName = "Microsoft Internet Explorer";
       Matcher matcher = MSIE_VERSION.matcher(userAgent);
+
+      if (matcher.find()) {
+        userAgentVersion = matcher.group(1);
+      }
+    } else if (userAgent.contains("Opera")) {
+      userAgentName = "Opera";
+      Matcher matcher = OPERA_VERSION.matcher(userAgent);
 
       if (matcher.find()) {
         userAgentVersion = matcher.group(1);
