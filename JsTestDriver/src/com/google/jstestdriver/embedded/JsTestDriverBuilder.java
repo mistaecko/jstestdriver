@@ -10,6 +10,7 @@ import com.google.jstestdriver.JsTestDriver;
 import com.google.jstestdriver.PluginLoader;
 import com.google.jstestdriver.config.Configuration;
 import com.google.jstestdriver.config.ConfigurationSource;
+
 import com.google.jstestdriver.config.UserConfigurationSource;
 import com.google.jstestdriver.config.YamlParser;
 import com.google.jstestdriver.hooks.PluginInitializer;
@@ -38,11 +39,13 @@ public class JsTestDriverBuilder {
   private String serverAddress;
   final private List<Class<? extends PluginInitializer>> pluginInitializers =  Lists.newArrayList();
 
+
   /**
    * @param configPath
    * @return The builder.
    */
   public JsTestDriverBuilder setDefaultConfiguration(String configPath) {
+
     setConfigurationSource(new UserConfigurationSource(new File(configPath)));
     return this;
   }
@@ -157,6 +160,7 @@ public class JsTestDriverBuilder {
    */
   public JsTestDriverBuilder addPluginModules(List<Module> pluginModules) {
     this.pluginModules = pluginModules;
+
     return this;
   }
 

@@ -43,7 +43,6 @@ public class UserConfigurationSource implements ConfigurationSource {
   }
 
   /** {@inheritDoc} */
-
   public Configuration parse(File basePath, ConfigurationParser configParser) throws ConfigurationException {
     try {
       return configParser.parse(

@@ -38,8 +38,7 @@ public interface ConfigurationSource {
    * @return The parsed configuration object.
    * @throws ConfigurationException If the configuration file does not exist.
    */
-  Configuration parse(File basePath, ConfigurationParser configParser)
-      throws ConfigurationException;
+  Configuration parse(File basePath, ConfigurationParser configParser) throws ConfigurationException;
 
   /** Returns the name of the current configuration. */
   String getName();

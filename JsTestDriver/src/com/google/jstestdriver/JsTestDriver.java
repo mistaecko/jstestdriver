@@ -109,11 +109,11 @@ public class JsTestDriver {
     this.testListeners = testListeners;
     this.baseDir = baseDir;
     this.serverAddress = serverAddress;
-
   }
 
   public static void main(String[] args) {
     try {
+      
       // pre-parse parsing... These are the flags
       // that must be dealt with before we parse the flags.
       CmdFlags cmdLineFlags = new CmdLineFlagsFactory().create(args);
@@ -198,6 +198,7 @@ public class JsTestDriver {
     urlBuilder.append("/");
     urlBuilder.append("quit");
     new HttpServer().ping(urlBuilder.toString());
+
   }
 
   /**
