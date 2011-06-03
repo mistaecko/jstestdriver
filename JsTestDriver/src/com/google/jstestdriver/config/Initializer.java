@@ -16,6 +16,12 @@
 
 package com.google.jstestdriver.config;
 
+import java.io.File;
+import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Module;

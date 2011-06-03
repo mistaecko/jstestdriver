@@ -32,7 +32,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryProvider;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
-import com.google.jstestdriver.action.ConfigureProxyAction;
 import com.google.jstestdriver.config.DefaultConfiguration;
 import com.google.jstestdriver.guice.BrowserActionProvider;
 import com.google.jstestdriver.guice.FlagsModule;

@@ -18,7 +18,6 @@ package com.google.jstestdriver;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.args4j.CmdLineException;
