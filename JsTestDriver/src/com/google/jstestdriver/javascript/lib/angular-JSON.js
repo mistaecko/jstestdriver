@@ -94,17 +94,17 @@ angular['fromJson'] = fromJson;
 function toJsonArray(buf, obj, pretty, stack) {
   if (isObject(obj)) {
     if (obj === window) {
-      buf.push('WINDOW');
+      buf.push(angular['String']['quote']('WINDOW'));
       return;
     }
 
     if (obj === document) {
-      buf.push('DOCUMENT');
+      buf.push(angular['String']['quote']('DOCUMENT'));
       return;
     }
 
     if (includes(stack, obj)) {
-      buf.push('RECURSION');
+      buf.push(angular['String']['quote']('RECURSION'));
       return;
     }
     stack.push(obj);

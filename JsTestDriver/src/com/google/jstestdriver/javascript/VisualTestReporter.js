@@ -118,7 +118,13 @@ jstestdriver.VisualTestReporter.prototype.renderResult = function(result, parent
       result.testName,
       result.result.toUpperCase(),
       result.time)];
-  var errors = result.message.length ? this.parseJson_(result.message) : [];
+  var errors;
+  try {
+    errors = result.message.length ? this.parseJson_(result.message) : [];
+  } catch (e) {
+    errors = 'Error parsing test result: ' + e.message + '\nmessage:' + result.message + '\n';
+  }
+
   while(errors.length) {
     var error = errors.pop()
     html.push('<div class="message">' + error.message + '</div>');
