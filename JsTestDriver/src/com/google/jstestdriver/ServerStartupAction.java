@@ -27,6 +27,7 @@ import com.google.jstestdriver.JsTestDriverServer.Factory;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.model.RunData;
+import com.google.jstestdriver.server.proxy.ProxyBehavior;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -126,7 +127,7 @@ public class ServerStartupAction implements ObservableAction {
 
     public JsTestDriverServer create(int port, int sslPort, FilesCache preloadedFilesCache) {
       return new JsTestDriverServerImpl(port, sslPort, preloadedFilesCache, capturedBrowsers, timeout,
-          nullPathPrefix, Sets.<ServerListener>newHashSet());
+          nullPathPrefix, ProxyBehavior.SPOOF, Sets.<ServerListener>newHashSet());
     }
   }
 
