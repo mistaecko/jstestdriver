@@ -224,7 +224,7 @@ public class FlagsImpl implements Flags {
   }
 
   @Option(name="--proxyHostHeaderMode",
-      usage="Whether to block, forward or spoof the HTTP HOST header")
+      usage="Whether to spoof or forward the HTTP HOST header")
   public void setProxyHostHeaderMode(ProxyBehavior proxyHostHeaderMode) {
     this.proxyHostHeaderMode = proxyHostHeaderMode;
   }
