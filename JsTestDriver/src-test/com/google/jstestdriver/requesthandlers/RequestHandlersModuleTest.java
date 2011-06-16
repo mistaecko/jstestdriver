@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.jstestdriver.server.proxy.ProxyBehavior;
 
 /**
  * @author rdionne@google.com (Robert Dionne)
@@ -27,7 +28,8 @@ public class RequestHandlersModuleTest extends TestCase {
   }
 
   public void testHandlerPathBindings() throws Exception {
-    Injector injector = Guice.createInjector(new RequestHandlersModule() {
+    Injector injector = Guice.createInjector(new RequestHandlersModule(
+        ProxyBehavior.SPOOF) {
 
       @Override
       protected void configureHandlers() {

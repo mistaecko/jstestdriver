@@ -40,6 +40,7 @@ import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.server.JettyModule;
 import com.google.jstestdriver.server.handlers.JstdHandlersModule;
+import com.google.jstestdriver.server.proxy.ProxyBehavior;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -59,6 +60,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
   private Timer timer;
 
   private final HandlerPathPrefix handlerPrefix;
+  private final ProxyBehavior proxyHostHeaderMode;
 
   private final Set<ServerListener> listeners;
 
@@ -69,6 +71,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
                                 CapturedBrowsers capturedBrowsers,
                                 @Named("browserTimeout") long browserTimeout,
                                 @Named("serverHandlerPrefix") HandlerPathPrefix handlerPrefix,
+                                @Named("proxyHostHeaderMode") ProxyBehavior proxyHostHeaderMode,
                                 Set<ServerListener> listeners) {
     this.port = port;
     this.sslPort = sslPort;
@@ -76,6 +79,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
     this.filesCache = preloadedFilesCache;
     this.browserTimeout = browserTimeout;
     this.handlerPrefix = handlerPrefix;
+    this.proxyHostHeaderMode = proxyHostHeaderMode;
     this.listeners = listeners;
     initServer();
   }
@@ -89,7 +93,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
       capturedBrowsers.addObserver(this);
       server =
           Guice.createInjector(new JettyModule(port, sslPort, handlerPrefix), new JstdHandlersModule(
-              capturedBrowsers, filesCache, browserTimeout, handlerPrefix))
+              capturedBrowsers, filesCache, browserTimeout, handlerPrefix, proxyHostHeaderMode))
               .getInstance(Server.class);
       server.addLifeCycleListener(new JettyLifeCycleLogger());
     }

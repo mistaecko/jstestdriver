@@ -23,6 +23,7 @@ import com.google.jstestdriver.browser.BrowserIdStrategy;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.NullPathPrefix;
+import com.google.jstestdriver.server.proxy.ProxyBehavior;
 import com.google.jstestdriver.util.NullStopWatch;
 
 import junit.framework.TestCase;
@@ -61,6 +62,7 @@ public class JsTestDriverServerTest extends TestCase {
         browsers,
         SlaveBrowser.TIMEOUT,
         new NullPathPrefix(),
+        ProxyBehavior.SPOOF,
         Sets.newHashSet(listener));
     return server;
   }

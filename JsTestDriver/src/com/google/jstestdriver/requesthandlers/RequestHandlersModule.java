@@ -13,6 +13,10 @@ import com.google.inject.servlet.RequestParameters;
 import com.google.inject.servlet.RequestScoped;
 import com.google.jstestdriver.annotations.RequestProtocol;
 import com.google.jstestdriver.annotations.ResponseWriter;
+import com.google.jstestdriver.server.proxy.HostSpoofingJstdProxyServlet;
+import com.google.jstestdriver.server.proxy.HostForwardingJstdProxyServlet;
+import com.google.jstestdriver.server.proxy.JstdProxyServlet;
+import com.google.jstestdriver.server.proxy.ProxyBehavior;
 import com.google.jstestdriver.server.proxy.ProxyServletConfig;
 
 import org.slf4j.Logger;
@@ -42,10 +46,12 @@ public abstract class RequestHandlersModule extends AbstractModule {
   
   private final ImmutableList.Builder<RequestMatcher> matchers;
   private final RequestScope requestScope;
+  private final ProxyBehavior proxyHostHeaderMode;
 
-  public RequestHandlersModule() {
+  public RequestHandlersModule(ProxyBehavior proxyHostHeaderMode) {
     matchers = ImmutableList.builder();
     requestScope = new RequestScope();
+    this.proxyHostHeaderMode = proxyHostHeaderMode;
   }
 
   /**
@@ -82,6 +88,15 @@ public abstract class RequestHandlersModule extends AbstractModule {
         FactoryProvider.newFactory(
             ProxyRequestHandler.Factory.class, ProxyRequestHandler.class));
     bind(ProxyConfiguration.class).in(Singleton.class);
+    switch (proxyHostHeaderMode) {
+      case FORWARD:
+        bind(JstdProxyServlet.class).to(HostForwardingJstdProxyServlet.class);
+        break;
+      default:
+        bind(JstdProxyServlet.class).to(HostSpoofingJstdProxyServlet.class);
+        break;
+    }
+
   }
 
   @Provides @Singleton ServletContext provideServletContext(Servlet servlet) {
