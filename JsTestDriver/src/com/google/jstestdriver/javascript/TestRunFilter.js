@@ -73,8 +73,10 @@ jstestdriver.TestRunFilter.prototype.regexMatcher_ = function(regex) {
  */
 jstestdriver.TestRunFilter.prototype.buildTestMethodMap_ = function() {
   var testMethodMap = {};
-  var templateProto = this.testCaseInfo_.getTemplate().prototype;
-  for (var methodName in templateProto) {
+  var testMethods = this.testCaseInfo_.getTestNames();
+  var testMethodsLength = testMethods.length;
+  for (var i = 0; i < testMethodsLength; ++i) {
+    var methodName = testMethods[i];
     if (this.isTestMethod_(methodName)) {
       testMethodMap[this.buildTestMethodId_(methodName)] = methodName;
     }
