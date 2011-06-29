@@ -56,7 +56,6 @@ jstestdriver.BrowserLogger.LEVEL = {
  * A log message.
  * Corresponds with the com.google.jstestdriver.protocol.BrowserLog.
  * @param {String} source
- * @param 
  */
 jstestdriver.BrowserLog = function(source, level, message) {
   this.source = source;

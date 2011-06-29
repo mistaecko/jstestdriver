@@ -13,6 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+/**
+ * @param dateObj
+ * @param clearBody
+ * @param opt_runTestLoop
+ * @constructor
+ */
 jstestdriver.plugins.TestRunnerPlugin = function(dateObj, clearBody, opt_runTestLoop) {
   this.dateObj_ = dateObj;
   this.clearBody_ = clearBody;
@@ -79,7 +86,7 @@ jstestdriver.plugins.TestRunnerPlugin.prototype.runTestConfiguration =
   if (testCaseInfo.getType() != jstestdriver.TestCaseInfo.DEFAULT_TYPE) {
     for (var i = 0; tests[i]; i++) {
       onTestDone(new jstestdriver.TestResult(
-          testCaseName,
+          testCaseInfo.getTestCaseName(),
           tests[i],
           'error',
           testCaseInfo.getTestCaseName() +
@@ -163,7 +170,7 @@ jstestdriver.plugins.TestRunnerPlugin.prototype.runTest =
       errors.push(e);
     }
     var end = new this.dateObj_().getTime();
-    msg = this.serializeError(errors);
+    var msg = this.serializeError(errors);
     return new jstestdriver.TestResult(testCaseName, testName, res, msg,
             jstestdriver.console.getAndResetLog(), end - start);
   } catch (e) {

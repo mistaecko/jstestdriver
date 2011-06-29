@@ -19,7 +19,7 @@
  * @param {jstestdriver.TestResult.RESULT} result
  * @param {string} message
  * @param {Array.<string>} log
- * @param {Number} time
+ * @param {number} time
  * @param {Object.<string, Object>} opt_data A map of arbitrary value pairs representing test meta data.
  * @constructor
  */

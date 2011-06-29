@@ -13,6 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+/**
+ * @constructor
+ */
 jstestdriver.Console = function() {
   this.log_ = [];
 };

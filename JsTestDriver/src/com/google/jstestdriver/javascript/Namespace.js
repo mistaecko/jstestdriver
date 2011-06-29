@@ -14,6 +14,7 @@
  * the License.
  */
 var jstestdriver = {};
+jstestdriver.console = null;
 jstestdriver.global = this;
 jstestdriver.plugins = {};
 jstestdriver.plugins.async = {};
