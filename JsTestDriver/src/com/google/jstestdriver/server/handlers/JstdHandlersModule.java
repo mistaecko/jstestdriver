@@ -59,7 +59,6 @@ import com.google.jstestdriver.server.handlers.pages.PageType;
 import com.google.jstestdriver.server.handlers.pages.RunnerPage;
 import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
 import com.google.jstestdriver.server.handlers.pages.StandaloneRunnerPage;
-import com.google.jstestdriver.server.proxy.ProxyBehavior;
 import com.google.jstestdriver.server.proxy.SimpleServletConfig;
 import com.google.jstestdriver.servlet.fileset.BrowserFileCheck;
 import com.google.jstestdriver.servlet.fileset.FileSetRequestHandler;
@@ -109,9 +108,7 @@ public class JstdHandlersModule extends RequestHandlersModule {
       CapturedBrowsers capturedBrowsers,
       FilesCache filesCache,
       long browserTimeout,
-      HandlerPathPrefix handlerPrefix,
-      ProxyBehavior proxyHostHeaderMode) {
-    super(proxyHostHeaderMode);
+      HandlerPathPrefix handlerPrefix) {
     this.capturedBrowsers = capturedBrowsers;
     this.filesCache = filesCache;
     this.browserTimeout = browserTimeout;

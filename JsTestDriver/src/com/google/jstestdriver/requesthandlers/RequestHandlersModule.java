@@ -15,22 +15,23 @@ import com.google.jstestdriver.annotations.RequestProtocol;
 import com.google.jstestdriver.annotations.ResponseWriter;
 import com.google.jstestdriver.server.proxy.GatewayServlet;
 import com.google.jstestdriver.server.proxy.JstdProxyServlet;
-import com.google.jstestdriver.server.proxy.ProxyBehavior;
 import com.google.jstestdriver.server.proxy.ProxyServletConfig;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.GenericServlet;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Map;
 
 /**
  * An abstract {@link Guice} module providing an EDSL for binding {@link RequestHandler}s
@@ -45,12 +46,10 @@ public abstract class RequestHandlersModule extends AbstractModule {
   
   private final ImmutableList.Builder<RequestMatcher> matchers;
   private final RequestScope requestScope;
-  private final ProxyBehavior proxyHostHeaderMode;
 
-  public RequestHandlersModule(ProxyBehavior proxyHostHeaderMode) {
+  public RequestHandlersModule() {
     matchers = ImmutableList.builder();
     requestScope = new RequestScope();
-    this.proxyHostHeaderMode = proxyHostHeaderMode;
   }
 
   /**

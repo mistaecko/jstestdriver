@@ -1,16 +1,15 @@
 // Copyright 2010 Google Inc. All Rights Reserved.
 package com.google.jstestdriver.requesthandlers;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.jstestdriver.server.proxy.ProxyBehavior;
+
+import junit.framework.TestCase;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author rdionne@google.com (Robert Dionne)
@@ -28,8 +27,7 @@ public class RequestHandlersModuleTest extends TestCase {
   }
 
   public void testHandlerPathBindings() throws Exception {
-    Injector injector = Guice.createInjector(new RequestHandlersModule(
-        ProxyBehavior.SPOOF) {
+    Injector injector = Guice.createInjector(new RequestHandlersModule() {
 
       @Override
       protected void configureHandlers() {
