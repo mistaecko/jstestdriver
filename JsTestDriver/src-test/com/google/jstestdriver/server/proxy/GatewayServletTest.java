@@ -60,8 +60,11 @@ public class GatewayServletTest extends TestCase {
         Iterators.asEnumeration(ImmutableList.of("Host").iterator()));
     expect(request.getHeaders("Host")).andStubReturn(
         Iterators.asEnumeration(ImmutableList.of("jstd:80").iterator()));
-    expect(request.getQueryString()).andStubReturn("?id=123");
-    expect(client.executeMethod(EasyMock.<HttpMethodBase>anyObject())).andStubReturn(200);
+    expect(request.getQueryString()).andStubReturn("id=123");
+    // TODO(rdionne): Feed fake response values into the captured HttpMethod and assert they are
+    // properly converted to equivalent HttpServletResponse fields.
+    Capture<HttpMethodBase> methodCapture = new Capture<HttpMethodBase>();
+    expect(client.executeMethod(EasyMock.capture(methodCapture))).andStubReturn(200);
     /* expect */ response.setStatus(200);
     final ByteArrayOutputStream output = new ByteArrayOutputStream();
     ServletOutputStream out = new ServletOutputStream() {
@@ -74,6 +77,10 @@ public class GatewayServletTest extends TestCase {
     control.replay();
     gateway.init(config);
     gateway.service(request, response);
+    assertEquals("GET", methodCapture.getValue().getName());
+    assertEquals("http://hostname/relativeUri?id=123", methodCapture.getValue().getURI().toString());
+    assertEquals("jstd:80", methodCapture.getValue().getRequestHeader("Host").getValue());
+    assertEquals("id=123", methodCapture.getValue().getQueryString());
     assertEquals("", output.toString());
   }
 
@@ -93,7 +100,9 @@ public class GatewayServletTest extends TestCase {
         Iterators.asEnumeration(ImmutableList.of("Host").iterator()));
     expect(request.getHeaders("Host")).andStubReturn(
         Iterators.asEnumeration(ImmutableList.of("jstd:80").iterator()));
-    expect(request.getQueryString()).andStubReturn("?id=123");
+    expect(request.getQueryString()).andStubReturn("id=123");
+    // TODO(rdionne): Feed fake response values into the captured HttpMethod and assert they are
+    // properly converted to equivalent HttpServletResponse fields.
     Capture<HttpMethodBase> methodCapture = new Capture<HttpMethodBase>();
     expect(client.executeMethod(EasyMock.capture(methodCapture))).andStubReturn(200);
     /* expect */ response.setStatus(200);
@@ -110,6 +119,10 @@ public class GatewayServletTest extends TestCase {
     gateway.service(request, response);
     ByteArrayOutputStream requestBody = new ByteArrayOutputStream();
     ((EntityEnclosingMethod) methodCapture.getValue()).getRequestEntity().writeRequest(requestBody);
+    assertEquals("POST", methodCapture.getValue().getName());
+    assertEquals("http://hostname/relativeUri?id=123", methodCapture.getValue().getURI().toString());
+    assertEquals("jstd:80", methodCapture.getValue().getRequestHeader("Host").getValue());
+    assertEquals("id=123", methodCapture.getValue().getQueryString());
     assertEquals("ASDF", requestBody.toString());
     assertEquals("", output.toString());
   }
