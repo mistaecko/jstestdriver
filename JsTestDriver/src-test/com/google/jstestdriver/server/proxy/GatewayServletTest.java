@@ -54,6 +54,7 @@ public class GatewayServletTest extends TestCase {
 
   public void testService_GET() throws Exception {
     expect(config.getInitParameter("ProxyTo")).andStubReturn("http://hostname:80");
+    expect(config.getInitParameter("Prefix")).andStubReturn(null);
     expect(request.getMethod()).andStubReturn("GET");
     expect(request.getRequestURI()).andStubReturn("/relativeUri");
     expect(request.getHeaderNames()).andStubReturn(
@@ -86,6 +87,7 @@ public class GatewayServletTest extends TestCase {
 
   public void testService_POST() throws Exception {
     expect(config.getInitParameter("ProxyTo")).andStubReturn("http://hostname:80");
+    expect(config.getInitParameter("Prefix")).andStubReturn(null);
     expect(request.getMethod()).andStubReturn("POST");
     expect(request.getRequestURI()).andStubReturn("/relativeUri");
     final ByteArrayInputStream input = new ByteArrayInputStream("ASDF".getBytes());

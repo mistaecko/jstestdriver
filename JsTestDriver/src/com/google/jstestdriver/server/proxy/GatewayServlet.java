@@ -8,17 +8,17 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Enumeration;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Enumeration;
 
 /**
  * An HTTP gateway that forwards requests to another server and feeds the responses back to the
@@ -31,6 +31,7 @@ public class GatewayServlet extends JstdProxyServlet {
 
   private final HttpClient client;
   private String proxyTo;
+  private String prefix;
 
   @Inject
   public GatewayServlet(final HttpClient client) {
@@ -40,6 +41,7 @@ public class GatewayServlet extends JstdProxyServlet {
   @Override
   public void init(final ServletConfig servletConfig) throws ServletException {
     proxyTo = servletConfig.getInitParameter("ProxyTo");
+    prefix = servletConfig.getInitParameter("Prefix");
   }
 
   @Override
@@ -88,13 +90,18 @@ public class GatewayServlet extends JstdProxyServlet {
 
   private HttpMethodBase getMethod(final HttpServletRequest request) throws IOException {
     final HttpMethod method = HttpMethod.valueOf(request.getMethod());
+    String uri = request.getRequestURI();
+    if (prefix != null && !uri.startsWith(prefix)) {
+      throw new RuntimeException("Request URI " + uri + " does not start with prefix " + prefix);
+    }
+    String url = prefix == null ? proxyTo + uri : proxyTo + uri.substring(prefix.length());
     switch (method) {
       case POST:
       case PUT:
         return new GatewayEntityMethod(
-            method.name(), proxyTo + request.getRequestURI(), request.getInputStream());
+            method.name(), url, request.getInputStream());
       default:
-        return new GatewayMethod(method.name(), proxyTo + request.getRequestURI());
+        return new GatewayMethod(method.name(), url);
     }
   }
 
