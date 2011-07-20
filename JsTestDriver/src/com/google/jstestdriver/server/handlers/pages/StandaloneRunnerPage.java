@@ -17,6 +17,7 @@ package com.google.jstestdriver.server.handlers.pages;
 
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import com.google.jstestdriver.util.HtmlWriter;
 
 /**
@@ -25,7 +26,13 @@ import com.google.jstestdriver.util.HtmlWriter;
  * @author corbinrsmith@gmail.com (Cory Smith)
  */
 public class StandaloneRunnerPage implements Page {
+  private final TestFileUtil testFileUtil;
 
+  @Inject
+  StandaloneRunnerPage(TestFileUtil testFileUtil) {
+    this.testFileUtil = testFileUtil;
+  }
+  
   public void render(HtmlWriter writer, SlavePageRequest request) throws IOException {
     writer.startHead()
         .writeTitle("Console Runner")
@@ -36,10 +43,16 @@ public class StandaloneRunnerPage implements Page {
         .writeExternalScript("/static/standalonerunner.js")
         .writeScript(
             "jstestdriver.console = new jstestdriver.Console();" +
-            "jstestdriver.config.startRunner(jstestdriver.config.createStandAloneExecutor);")
-        .finishHead()
-        .startBody()
-        .finishBody()
-        .flush();
+            "jstestdriver.runner = jstestdriver.config.createRunner(\n"+
+            "  jstestdriver.config.createStandAloneExecutor);");
+
+    testFileUtil.writeTestFiles(writer);
+
+    writer.writeScript("jstestdriver.runner.listen(" +
+        "jstestdriver.manualResourceTracker.getResults());");
+    writer.finishHead()
+      .startBody()
+      .finishBody()
+      .flush();
   }
 }

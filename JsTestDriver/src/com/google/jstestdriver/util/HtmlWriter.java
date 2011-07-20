@@ -121,7 +121,7 @@ public class HtmlWriter {
   public HtmlWriter writeScript(String script) {
     body.add("<script type=\"text/javascript\">");
     body.add(script);
-    body.add("</script>");
+    body.add("</script>\n");
     return this;
   }
 

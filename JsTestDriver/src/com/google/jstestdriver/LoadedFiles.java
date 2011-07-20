@@ -26,7 +26,7 @@ public class LoadedFiles {
   private Collection<FileResult> loadedFiles;
 
   public LoadedFiles() {
-    loadedFiles = new LinkedHashSet<FileResult>();
+    this(new LinkedHashSet<FileResult>());
   }
 
   public LoadedFiles(Collection<FileResult> loadedFiles) {

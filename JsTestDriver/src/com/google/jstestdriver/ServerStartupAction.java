@@ -15,18 +15,20 @@
  */
 package com.google.jstestdriver;
 
-import com.google.common.collect.Sets;
-import com.google.jstestdriver.JsTestDriverServer.Factory;
-import com.google.jstestdriver.hooks.ServerListener;
-import com.google.jstestdriver.model.NullPathPrefix;
-import com.google.jstestdriver.model.RunData;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Observer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
+import com.google.common.collect.Sets;
+import com.google.jstestdriver.JsTestDriverServer.Factory;
+import com.google.jstestdriver.hooks.FileInfoScheme;
+import com.google.jstestdriver.hooks.ServerListener;
+import com.google.jstestdriver.model.NullPathPrefix;
+import com.google.jstestdriver.model.RunData;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -126,11 +128,14 @@ public class ServerStartupAction implements ObservableAction {
 
     public JsTestDriverServer create(int port, int sslPort, FilesCache preloadedFilesCache) {
       return new JsTestDriverServerImpl(port, sslPort, preloadedFilesCache, capturedBrowsers, timeout,
-          nullPathPrefix, Sets.<ServerListener>newHashSet());
+          nullPathPrefix, Sets.<ServerListener>newHashSet(), Collections.<FileInfoScheme>emptySet());
     }
   }
 
   public static class ServerStartupException extends RuntimeException {
+
+    private static final long serialVersionUID = -6070989642608849122L;
+
     public ServerStartupException(String msg) {
       super(msg);
     }

@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import com.google.jstestdriver.browser.BrowserCaptureEvent;
 import com.google.jstestdriver.browser.BrowserReaper;
+import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.server.JettyModule;
@@ -62,6 +63,8 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
 
   private final Set<ServerListener> listeners;
 
+  private final Set<FileInfoScheme> schemes;
+
   @Inject
   public JsTestDriverServerImpl(@Assisted("port") int port,
                                 @Assisted("sslPort") int sslPort,
@@ -69,7 +72,8 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
                                 CapturedBrowsers capturedBrowsers,
                                 @Named("browserTimeout") long browserTimeout,
                                 @Named("serverHandlerPrefix") HandlerPathPrefix handlerPrefix,
-                                Set<ServerListener> listeners) {
+                                Set<ServerListener> listeners,
+                                Set<FileInfoScheme> schemes) {
     this.port = port;
     this.sslPort = sslPort;
     this.capturedBrowsers = capturedBrowsers;
@@ -77,6 +81,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
     this.browserTimeout = browserTimeout;
     this.handlerPrefix = handlerPrefix;
     this.listeners = listeners;
+    this.schemes = schemes;
     initServer();
   }
 
@@ -87,10 +92,13 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
       // TODO(corysmith): move this to the normal guice injection scope.
       capturedBrowsers.deleteObserver(this);
       capturedBrowsers.addObserver(this);
-      server =
-          Guice.createInjector(new JettyModule(port, sslPort, handlerPrefix), new JstdHandlersModule(
-              capturedBrowsers, filesCache, browserTimeout, handlerPrefix))
-              .getInstance(Server.class);
+      server = Guice.createInjector(
+          new JettyModule(port, sslPort, handlerPrefix),
+          new JstdHandlersModule(capturedBrowsers,
+                                 filesCache,
+                                 browserTimeout,
+                                 handlerPrefix,
+                                 schemes)).getInstance(Server.class);
       server.addLifeCycleListener(new JettyLifeCycleLogger());
     }
   }

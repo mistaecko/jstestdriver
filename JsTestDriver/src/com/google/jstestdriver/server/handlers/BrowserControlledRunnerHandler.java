@@ -97,25 +97,25 @@ public class BrowserControlledRunnerHandler implements RequestHandler {
     logger.debug("Adding noop command.");
     slaveBrowser.createCommand(gson.toJson(new JsonCommand(CommandType.NOOP, null)));
 
-    Set<String> filesToload = cache.getAllFileNames();
-    LinkedList<FileSource> filesSources = new LinkedList<FileSource>();
-
-    for (String f : filesToload) {
-      filesSources.add(new FileSource(prefix.prefixPath("/test/" + f), f, -1));
-    }
-    final int size = filesSources.size();
-
-    for (int i = 0; i < size; i += FileUploader.CHUNK_SIZE) {
-      LinkedList<String> loadFilesParameters = new LinkedList<String>();
-      List<FileSource> chunkedFileSources =
-          filesSources.subList(i, Math.min(i + FileUploader.CHUNK_SIZE, size));
-
-      loadFilesParameters.add(gson.toJson(chunkedFileSources));
-      loadFilesParameters.add("true");
-      logger.debug("adding chunked upload command: {}", i);
-      slaveBrowser.createCommand(gson.toJson(new JsonCommand(CommandType.LOADTEST,
-          loadFilesParameters)));
-    }
+//    Set<String> filesToload = cache.getAllFileNames();
+//    LinkedList<FileSource> filesSources = new LinkedList<FileSource>();
+//
+//    for (String f : filesToload) {
+//      filesSources.add(new FileSource(prefix.prefixPath("/test/" + f), f, -1));
+//    }
+//    final int size = filesSources.size();
+//
+//    for (int i = 0; i < size; i += FileUploader.CHUNK_SIZE) {
+//      LinkedList<String> loadFilesParameters = new LinkedList<String>();
+//      List<FileSource> chunkedFileSources =
+//          filesSources.subList(i, Math.min(i + FileUploader.CHUNK_SIZE, size));
+//
+//      loadFilesParameters.add(gson.toJson(chunkedFileSources));
+//      loadFilesParameters.add("true");
+//      logger.debug("adding chunked upload command: {}", i);
+//      slaveBrowser.createCommand(gson.toJson(new JsonCommand(CommandType.LOADTEST,
+//          loadFilesParameters)));
+//    }
     LinkedList<String> runAllTestsParameters = new LinkedList<String>();
 
     runAllTestsParameters.add("false");

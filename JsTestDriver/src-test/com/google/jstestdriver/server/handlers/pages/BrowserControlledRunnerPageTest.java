@@ -15,13 +15,23 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
+import java.util.Collections;
+
+import com.google.jstestdriver.FileInfo;
+import com.google.jstestdriver.FilesCache;
+import com.google.jstestdriver.hooks.FileInfoScheme;
+import com.google.jstestdriver.model.NullPathPrefix;
+
 import junit.framework.TestCase;
 
 /**
- * @author Cory Smith (corbinrsmith@gmail.com) 
+ * @author Cory Smith (corbinrsmith@gmail.com)
  */
 public class BrowserControlledRunnerPageTest extends TestCase {
   public void testRenderWithPrefix() throws Exception {
-    new PrefixTester().testPrefixes(new BrowserControlledRunnerPage());
+    new PrefixTester().testPrefixes(new BrowserControlledRunnerPage(new FilesCache(
+      Collections.<String, FileInfo>emptyMap()),
+      new NullPathPrefix(),
+      Collections.<FileInfoScheme>emptySet()));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Google Inc.
+ * Copyright 2011 Google Inc.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,7 +15,6 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import java.io.IOException;
 import java.util.Set;
 
 import com.google.gson.Gson;
@@ -28,43 +27,50 @@ import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.util.HtmlWriter;
 
 /**
- * Runner page 
+ * A utility that write The contents of the FilesCache into an HtmlWriter.
  *
- * @author corbinrsmith@gmail.com (Cory Smith)
+ * @author Cory Smith (corbinrsmith@gmail.com) 
  */
-public class BrowserControlledRunnerPage implements Page {
-  private final FilesCache cache;
-  private final Gson gson = new Gson();
-  private final Set<FileInfoScheme> schemes;
+// TODO(corysmith): Probably, horribly, misnamed. Fix.
+public class TestFileUtil {
   private final HandlerPathPrefix prefix;
+  private final FilesCache cache;
+  private final Set<FileInfoScheme> schemes;
+  private final Gson gson;
 
+  /**
+   * Creates a new TestFileUtil from the dependencies.
+   */
   @Inject
-  BrowserControlledRunnerPage(FilesCache cache, HandlerPathPrefix prefix, Set<FileInfoScheme> schemes) {
+   TestFileUtil(FilesCache cache, HandlerPathPrefix prefix, Set<FileInfoScheme> schemes,
+      Gson gson) {
     this.cache = cache;
     this.prefix = prefix;
     this.schemes = schemes;
+    this.gson = gson;
   }
-  public void render(HtmlWriter writer, SlavePageRequest request) throws IOException {
-    writer.startHead()
-        .writeTitle("Console Runner")
-        .writeExternalScript("/static/jstestdrivernamespace.js")
-        .writeExternalScript("/static/lib/json2.js")
-        .writeExternalScript("/static/lib/json_sans_eval.js")
-        .writeExternalScript("/static/lib/jquery-min.js")
-        .writeExternalScript("/static/browser_controlled_runner.js")
-        .writeStyleSheet("/static/bcr.css")
-        .writeScript(
-            "jstestdriver.console = new jstestdriver.Console();" +
-            "jstestdriver.runner = jstestdriver.config.createRunner(\n"+
-            "    jstestdriver.config.createVisualExecutor);");
+
+  /**
+   * Writes as many of the test files into the HtmlWriter, until it reaches a
+   * FileInfo that cannot be handled using a &lt;link&gt; or a &lt;script&gt;.
+   * @param writer The output writer.
+   */
+  public void writeTestFiles(HtmlWriter writer) {
     for (FileInfo file : cache.getAllFileInfos()) {
-      if (!file.canLoad()) {
+      if (file.isServeOnly()) {
         continue;
       }
+      // TODO(corysmith): This is a problematic optimization.
+      // If a client connects with unknown schemes and causes a reset, this will mess up miserably.
+      // Must fix.
       FileSource fileSource = file.toFileSource(prefix, schemes);
+      if (!(fileSource.getFileSrc().startsWith("http") || fileSource.getFileSrc().startsWith("/test"))) {
+        // better safe than sorry.
+        break;
+      }
       writer.writeScript(String.format(
-        "jstestdriver.manualResourceTracker.startResourceLoad('%s')",
-        gson.toJson(fileSource)));
+          "jstestdriver.manualResourceTracker.startResourceLoad('%s')",
+          gson.toJson(fileSource)));
       if (fileSource.getFileSrc().endsWith(".css")) {
         writer.writeStyleSheet(fileSource.getFileSrc());
       } else {
@@ -72,15 +78,5 @@ public class BrowserControlledRunnerPage implements Page {
       }
       writer.writeScript("jstestdriver.manualResourceTracker.finishResourceLoad()");
     }
-
-    writer.writeScript("jstestdriver.reporter.addLoadedFileResults(" +
-        "jstestdriver.manualResourceTracker.getResults());");
-
-    writer.writeScript("jstestdriver.runner.listen(" +
-        "jstestdriver.manualResourceTracker.getResults());");
-    writer.finishHead()
-      .startBody()
-      .finishBody()
-      .flush();
   }
 }

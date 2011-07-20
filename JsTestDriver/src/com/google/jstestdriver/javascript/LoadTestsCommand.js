@@ -25,13 +25,13 @@ jstestdriver.LoadTestsCommand = function(
   this.boundOnFileLoadedRunnerMode_ =
       jstestdriver.bind(this, this.onFileLoadedRunnerMode);
   this.getBrowserInfo = getBrowserInfo;
-  this.onLoadComplete_ = onLoadComplete
+  this.onLoadComplete_ = onLoadComplete;
 }
 
 
 jstestdriver.LoadTestsCommand.prototype.loadTest = function(args) {
   var files = args[0];
-  var runnerMode = args[1] == "true" ? true : false;
+  var runnerMode = args[1] == 'true' ? true : false;
   var fileSrcs = this.jsonParse_('{"f":' + files + '}').f;
 
   this.removeScripts(document, fileSrcs);
@@ -50,9 +50,11 @@ jstestdriver.LoadTestsCommand.prototype.onFileLoaded = function(status) {
   this.onLoadComplete_(response);
 };
 
+
 jstestdriver.LoadTestsCommand.prototype.onFileLoadedRunnerMode = function(status) {
   this.streamingService_.close(null, this.__boundExecuteCommand);
 };
+
 
 jstestdriver.LoadTestsCommand.prototype.findScriptTagsToRemove_ = function(dom, fileSrcs) {
   var scripts = dom.getElementsByTagName('script');
@@ -77,7 +79,7 @@ jstestdriver.LoadTestsCommand.prototype.findScriptTagsToRemove_ = function(dom, 
 
 
 jstestdriver.LoadTestsCommand.prototype.removeScriptTags_ = function(dom,
-                                                                    scriptTagsToRemove) {
+                                                                     scriptTagsToRemove) {
   var head = dom.getElementsByTagName('head')[0];
   var size = scriptTagsToRemove.length;
 

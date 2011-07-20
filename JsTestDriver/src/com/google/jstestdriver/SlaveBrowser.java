@@ -48,6 +48,11 @@ import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
  */
 public class SlaveBrowser {
 
+  /**
+   * 
+   */
+  private static final LoadedFiles EMPTY_LOADED_FILES = new LoadedFiles();
+
   private static final String CLIENT_CONSOLE_RUNNER = "/slave/id/%s/page/CONSOLE/mode/%s/"
       + SlavePageRequest.TIMEOUT + "/%s/"
       + SlavePageRequest.UPLOAD_SIZE + "/%s/"
@@ -89,6 +94,9 @@ public class SlaveBrowser {
 
   private final RunnerType type;
 
+  private AtomicReference<LoadedFiles> lastloadedFiles =
+    new AtomicReference<LoadedFiles>(EMPTY_LOADED_FILES);
+
   public SlaveBrowser(Time time, String id, BrowserInfo browserInfo, long timeout,
       HandlerPathPrefix prefix, String mode, RunnerType type) {
     this.time = time;
@@ -120,6 +128,7 @@ public class SlaveBrowser {
   public Command dequeueCommand() {
     try {
       Command command = commandsToRun.poll(dequeueTimeout, timeUnit);
+      LOGGER.debug("dequeue {}", command);
 
       synchronized (this) {
         if (command != null) {
@@ -173,11 +182,10 @@ public class SlaveBrowser {
         : ((time.now().getMillis() - lastHeartbeat.get().getMillis()) / 1000.0);
   }
 
-  public void addFiles(Collection<FileInfo> fileSet) {
-    synchronized (fileSet) {
-      this.fileSet.removeAll(fileSet);
-      this.fileSet.addAll(fileSet);
-    }
+  public synchronized void addFiles(Collection<FileInfo> fileSet, LoadedFiles loadedFiles) {
+    this.fileSet.removeAll(fileSet);
+    this.fileSet.addAll(fileSet);
+    this.lastloadedFiles.set(loadedFiles);
   }
 
   public Set<FileInfo> getFileSet() {
@@ -186,8 +194,9 @@ public class SlaveBrowser {
 
   public void resetFileSet() {
     LOGGER.debug("Resetting fileSet for {}", this);
-    synchronized (fileSet) {
+    synchronized (this) {
       fileSet.clear();
+      lastloadedFiles.set(EMPTY_LOADED_FILES);
     }
   }
 
@@ -195,8 +204,10 @@ public class SlaveBrowser {
     try {
       StreamMessage message = responses.poll(POLL_RESPONSE_TIMEOUT, TimeUnit.SECONDS);
       if (message == null) {
-        LOGGER.debug("responses size {}", responses.size());
+        LOGGER.trace("responses size {}", responses.size());
         message = new StreamMessage(false, new Response(ResponseType.UNKNOWN.name(), "{}", browserInfo, "", 0l));
+      } else {
+        LOGGER.trace("returning type {}", message.getResponse().getResponseType());
       }
       return message;
     } catch (InterruptedException e) {
@@ -209,6 +220,7 @@ public class SlaveBrowser {
     if (isLast) {
       commandRunning.set(null);
     }
+    LOGGER.debug("adding response type {}", response.getResponseType());
     responses.offer(new StreamMessage(isLast, response));
   }
 
@@ -222,22 +234,6 @@ public class SlaveBrowser {
 
   public Command getCommandRunning() {
     return commandRunning.get();
-  }
-
-  public void removeFiles(Collection<FileSource> errorFiles) {
-    synchronized (fileSet) {
-      Set<FileInfo> filesInfoToRemove = new LinkedHashSet<FileInfo>();
-
-      for (FileSource f : errorFiles) {
-        for (FileInfo info : fileSet) {
-          if (info.getFilePath().equals(f.getBasePath())) {
-            filesInfoToRemove.add(info);
-            break;
-          }
-        }
-      }
-      fileSet.removeAll(filesInfoToRemove);
-    }
   }
 
   public Command peekCommand() {
@@ -278,5 +274,9 @@ public class SlaveBrowser {
   public String toString() {
     return format("SlaveBrowser(browserInfo=%s,\n\tid=%s,\n\tsinceLastCheck=%ss,\n\ttimeout=%s)",
         browserInfo, id, getSecondsSinceLastHeartbeat(), timeout);
+  }
+
+  public LoadedFiles getLastLoadedFiles() {
+    return lastloadedFiles.get();
   }
 }

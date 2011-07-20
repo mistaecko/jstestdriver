@@ -26,12 +26,24 @@ import static com.google.jstestdriver.server.handlers.pages.PageType.STANDALONE_
 import static com.google.jstestdriver.server.handlers.pages.PageType.VISUAL_STANDALONE_RUNNER;
 import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.UPLOAD_SIZE;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.servlet.RequestScoped;
 import com.google.jstestdriver.CapturedBrowsers;
@@ -47,6 +59,7 @@ import com.google.jstestdriver.TimeImpl;
 import com.google.jstestdriver.annotations.BaseResourceLocation;
 import com.google.jstestdriver.annotations.BrowserTimeout;
 import com.google.jstestdriver.annotations.Port;
+import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
@@ -65,17 +78,6 @@ import com.google.jstestdriver.servlet.fileset.FileSetRequestHandler;
 import com.google.jstestdriver.servlet.fileset.ServerFileCheck;
 import com.google.jstestdriver.servlet.fileset.ServerFileUpload;
 import com.google.jstestdriver.util.ParameterParser;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Defines {@link RequestHandler} bindings for the JSTD server.
@@ -99,20 +101,26 @@ public class JstdHandlersModule extends RequestHandlersModule {
   private final long browserTimeout;
   private final HandlerPathPrefix handlerPrefix;
 
+  private final Set<FileInfoScheme> schemes;
+
   /**
    * TODO(rdionne): Refactor so we don't depend upon manually instantiated
    * classes from other object graphs. 
    * @param handlerPrefix TODO
+   * @param schemes 
    */
   public JstdHandlersModule(
       CapturedBrowsers capturedBrowsers,
       FilesCache filesCache,
       long browserTimeout,
-      HandlerPathPrefix handlerPrefix) {
+      HandlerPathPrefix handlerPrefix,
+      Set<FileInfoScheme> schemes) {
+    super();
     this.capturedBrowsers = capturedBrowsers;
     this.filesCache = filesCache;
     this.browserTimeout = browserTimeout;
     this.handlerPrefix = handlerPrefix;
+    this.schemes = schemes;
   }
   
   @Override
@@ -165,6 +173,7 @@ public class JstdHandlersModule extends RequestHandlersModule {
     bind(StandaloneRunnerFilesFilter.class).to(StandaloneRunnerFilesFilterImpl.class);
     bind(HandlerPathPrefix.class).toInstance(handlerPrefix);
     bind(Time.class).to(TimeImpl.class);
+    bind(new TypeLiteral<Set<FileInfoScheme>>(){}).toInstance(schemes);
 
     MapBinder<PageType, Page> pageBinder = newMapBinder(binder(), PageType.class, Page.class);
     pageBinder.addBinding(CONSOLE).to(ConsolePage.class).in(RequestScoped.class);

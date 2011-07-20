@@ -84,6 +84,7 @@ jstestdriver.CommandExecutor = function(streamingService,
   this.lastTestResultsSent_ = 0;
   this.getBrowserInfo = getBrowserInfo;
   this.currentActionSignal_ = currentActionSignal;
+  this.currentCommand = null;
 };
 
 
@@ -98,6 +99,8 @@ jstestdriver.CommandExecutor.prototype.executeCommand = function(jsonCommand) {
   } else {
     command = jstestdriver.NOOP_COMMAND;
   }
+  this.currentCommand = command.command;
+  jstestdriver.log('current command ' + command.command);
   try {
     this.commandMap_[command.command](command.parameters);
   } catch (e) {
@@ -198,19 +201,19 @@ jstestdriver.CommandExecutor.prototype.dryRunFor = function(args) {
 };
 
 
-jstestdriver.CommandExecutor.prototype.listen = function() {
+jstestdriver.CommandExecutor.prototype.listen = function(loadResults) {
   var response;
   if (window.location.href.search('\\?refresh') != -1) {
     response =
         new jstestdriver.Response(jstestdriver.RESPONSE_TYPES.RESET_RESULT,
-                                  'Runner reset.',
+                                  '{"loadedFiles":' + JSON.stringify(loadResults) + '}',
                                   this.getBrowserInfo(),
                                   true);
     jstestdriver.log('Runner reset: ' + window.location.href);
   } else {
     response =
         new jstestdriver.Response(jstestdriver.RESPONSE_TYPES.BROWSER_READY,
-                                  null,
+                                  '{"loadedFiles":' + JSON.stringify(loadResults) + '}',
                                   this.getBrowserInfo(),
                                   true);
 

@@ -35,7 +35,6 @@ jstestdriver.StreamingService = function(url, now, post, synchPost) {
 
 jstestdriver.StreamingService.prototype.synchClose = function(response) {
   var data = new jstestdriver.CommandResponse(true, response);
-  console.info("synch call");
   this.synchPost_(this.url_, data);
 };
 
@@ -51,7 +50,7 @@ jstestdriver.StreamingService.prototype.streamResponse = function(response,
   var data = new jstestdriver.CommandResponse(done, response);
   if (!done && response != null) {
     data.responseId = this.now_();
-    // no ack expected after the final response, and no ack expected on no reponse
+    // no ack expected after the final response, and no ack expected on no response
     this.activeResponses_[data.responseId] = data;
   }
   this.post_(this.url_, data, callback, 'text/plain');

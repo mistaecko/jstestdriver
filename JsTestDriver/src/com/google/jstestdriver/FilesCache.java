@@ -28,6 +28,9 @@ public class FilesCache {
   // When the map semantics are clean.
   private final Map<String, FileInfo> files;
 
+  /**
+   * @param files Files is expected to be an ordered map. Seriously.
+   */
   public FilesCache(Map<String, FileInfo> files) {
     this.files = files;
   }

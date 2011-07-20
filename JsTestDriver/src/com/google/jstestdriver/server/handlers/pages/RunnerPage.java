@@ -17,6 +17,7 @@ package com.google.jstestdriver.server.handlers.pages;
 
 import java.io.IOException;
 
+import com.google.inject.Inject;
 import com.google.jstestdriver.util.HtmlWriter;
 
 /**
@@ -25,6 +26,12 @@ import com.google.jstestdriver.util.HtmlWriter;
  * @author corbinrsmith@gmail.com (Cory Smith)
  */
 public class RunnerPage implements Page {
+  private final TestFileUtil testFileUtil;
+
+  @Inject
+  RunnerPage(TestFileUtil testFileUtil) {
+    this.testFileUtil = testFileUtil;
+  }
 
   public void render(HtmlWriter writer, SlavePageRequest request) throws IOException {
     writer.startHead()
@@ -35,11 +42,19 @@ public class RunnerPage implements Page {
       .writeExternalScript("/static/lib/jquery-min.js")
       .writeExternalScript("/static/runner.js")
       .writeScript(
-          "jstestdriver.console = new jstestdriver.Console();" +
-          "jstestdriver.config.startRunner(jstestdriver.config.createExecutor, " +
-          "    jstestdriver.plugins.createPausingRunTestLoop(jstestdriver.TIMEOUT, " +
-          "        jstestdriver.now, jstestdriver.setTimeout));")
-      .finishHead()
+          "jstestdriver.console = new jstestdriver.Console();\n" +
+          "jstestdriver.runner = jstestdriver.config.createRunner(\n" +
+          "    jstestdriver.config.createExecutor,\n" +
+          "    jstestdriver.plugins.createPausingRunTestLoop(\n" +
+          "        jstestdriver.TIMEOUT,\n" +
+          "        jstestdriver.now,\n" +
+          "        jstestdriver.setTimeout));");
+
+    testFileUtil.writeTestFiles(writer);
+
+    writer.writeScript("jstestdriver.runner.listen(" +
+        "jstestdriver.manualResourceTracker.getResults());");
+    writer.finishHead()
       .startBody()
       .finishBody()
       .flush();

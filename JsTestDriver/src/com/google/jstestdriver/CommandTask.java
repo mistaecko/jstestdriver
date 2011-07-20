@@ -98,6 +98,7 @@ public class CommandTask {
     try {
       checkBrowser();
       logger.debug("Starting upload for {}", browserId);
+      // TODO(corysmith): Move the loading of files to a browser into the server.
       if (upload) {
         fileUploader.uploadToTheBrowser(
             browserId,
@@ -128,6 +129,7 @@ public class CommandTask {
         stream.stream(resObj);
       } while (!streamMessage.isLast());
       stopWatch.stop("execution %s", params.get("data"));
+      logger.debug("finished {} for {} with {}", new Object[] {params.get("data"), browserId, streamMessage.getResponse().getResponseType()});
     } finally {
       logger.debug("finished {} for {}", params.get("data"), browserId);
     }

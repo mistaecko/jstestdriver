@@ -72,7 +72,7 @@ public class FileSetRequestHandlerTest extends TestCase {
         new SlaveBrowser(new MockTime(0), "1", browserInfo, 100, null, CaptureHandler.QUIRKS,
             RunnerType.CLIENT);
     browser.addFiles(Lists.newArrayList(createFile(fileOne, 1), createFile(fileTwo, 1),
-        createFile(fileThree, 1)));
+        createFile(fileThree, 1)), new LoadedFiles());
     browsers.addSlave(browser);
     final BrowserFileCheck browserFileCheck = new BrowserFileCheck(new FileSetCacheStrategy());
 

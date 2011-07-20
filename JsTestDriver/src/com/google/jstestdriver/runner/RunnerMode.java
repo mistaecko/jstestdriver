@@ -21,11 +21,17 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 public enum RunnerMode {
-  DEBUG(new LogConfigBuilder()
+  TRACE(new LogConfigBuilder()
             .useFileHandler()
             .useConsoleHandler()
             .finest("com.google.javascript.jstestdriver")
             .finest("com.google.jstestdriver")
+            .severe("org.mortbay"), true),
+  DEBUG(new LogConfigBuilder()
+            .useFileHandler()
+            .useConsoleHandler()
+            .fine("com.google.javascript.jstestdriver")
+            .fine("com.google.jstestdriver")
             .severe("org.mortbay"), true),
   DEBUG_OBSERVE(new LogConfigBuilder()
             .useFileHandler()

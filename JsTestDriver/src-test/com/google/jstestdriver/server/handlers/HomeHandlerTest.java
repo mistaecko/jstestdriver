@@ -59,11 +59,13 @@ public class HomeHandlerTest extends TestCase {
     EasyMock.replay(response);
 
     handler.handleIt();
-    assertEquals("<html><head><title>JsTestDriver</title></head><body>"
-        + "<a href=\"/capture\">Capture This Browser</a><br/><a href=\"/capture?strict\">"
-        + "Capture This Browser in strict mode</a><br/><p><strong>Captured "
-        + "Browsers: (1)</strong></p><p>Id: 1<br/>Name: browser<br/>Version:"
-        + " 1.0<br/>Operating System: OS<br/>Currently" + " waiting...<br/></p></body></html>",
+    assertEquals("<html><head><title>JsTestDriver</title></head><body>" +
+        "<a href=\"/capture\">Capture This Browser</a><br/>" +
+        "<a href=\"/capture?strict\">Capture This Browser in strict mode</a>" +
+        "<br/><p><strong>Captured Browsers: (1)</strong></p>" +
+        "<div>Id: 1<br/>Name: browser<br/>Version: 1.0" +
+        "<br/>Operating System: OS<br/>Currently waiting...<br/>" +
+        "<ul style='display:none'></ul></div></body></html>",
         stream.toString());
 
     EasyMock.verify(response);

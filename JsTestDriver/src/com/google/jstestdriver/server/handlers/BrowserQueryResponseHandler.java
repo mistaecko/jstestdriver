@@ -18,6 +18,7 @@ package com.google.jstestdriver.server.handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.inject.Inject;
+import com.google.inject.internal.Lists;
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.Command;
 import com.google.jstestdriver.FileInfo;
@@ -27,6 +28,7 @@ import com.google.jstestdriver.JsonCommand;
 import com.google.jstestdriver.LoadedFiles;
 import com.google.jstestdriver.Response;
 import com.google.jstestdriver.SlaveBrowser;
+import com.google.jstestdriver.Response.ResponseType;
 import com.google.jstestdriver.protocol.BrowserLog;
 import com.google.jstestdriver.protocol.BrowserStreamAcknowledged;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
@@ -109,8 +111,8 @@ class BrowserQueryResponseHandler implements RequestHandler {
       }
     } else {
       // TODO(corysmith): handle this better.
-      logger.error("Unknown browser {} with response {}", id, response);
-      writer.print(gson.toJson(new JsonCommand(JsonCommand.CommandType.STOP, null)));
+      logger.error("Unknown browser {} with response {}.\n Known {}", new Object[]{id, response, browsers.getSlaveBrowsers()});
+      writer.print(gson.toJson(new JsonCommand(JsonCommand.CommandType.STOP, Lists.newArrayList("Stopping due to missing browser."))));
       try {
         Thread.sleep(1000); // pause to make sure the browser doesn't spin.
       } catch (InterruptedException e) {
@@ -125,40 +127,25 @@ class BrowserQueryResponseHandler implements RequestHandler {
     addResponseId(responseId, browser);
     browser.heartBeat();
     Command command = null;
-    if (isResponseValid(response) && browser.isCommandRunning()) {
+    if (isResponseValid(response)) {
       Response res = gson.fromJson(response, Response.class);
       logger.debug("response type: " +  res.getResponseType());
       // TODO (corysmith): Replace this with polymorphism,
       // using the response type to create disposable actions.
       switch (res.getResponseType()) {
+        case BROWSER_READY:
+          handleFileLoadResult(browser, res);
+          // TODO(corysmith): Move the loading of files to a browser into the
+          // server
+          browser.addResponse(
+              new Response(ResponseType.FILE_LOAD_RESULT.toString(), res.getResponse(), browser
+                  .getBrowserInfo(), "", res.getExecutionTime()), false);
+          break;
         case FILE_LOAD_RESULT:
-          LoadedFiles loadedFiles = gson.fromJson(res.getResponse(), res.getGsonType());
-          Collection<FileResult> allLoadedFiles = loadedFiles.getLoadedFiles();
-          if (!allLoadedFiles.isEmpty()) {
-            LinkedHashSet<FileInfo> fileInfos = new LinkedHashSet<FileInfo>();
-            Collection<FileSource> errorFiles = new LinkedHashSet<FileSource>();
-
-            for (FileResult fileResult : allLoadedFiles) {
-              FileSource fileSource = fileResult.getFileSource();
-
-              if (fileResult.isSuccess()) {
-                fileInfos.add(new FileInfo(fileSource.getBasePath(), fileSource.getTimestamp(),
-                    -1, false, false, null, fileSource.getFileSrc()));
-              } else {
-                errorFiles.add(fileSource);
-              }
-            }
-            browser.addFiles(fileInfos);
-            if (errorFiles.size() > 0) {
-              logger.debug("clearing fileset on browser errors:" + errorFiles.size());
-              browser.resetFileSet();
-            }
-          }
+          handleFileLoadResult(browser, res);
+          browser.addResponse(res, done);
           break;
         case NOOP:
-          command = browser.getLastDequeuedCommand();
-          logger.warn("Got a NOOP with command {} running, which should not happen.",
-              browser.getLastDequeuedCommand());
           break;
         case LOG:
           BrowserLog log = gson.fromJson(res.getResponse(), res.getGsonType());
@@ -167,28 +154,28 @@ class BrowserQueryResponseHandler implements RequestHandler {
           } else {
             logger.info("Message from the browser: " + res.toString());
           }
+          browser.addResponse(res, done);
           break;
         // reset the browsers fileset.
         case RESET_RESULT:
-          Command commandRunning = browser.getCommandRunning();
-
-          if (commandRunning != null) {
-            JsonCommand jsonCommand = gson.fromJson(commandRunning.getCommand(), JsonCommand.class);
-
-            if (jsonCommand.getCommand().equals(JsonCommand.CommandType.RESET.getCommand())) {
-              command = browser.getLastDequeuedCommand();
-            }
-          }
-        //$FALL-THROUGH$
-        case BROWSER_READY:
-          logger.debug("Clearing fileset for {}", browser);
           browser.resetFileSet();
+          logger.debug("Clearing fileset for {}", browser);
+          handleFileLoadResult(browser, res);
+          browser.addResponse(res, done);
+          // queue the load results for the next command to be run.
+          browser.addResponse(
+              new Response(ResponseType.FILE_LOAD_RESULT.toString(), res.getResponse(), browser
+                  .getBrowserInfo(), "", res.getExecutionTime()), false);
           break;
         case UNKNOWN:
           logger.error("Recieved Unknown: " + response);
+          browser.addResponse(res, done);
+          break;
+        default:
+          browser.addResponse(res, done);
+          break;
       }
-      logger.debug("Received:\n done: {} \n res:\n {}\n", new Object[] {done, res});
-      browser.addResponse(res, done);
+      logger.trace("Received:\n done: {} \n res:\n {}\n", new Object[] {done, res});
     }
     if (isResponseIdValid(responseId) && !done && !isResponseValid(response)) {
       logger.trace("Streaming query for ids {} from {}", streamedResponses.get(browser), browser);
@@ -218,6 +205,35 @@ class BrowserQueryResponseHandler implements RequestHandler {
     
     logger.debug("sending command {}", command == null ? "null" : command.getCommand());
     writer.print(command.getCommand());
+  }
+
+  /**
+   * @param browser
+   * @param res
+   */
+  private void handleFileLoadResult(SlaveBrowser browser, Response res) {
+    LoadedFiles loadedFiles = gson.fromJson(res.getResponse(), res.getGsonType());
+    Collection<FileResult> allLoadedFiles = loadedFiles.getLoadedFiles();
+    if (!allLoadedFiles.isEmpty()) {
+      LinkedHashSet<FileInfo> fileInfos = new LinkedHashSet<FileInfo>();
+      Collection<FileSource> errorFiles = new LinkedHashSet<FileSource>();
+
+      for (FileResult fileResult : allLoadedFiles) {
+        FileSource fileSource = fileResult.getFileSource();
+
+        if (fileResult.isSuccess()) {
+          fileInfos.add(new FileInfo(fileSource.getBasePath(), fileSource.getTimestamp(),
+              -1, false, false, null, fileSource.getFileSrc()));
+        } else {
+          errorFiles.add(fileSource);
+        }
+      }
+      browser.addFiles(fileInfos, loadedFiles);
+      if (errorFiles.size() > 0) {
+        logger.debug("clearing fileset on browser errors:" + errorFiles.size());
+        browser.resetFileSet();
+      }
+    }
   }
 
   private boolean isResponseValid(String response) {

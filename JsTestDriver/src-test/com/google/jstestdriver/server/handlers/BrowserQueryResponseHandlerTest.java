@@ -149,7 +149,7 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
 
     handler.service("1", "response", "true", null, writer);
     assertEquals(new Gson().toJson(
-        new JsonCommand(JsonCommand.CommandType.STOP, null)), out.toString());
+        new JsonCommand(JsonCommand.CommandType.STOP, Lists.newArrayList("Stopping due to missing browser."))), out.toString());
   }
 
   public void testDoNotGetCommandIfNotLastResponse() throws Exception {
@@ -237,10 +237,10 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
     BrowserQueryResponseHandler handler =
         new BrowserQueryResponseHandler(null, null, browsers, streamedResponses);
 
-    slave.addFiles(Lists.newArrayList(new FileInfo()));
+    slave.addFiles(Lists.newArrayList(new FileInfo()), new LoadedFiles());
     Response response = new Response();
     response.setType(ResponseType.RESET_RESULT.name());
-    response.setResponse("Runner reset.");
+    response.setResponse(new Gson().toJson(new LoadedFiles()));
     response.setBrowser(new BrowserInfo());
 
     JsonCommand resetCommand = new JsonCommand(CommandType.RESET, Collections.<String>emptyList());

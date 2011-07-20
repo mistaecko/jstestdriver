@@ -105,10 +105,13 @@ class FileSetGetHandler implements RequestHandler {
     SlaveBrowser browser = capturedBrowsers.getBrowser(id);
     Lock lock = browser.getLock();
     String sessionId = UUID.randomUUID().toString();
+    SlaveBrowser slaveBrowser = capturedBrowsers.getBrowser(id);
 
     if (lock.tryLock(sessionId)) {
       logger.debug("got session lock {} for {}", sessionId, id);
       writer.write(sessionId);
+      slaveBrowser.clearCommandRunning();
+      slaveBrowser.clearResponseQueue();
     } else {
       logger.debug("checking session status for {}", id);
       // session is probably stalled
@@ -116,7 +119,6 @@ class FileSetGetHandler implements RequestHandler {
           ((System.currentTimeMillis() - lock.getLastHeartBeat()) > HEARTBEAT_TIMEOUT)) {
         logger.debug("forcing unlock for {}", id);
         lock.forceUnlock();
-        SlaveBrowser slaveBrowser = capturedBrowsers.getBrowser(id);
 
         slaveBrowser.clearCommandRunning();
         slaveBrowser.clearResponseQueue();

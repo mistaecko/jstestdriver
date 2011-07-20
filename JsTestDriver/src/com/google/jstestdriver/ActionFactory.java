@@ -26,9 +26,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.google.jstestdriver.JsTestDriverServer.Factory;
 import com.google.jstestdriver.hooks.TestsPreProcessor;
-import com.google.jstestdriver.model.HandlerPathPrefix;
 
 /**
  * Produces instances of Actions, so they can have observers, and other stuff.
@@ -42,27 +40,21 @@ public class ActionFactory {
   Map<Class<?>, List<Observer>> observers = new HashMap<Class<?>, List<Observer>>();
   private final Provider<JsTestDriverClient> clientProvider;
   private final Set<TestsPreProcessor> testPreProcessors;
-  private final long browserTimeout;
   private final boolean preloadFiles;
   private final FileLoader fileLoader;
-  private final HandlerPathPrefix serverHandlerPrefix;
-  private final Factory serverFactory;
+  private final JsTestDriverServer.Factory factory;
 
   @Inject
   public ActionFactory(Provider<JsTestDriverClient> clientProvider,
                        Set<TestsPreProcessor> testPreProcessors,
-                       @Named("browserTimeout") long browserTimeout,
                        @Named("preloadFiles") boolean preloadFiles,
                        FileLoader fileLoader,
-                       @Named("serverHandlerPrefix") HandlerPathPrefix serverHandlerPrefix,
-                       Factory serverFactory) {
+                       JsTestDriverServer.Factory factory) {
     this.clientProvider = clientProvider;
     this.testPreProcessors = testPreProcessors;
-    this.browserTimeout = browserTimeout;
     this.preloadFiles = preloadFiles;
     this.fileLoader = fileLoader;
-    this.serverHandlerPrefix = serverHandlerPrefix;
-    this.serverFactory = serverFactory;
+    this.factory = factory;
   }
 
   public ServerStartupAction getServerStartupAction(Integer port,
@@ -74,7 +66,7 @@ public class ActionFactory {
                                 preloadedFilesCache,
                                 preloadFiles,
                                 fileLoader,
-                                serverFactory);
+                                factory);
 
     if (observers.containsKey(CapturedBrowsers.class)) {
       for (Observer o : observers.get(CapturedBrowsers.class)) {

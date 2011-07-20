@@ -21,13 +21,13 @@ jstestdriver.config = (function(module) {
   var config = module || {};
 
   /**
-   * Start a new runner.
+   * Create a new runner.
    */
-  config.startRunner = function(createCommandExecutor, opt_runTestLoop) {
+  config.createRunner = function(createCommandExecutor, opt_runTestLoop) {
     
     var runTestLoop = opt_runTestLoop || jstestdriver.plugins.defaultRunTestLoop;
     jstestdriver.log("using runTestLoop:" + runTestLoop);
-    
+
     jstestdriver.pluginRegistrar = new jstestdriver.PluginRegistrar();
     jstestdriver.testCaseManager =
         new jstestdriver.TestCaseManager(jstestdriver.pluginRegistrar);
@@ -87,15 +87,33 @@ jstestdriver.config = (function(module) {
     // legacy
     jstestdriver.testCaseManager.TestCase = jstestdriver.global.TestCase;
 
-    jstestdriver.executor = createCommandExecutor(jstestdriver.testCaseManager,
-                                                  jstestdriver.testRunner,
-                                                  jstestdriver.pluginRegistrar,
-                                                  jstestdriver.now,
-                                                  window.location.toString());
+    var id = parseInt(jstestdriver.extractId(top.location.toString()));
+    console.debug("id " + id);
+    function getBrowserInfo() {
+      return new jstestdriver.BrowserInfo(id);
+    }
 
-    jstestdriver.executor.listen();
+    jstestdriver.manualResourceTracker = new jstestdriver.ManualResourceTracker(
+        jstestdriver.JSON.parse,
+        jstestdriver.JSON.stringify,
+        jstestdriver.pluginRegistrar,
+        getBrowserInfo,
+        new jstestdriver.ManualScriptLoader(
+            window,
+            jstestdriver.testCaseManager,
+            jstestdriver.now));
+
+    return jstestdriver.executor = createCommandExecutor(
+        jstestdriver.testCaseManager,
+        jstestdriver.testRunner,
+        jstestdriver.pluginRegistrar,
+        jstestdriver.now,
+        window.location.toString(),
+        getBrowserInfo,
+        id);
   };
-  
+
+
   /**
    * Creates a CommandExecutor.
    * @static
@@ -111,20 +129,17 @@ jstestdriver.config = (function(module) {
                                    testRunner,
                                    pluginRegistrar,
                                    now,
-                                   location) {
-    var id = parseInt(jstestdriver.extractId(location));
-    var url =jstestdriver.createPath(top.location.toString(),
-                                     jstestdriver.SERVER_URL + id);
+                                   location,
+                                   getBrowserInfo,
+                                   id) {
+    var url = jstestdriver.createPath(top.location.toString(),
+                                      jstestdriver.SERVER_URL + id);
 
     var streamingService = new jstestdriver.StreamingService(
             url,
             now,
             jstestdriver.convertToJson(jstestdriver.jQuery.post),
             jstestdriver.createSynchPost(jstestdriver.jQuery));
-    
-    function getBrowserInfo() {
-      return new jstestdriver.BrowserInfo(id);
-    }
 
     var executor = new jstestdriver.CommandExecutor(streamingService,
                                                     testCaseManager,
@@ -164,7 +179,7 @@ jstestdriver.config = (function(module) {
         window.location,
         unloadSignal,
         jstestdriver.now);
-        
+
     var noopCommand = new jstestdriver.NoopCommand(streamStop, getBrowserInfo);
 
     executor.registerCommand('execute', executor, executor.execute);
@@ -184,8 +199,9 @@ jstestdriver.config = (function(module) {
       }
     });
     executor.registerCommand('streamAcknowledged',
-                             streamingService,
-                             streamingService.streamAcknowledged);
+                              streamingService,
+                              streamingService.streamAcknowledged);
+
 
     function getCommand() {
       return currentActionSignal.get();
@@ -219,20 +235,25 @@ jstestdriver.config = (function(module) {
       testRunner,
       pluginRegistrar,
       now,
-      location) {
+      location,
+      getBrowserInfo,
+      id) {
     return config.createStandAloneExecutorWithReporter(testCaseManager,
       testRunner,
       pluginRegistrar,
       now,
       location,
-      new jstestdriver.VisualTestReporter(function(tagName) {
-        return document.createElement(tagName);
-      },
-      function(node) {
-        return document.body.appendChild(node);
-      },
-      jstestdriver.jQuery,
-      JSON.parse));
+      new jstestdriver.VisualTestReporter(
+          function(tagName) {
+            return document.createElement(tagName);
+          },
+          function(node) {
+            return document.body.appendChild(node);
+          },
+          jstestdriver.jQuery,
+          JSON.parse),
+      getBrowserInfo,
+      id);
   };
 
   /**
@@ -250,13 +271,17 @@ jstestdriver.config = (function(module) {
       testRunner,
       pluginRegistrar,
       now,
-      location) {
+      location,
+      getBrowserInfo,
+      id) {
     return config.createStandAloneExecutorWithReporter(testCaseManager,
         testRunner,
         pluginRegistrar,
         now,
         location,
-        new jstestdriver.StandAloneTestReporter())
+        new jstestdriver.StandAloneTestReporter(),
+        getBrowserInfo,
+        id)
   };
 
 
@@ -277,20 +302,19 @@ jstestdriver.config = (function(module) {
           pluginRegistrar,
           now,
           location,
-          reporter) {
-    var id = parseInt(jstestdriver.extractId(location));
+          reporter,
+          getBrowserInfo,
+          id) {
     var url =jstestdriver.createPath(top.location.toString(),
         jstestdriver.SERVER_URL + id);
-    
+
     var streamingService = new jstestdriver.StreamingService(
             url,
             now,
             jstestdriver.convertToJson(jstestdriver.jQuery.post));
 
-    function getBrowserInfo() {
-      return new jstestdriver.BrowserInfo(id);
-    }
     window.top.G_testRunner = reporter;
+    jstestdriver.reporter = reporter;
 
     var currentActionSignal = new jstestdriver.Signal(null);
     
@@ -303,7 +327,7 @@ jstestdriver.config = (function(module) {
             currentActionSignal);
 
     var boundExecuteCommand = jstestdriver.bind(executor, executor.executeCommand);
-    
+
     function streamStop(response) {
       streamingService.close(response, boundExecuteCommand)
     }

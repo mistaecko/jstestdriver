@@ -42,6 +42,7 @@ jstestdriver.plugins.ScriptLoader.prototype.load = function(file, callback) {
   });
 
   var handleError = jstestdriver.bind(this, function(msg, url, line) {
+    this.testCaseManager_.removeTestCaseForFilename(file.fileSrc);
     var loadMsg = 'error loading file: ' + file.fileSrc;
 
     if (line != undefined && line != null) {

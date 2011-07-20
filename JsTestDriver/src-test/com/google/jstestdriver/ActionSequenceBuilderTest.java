@@ -29,14 +29,13 @@ import com.google.jstestdriver.action.UploadAction;
 import com.google.jstestdriver.browser.BrowserActionExecutorAction;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
 import com.google.jstestdriver.hooks.TestsPreProcessor;
-import com.google.jstestdriver.model.NullPathPrefix;
 
 public class ActionSequenceBuilderTest extends TestCase {
 
   private LinkedHashSet<FileInfo> files = new LinkedHashSet<FileInfo>();
   ActionFactory actionFactory =
-      new ActionFactory(null, Collections.<TestsPreProcessor>emptySet(), SlaveBrowser.TIMEOUT,
-          false, null, null, null);
+      new ActionFactory(null, Collections.<TestsPreProcessor>emptySet(), false,
+          null, null);
 
   public void testAddTestsWithRemoteServerAddress() throws Exception {
     List<String> tests = tests();
@@ -74,9 +73,9 @@ public class ActionSequenceBuilderTest extends TestCase {
         new ActionFactory(
             null,
             Collections.<TestsPreProcessor> emptySet(),
-            SlaveBrowser.TIMEOUT,
             false,
-            null, null, null),
+            null,
+            null),
             null, null, new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null),
         new FailureCheckerAction(null, null),
         new UploadAction(null),
@@ -103,9 +102,9 @@ public class ActionSequenceBuilderTest extends TestCase {
         new ActionFactory(
             null,
             Collections.<TestsPreProcessor> emptySet(),
-            SlaveBrowser.TIMEOUT,
             false,
-            null, null, null),
+            null,
+            null),
             null, null, new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null),
             new FailureCheckerAction(null, null),
             new UploadAction(null),
@@ -134,10 +133,9 @@ public class ActionSequenceBuilderTest extends TestCase {
             new ActionFactory(
                 null,
                 Collections.<TestsPreProcessor>emptySet(),
-                SlaveBrowser.TIMEOUT,
                 false,
                 null,
-                new NullPathPrefix(), null),
+                null),
             null, null, new BrowserActionExecutorAction(
                 null, null, null, null, null, 0, null, null),
             new FailureCheckerAction(null, null),

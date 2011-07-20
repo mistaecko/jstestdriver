@@ -21,6 +21,31 @@
   <property name="jstests.dir" value="src-test/com/google/jstestdriver/javascript" />
   <property name="testability-explorer.reports.dir" value="${target.dir}/reports/testability-explorer" />
   <property name="defaultbrowser" value="/usr/bin/firefox" />
+  <property name="jscorefiles" value="angular-json.js,
+    Signal.js,
+    PageUnloadHandler.js,
+    ResetCommand.js,
+    NoopCommand.js,
+    Response.js,
+    Asserts.js,
+    StreamingService.js,
+    FileSource.js,
+    FileResult.js,
+    Utils.js,
+    Console.js,
+    PluginRegistrar.js,
+    LibLoader.js,
+    FileLoader.js,
+    TestRunFilter.js,
+    TestCaseInfo.js,
+    TestResult.js,
+    TestRunConfiguration.js,
+    TestCaseManager.js,
+    TestCaseBuilder.js,
+    TestRunner.js,
+    CommandExecutor.js,
+    ManualScriptLoader.js,
+    ManualResourceTracker.js" />
 
   <property name="XMLDIRECTORY" value="${target.dir}/reports/jstestdriver" />
   <property name="SERVERADDRESS" value="http://localhost:9876" />
@@ -35,8 +60,8 @@
 
   <target name="clean">
     <delete dir="target" />
-    <ant antfile="../idea-plugin/build.xml" dir="../idea-plugin" target="clean" />
-    <ant antfile="../eclipse-plugin/build.xml" dir="../eclipse-plugin" target="clean" />
+    <!-- ant antfile="../idea-plugin/build.xml" dir="../idea-plugin" target="clean" />
+    <ant antfile="../eclipse-plugin/build.xml" dir="../eclipse-plugin" target="clean" / -->
   </target>
 
   <path id="classpath">
@@ -107,11 +132,11 @@
   </target>
 
   <target name="compile-js" unless="dontcompile">
-    <echo message="Compiling Js to ${destdir}/${javascript-resources}" />
+    <echo message="Compiling Js to ${destdir}/${javascript-resources} from ${src.dir}/${javascript-resources}" />
     <apply executable="java" dest="${destdir}/${javascript-resources}">
       <arg value="-jar" />
       <arg value="${lib.dir}/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar" />
-      <!--arg value="-v" / -->
+      <arg value="-v" />
       <arg value="--type" />
       <arg value="js" />
       <arg value="--disable-optimizations" />
@@ -166,33 +191,10 @@
       <filelist dir="${destdir}/${javascript-resources}" files="Namespace.js" />
     </concat>
     <concat destfile="${destdir}/${javascript-resources}/runner.js">
-      <filelist dir="${destdir}/${javascript-resources}" files="
-               angular-json.js,
-               Signal.js,
-               PageUnloadHandler.js,
-               ResetCommand.js,
-               NoopCommand.js,
-               Response.js,
-               Asserts.js,
-               StreamingService.js,
-               FileSource.js,
-               FileResult.js,
-               Utils.js,
-               Console.js,
-               PluginRegistrar.js,
-               LibLoader.js,
-               FileLoader.js,
-               TestRunFilter.js,
-               TestCaseInfo.js,
-               TestResult.js,
-               TestRunConfiguration.js,
-               TestCaseManager.js,
-               TestCaseBuilder.js,
-               TestRunner.js,
-               LoadTestsCommand.js,
-               RunTestsCommand.js,
-               CommandExecutor.js,
-               config.js" />
+      <filelist dir="${destdir}/${javascript-resources}" files="${jscorefiles}" />
+      <filelist dir="${destdir}/${javascript-resources}" files="LoadTestsCommand.js,
+               RunTestsCommand.js" />
+      <filelist dir="${destdir}/${javascript-resources}" files="config.js" />
       <filelist dir="${destdir}/${javascript-resources}/plugins/async" files="CatchingCallback.js,
                ExpiringCallback.js,
                FiniteUseCallback.js,
@@ -213,32 +215,12 @@
                TestCaseManagerPlugin.js" />
     </concat>
     <concat destfile="${destdir}/${javascript-resources}/standalonerunner.js">
-      <filelist dir="${destdir}/${javascript-resources}" files="
-               angular-json.js,
-               Signal.js,
-               Response.js,
-               Asserts.js,
-               StreamingService.js,
-               FileSource.js,
-               FileResult.js,
-               Utils.js,
-               Console.js,
-               PluginRegistrar.js,
-               LibLoader.js,
-               FileLoader.js,
-               TestRunFilter.js,
-               TestCaseInfo.js,
-               TestResult.js,
-               TestRunConfiguration.js,
-               TestCaseManager.js,
-               TestCaseBuilder.js,
-               TestRunner.js,
-               StandAloneLoadTestsCommand.js,
+      <filelist dir="${destdir}/${javascript-resources}" files="${jscorefiles}" />
+      <filelist dir="${destdir}/${javascript-resources}" files="StandAloneLoadTestsCommand.js,
                StandAloneRunTestsCommand.js,
                NoopCommand.js,
-               StandAloneTestReporter.js,
-               CommandExecutor.js,
-               config.js" />
+               StandAloneTestReporter.js" />
+      <filelist dir="${destdir}/${javascript-resources}" files="config.js" />
       <filelist dir="${destdir}/${javascript-resources}/plugins/async" files="CatchingCallback.js,
                ExpiringCallback.js,
                FiniteUseCallback.js,
@@ -260,32 +242,12 @@
 
     </concat>
     <concat destfile="${destdir}/${javascript-resources}/browser_controlled_runner.js">
-      <filelist dir="${destdir}/${javascript-resources}" files="
-               angular-json.js,
-               Signal.js,
-               Response.js,
-               Asserts.js,
-               StreamingService.js,
-               FileSource.js,
-               FileResult.js,
-               Utils.js,
-               Console.js,
-               PluginRegistrar.js,
-               LibLoader.js,
-               FileLoader.js,
-               TestRunFilter.js,
-               TestCaseInfo.js,
-               TestResult.js,
-               TestRunConfiguration.js,
-               TestCaseManager.js,
-               TestCaseBuilder.js,
-               TestRunner.js,
-               StandAloneLoadTestsCommand.js,
+      <filelist dir="${destdir}/${javascript-resources}" files="${jscorefiles}" />
+      <filelist dir="${destdir}/${javascript-resources}" files="StandAloneLoadTestsCommand.js,
                StandAloneRunTestsCommand.js,
                NoopCommand.js,
-               VisualTestReporter.js,
-               CommandExecutor.js,
-               config.js" />
+               VisualTestReporter.js" />
+      <filelist dir="${destdir}/${javascript-resources}" files="config.js" />
       <filelist dir="${destdir}/${javascript-resources}/plugins/async" files="CatchingCallback.js,
                ExpiringCallback.js,
                FiniteUseCallback.js,

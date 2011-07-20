@@ -175,8 +175,7 @@ public class JsTestDriverModule extends AbstractModule {
             ConfigureProxyAction.class));
 
     bind(JsTestDriverServer.Factory.class).toProvider(
-      FactoryProvider.newFactory(JsTestDriverServer.Factory.class,
-        JsTestDriverServerImpl.class));
+        FactoryProvider.newFactory(JsTestDriverServer.Factory.class, JsTestDriverServerImpl.class));
   }
 
   /**

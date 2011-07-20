@@ -40,8 +40,7 @@ public class ResetAction implements BrowserAction {
     }
     
     public void stream(Response response) {
-      out.println(String.format("%s: %s", response.getBrowser().getName(),
-          response.getResponse()));
+      out.println(String.format("%s: Reset", response.getBrowser().getName()));
     }
   }
   private final ResponseStreamFactory responseStreamFactory;

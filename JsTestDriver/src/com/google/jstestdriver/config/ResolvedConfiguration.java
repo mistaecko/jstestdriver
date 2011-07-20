@@ -60,7 +60,6 @@ public class ResolvedConfiguration implements Configuration {
 
   // TODO(corysmith): fix this interface to not require extra information.
   public String getServer(String flagValue, int port, HandlerPathPrefix handlerPrefix) {
-    System.out.printf("ParsedConfiguration: %s %s %s", server, flagValue, port);
     if (flagValue != null && flagValue.length() != 0) {
       return handlerPrefix.suffixServer(flagValue);
     }

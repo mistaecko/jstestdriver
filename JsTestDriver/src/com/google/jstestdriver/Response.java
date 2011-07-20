@@ -35,10 +35,10 @@ public class Response {
     REGISTER_RESULT(null),
     TEST_RESULT(new TypeToken<Collection<TestResult>>() {}.getType()),
     TEST_QUERY_RESULT(null),
-    RESET_RESULT(null),
+    RESET_RESULT(LoadedFiles.class),
     BROWSER_PANIC(BrowserPanic.class),
     UNKNOWN(null),
-    BROWSER_READY(null),
+    BROWSER_READY(LoadedFiles.class),
     COMMAND_RESULT(null),
     NOOP(Noop.class),
     LOG(BrowserLog.class);

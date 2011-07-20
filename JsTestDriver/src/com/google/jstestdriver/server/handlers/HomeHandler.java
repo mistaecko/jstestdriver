@@ -4,6 +4,7 @@ package com.google.jstestdriver.server.handlers;
 import com.google.inject.Inject;
 import com.google.jstestdriver.BrowserInfo;
 import com.google.jstestdriver.CapturedBrowsers;
+import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.SlaveBrowser;
 import com.google.jstestdriver.annotations.ResponseWriter;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
@@ -37,15 +38,17 @@ class HomeHandler implements RequestHandler {
     this.writer = writer;
   }
 
-  public void handleIt() throws IOException {writer.write("<html><head><title>JsTestDriver</title></head><body>");
+  public void handleIt() throws IOException {
     response.setContentType("text/html");
+    writer.write("<html><head><title>JsTestDriver</title>");
+    writer.write("</head><body>");
     writer.write("<a href=\"/capture\">Capture This Browser</a><br/>");
     writer.write("<a href=\"/capture?strict\">Capture This Browser in strict mode</a><br/>");
     writer.write("<p><strong>Captured Browsers: (");
     writer.write(String.valueOf(capturedBrowsers.getSlaveBrowsers().size()));
     writer.write(")</strong></p>");
     for (SlaveBrowser browser : capturedBrowsers.getSlaveBrowsers()) {
-      writer.write("<p>");
+      writer.write("<div>");
       BrowserInfo info = browser.getBrowserInfo();
       writer.write("Id: " + info.getId() + "<br/>");
       writer.write("Name: " + info.getName() + "<br/>");
@@ -56,7 +59,14 @@ class HomeHandler implements RequestHandler {
       } else {
         writer.write("Currently waiting...<br/>");
       }
-      writer.write("</p>");
+      writer.write("<ul style='display:none'>");
+      for (FileInfo fileInfo : browser.getFileSet()) {
+        writer.write("<li>");
+        writer.write(fileInfo.getDisplayPath());
+        writer.write("</li>");
+      }
+      writer.write("</ul>");
+      writer.write("</div>");
       writer.flush();
     }
     writer.write("</body></html>");
