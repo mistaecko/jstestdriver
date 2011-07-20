@@ -79,7 +79,7 @@ public class GatewayServletTest extends TestCase {
     gateway.service(request, response);
     assertEquals("GET", methodCapture.getValue().getName());
     assertEquals("http://hostname/relativeUri?id=123", methodCapture.getValue().getURI().toString());
-    assertEquals("jstd:80", methodCapture.getValue().getRequestHeader("Host").getValue());
+    assertEquals("hostname:80", methodCapture.getValue().getRequestHeader("Host").getValue());
     assertEquals("id=123", methodCapture.getValue().getQueryString());
     assertEquals("", output.toString());
   }
@@ -121,7 +121,7 @@ public class GatewayServletTest extends TestCase {
     ((EntityEnclosingMethod) methodCapture.getValue()).getRequestEntity().writeRequest(requestBody);
     assertEquals("POST", methodCapture.getValue().getName());
     assertEquals("http://hostname/relativeUri?id=123", methodCapture.getValue().getURI().toString());
-    assertEquals("jstd:80", methodCapture.getValue().getRequestHeader("Host").getValue());
+    assertEquals("hostname:80", methodCapture.getValue().getRequestHeader("Host").getValue());
     assertEquals("id=123", methodCapture.getValue().getQueryString());
     assertEquals("ASDF", requestBody.toString());
     assertEquals("", output.toString());

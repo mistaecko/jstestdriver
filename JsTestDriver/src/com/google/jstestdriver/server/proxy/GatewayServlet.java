@@ -3,6 +3,7 @@ package com.google.jstestdriver.server.proxy;
 
 import com.google.inject.Inject;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -14,6 +15,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Enumeration;
 
 /**
@@ -50,10 +54,16 @@ public class GatewayServlet extends JstdProxyServlet {
     final HttpMethodBase method = getMethod(request);
     addRequestHeaders(method, request);
     method.setQueryString(request.getQueryString());
+    try {
+      method.setRequestHeader("Host", new URI(proxyTo).getAuthority());
+    } catch (URISyntaxException badUriSyntax) {
+      throw new RuntimeException(badUriSyntax);
+    }
     final int statusCode = client.executeMethod(method);
     final HttpServletResponse response = (HttpServletResponse) res;
     response.setStatus(statusCode);
     addResponseHeaders(method, response);
+    // TODO(rdionne): Substitute the JsTD server address for the proxyTo address in any redirects.
     Streams.copy(method.getResponseBodyAsStream(), response.getOutputStream());
     method.releaseConnection();
   }
