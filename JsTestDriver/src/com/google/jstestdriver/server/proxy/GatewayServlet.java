@@ -29,6 +29,14 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class GatewayServlet extends JstdProxyServlet {
 
+  private static final String HOST = "Host";
+  private static final String DESTROY_NOT_SUPPORTED = "#destroy() not supported.";
+  private static final String GET_SERLVET_CONFIG_NOT_SUPPORTED =
+      "#getSerlvetConfig() not supported.";
+  private static final String GET_SERVLET_INFO_NOT_SUPPORTED = "#getServletInfo() not supported.";
+  private static final String REQUEST_URI_DOES_NOT_START_WITH_PREFIX =
+      "Request URI '%s' does not start with prefix '%s'.";
+
   private final HttpClient client;
   private String proxyTo;
   private String prefix;
@@ -40,13 +48,13 @@ public class GatewayServlet extends JstdProxyServlet {
 
   @Override
   public void init(final ServletConfig servletConfig) throws ServletException {
-    proxyTo = servletConfig.getInitParameter("ProxyTo");
-    prefix = servletConfig.getInitParameter("Prefix");
+    proxyTo = servletConfig.getInitParameter(ProxyServletConfig.PROXY_TO);
+    prefix = servletConfig.getInitParameter(ProxyServletConfig.PREFIX);
   }
 
   @Override
   public ServletConfig getServletConfig() {
-    throw new UnsupportedOperationException("#getSerlvetConfig() not supported.");
+    throw new UnsupportedOperationException(GET_SERLVET_CONFIG_NOT_SUPPORTED);
   }
 
   @Override
@@ -56,11 +64,7 @@ public class GatewayServlet extends JstdProxyServlet {
     final HttpMethodBase method = getMethod(request);
     addRequestHeaders(method, request);
     method.setQueryString(request.getQueryString());
-    try {
-      method.setRequestHeader("Host", new URI(proxyTo).getAuthority());
-    } catch (URISyntaxException badUriSyntax) {
-      throw new RuntimeException(badUriSyntax);
-    }
+    spoofHostHeader(method);
     final int statusCode = client.executeMethod(method);
     final HttpServletResponse response = (HttpServletResponse) res;
     response.setStatus(statusCode);
@@ -82,6 +86,14 @@ public class GatewayServlet extends JstdProxyServlet {
     }
   }
 
+  private void spoofHostHeader(HttpMethodBase method) {
+    try {
+      method.setRequestHeader(HOST, new URI(proxyTo).getAuthority());
+    } catch (URISyntaxException badUriSyntax) {
+      throw new RuntimeException(badUriSyntax);
+    }
+  }
+
   private void addResponseHeaders(final HttpMethodBase method, final HttpServletResponse response) {
     for (final Header header : method.getResponseHeaders()) {
       response.addHeader(header.getName(), header.getValue());
@@ -92,7 +104,9 @@ public class GatewayServlet extends JstdProxyServlet {
     final HttpMethod method = HttpMethod.valueOf(request.getMethod());
     String uri = request.getRequestURI();
     if (prefix != null && !uri.startsWith(prefix)) {
-      throw new RuntimeException("Request URI " + uri + " does not start with prefix " + prefix);
+      // Probably impossible.
+      throw new RuntimeException(
+          String.format(REQUEST_URI_DOES_NOT_START_WITH_PREFIX, uri, prefix));
     }
     String url = prefix == null ? proxyTo + uri : proxyTo + uri.substring(prefix.length());
     switch (method) {
@@ -107,11 +121,11 @@ public class GatewayServlet extends JstdProxyServlet {
 
   @Override
   public String getServletInfo() {
-    throw new UnsupportedOperationException("#getServletInfo() not supported.");
+    throw new UnsupportedOperationException(GET_SERVLET_INFO_NOT_SUPPORTED);
   }
 
   @Override
   public void destroy() {
-    throw new UnsupportedOperationException("#destroy() not supported.");
+    throw new UnsupportedOperationException(DESTROY_NOT_SUPPORTED);
   }
 }

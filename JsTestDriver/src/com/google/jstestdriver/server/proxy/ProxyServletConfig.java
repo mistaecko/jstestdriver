@@ -19,8 +19,8 @@ import javax.servlet.ServletContext;
 public class ProxyServletConfig extends SimpleServletConfig {
 
   private static final String NAME = "Proxy Servlet";
-  private static final String PREFIX = "Prefix";
-  private static final String PROXY_TO = "ProxyTo";
+  static final String PREFIX = "Prefix";
+  static final String PROXY_TO = "ProxyTo";
 
   public interface Factory {
     ProxyServletConfig create(
