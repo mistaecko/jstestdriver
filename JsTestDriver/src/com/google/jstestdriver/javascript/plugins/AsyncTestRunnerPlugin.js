@@ -40,6 +40,7 @@
  *
  * @param {Function} dateObj the date object constructor
  * @param {Function} clearBody a function to call to clear the document body.
+ * @param {Function} toJson a function to call to convert an object to JSON.
  * @param {boolean} opt_pauseForHuman Whether to pause for debugging.
  * @param {Function} opt_setTimeout window.setTimeout replacement.
  * @param {Function} opt_queueConstructor a constructor for obtaining new
