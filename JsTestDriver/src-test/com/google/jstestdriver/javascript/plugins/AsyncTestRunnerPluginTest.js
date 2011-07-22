@@ -25,7 +25,7 @@ var asyncTestRunnerPluginTest = TestCase('asyncTestRunnerPluginTest');
 asyncTestRunnerPluginTest.prototype.
     testMultipleAsyncTestCases = function() {
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testCase0 = function() {};
   testCase0.prototype.test0 = function(queue) {};
@@ -91,7 +91,7 @@ asyncTestRunnerPluginTest.prototype.
   var priorAssertCount = jstestdriver.assertCount;
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testCase = function() {};
   testCase.prototype.testWithExpectAsserts = function() {
@@ -136,7 +136,7 @@ asyncTestRunnerPluginTest.prototype.
   var priorAssertCount = jstestdriver.assertCount;
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, jstestdriver.angular.toJson, false, function(callback) {callback();});
 
   var testCase = function() {};
   testCase.prototype.testWithExpectAsserts = function() {
@@ -173,7 +173,7 @@ asyncTestRunnerPluginTest.prototype.
 
 asyncTestRunnerPluginTest.prototype.testScopeIsNotWindow = function() {
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testCase = function() {};
   var testCaseInstance;
@@ -225,7 +225,7 @@ asyncTestRunnerPluginTest.prototype.testTestCaseWithWrongType = function() {
       'testCase', testCase, jstestdriver.TestCaseInfo.DEFAULT_TYPE);
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testRunConfiguration = {};
   testRunConfiguration.getTestCaseInfo = function() {return testCaseInfo;};
@@ -252,7 +252,7 @@ asyncTestRunnerPluginTest.prototype.testTestCaseWithoutSteps = function() {
       'testCase', testCase, jstestdriver.TestCaseInfo.ASYNC_TYPE);
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testDone = false;
   var testResult;
@@ -299,7 +299,7 @@ asyncTestRunnerPluginTest.prototype.
       'testCase', testCase, jstestdriver.TestCaseInfo.ASYNC_TYPE);
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testDone = false;
   var testResult;
@@ -357,7 +357,7 @@ asyncTestRunnerPluginTest.prototype.testTestCaseWithSteps = function() {
       'testCase', testCase, jstestdriver.TestCaseInfo.ASYNC_TYPE);
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testDone = false;
   var testResult;
@@ -409,7 +409,7 @@ asyncTestRunnerPluginTest.prototype.testTestCaseWithErrback = function() {
       'testCase', testCase, jstestdriver.TestCaseInfo.ASYNC_TYPE);
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testDone = false;
   var testResult;
@@ -467,7 +467,7 @@ asyncTestRunnerPluginTest.prototype.
       'testCase', testCase, jstestdriver.TestCaseInfo.ASYNC_TYPE);
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, false, function(callback) {callback();});
+      Date, function() {}, function() {}, false, function(callback) {callback();});
 
   var testDone = false;
   var testResult;

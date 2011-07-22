@@ -48,12 +48,13 @@
  *     DeferredQueueArmors.
  * @constructor
  */
-jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody,
+jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody, toJson,
       opt_pauseForHuman, opt_setTimeout, opt_queueConstructor,
       opt_armorConstructor) {
   this.name = "AsyncTestRunnerPlugin";
   this.dateObj_ = dateObj;
   this.clearBody_ = clearBody;
+  this.toJson_ = toJson;
   this.pauseForHuman_ = !!opt_pauseForHuman;
   this.setTimeout_ = opt_setTimeout || jstestdriver.setTimeout;
   this.queueConstructor_ = opt_queueConstructor || jstestdriver.plugins.async.DeferredQueue;
@@ -222,11 +223,11 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.buildResult = functio
   var message = '';
   if (this.errors_.length) {
     result = 'failed';
-    message = jstestdriver.angular.toJson(this.errors_);
+    message = this.toJson_(this.errors_);
   } else if (jstestdriver.expectedAssertCount != -1 &&
              jstestdriver.expectedAssertCount != jstestdriver.assertCount) {
     result = 'failed';
-    message = jstestdriver.angular.toJson([new Error("Expected '" +
+    message = this.toJson_([new Error("Expected '" +
         jstestdriver.expectedAssertCount +
         "' asserts but '" +
         jstestdriver.assertCount +

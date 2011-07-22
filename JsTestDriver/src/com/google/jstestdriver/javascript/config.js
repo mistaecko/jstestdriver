@@ -82,7 +82,7 @@ jstestdriver.config = (function(module) {
           jstestdriver.jQuery('body').children().remove();
           jstestdriver.jQuery(document).unbind();
           jstestdriver.jQuery(document).die();
-        }));
+        }, jstestdriver.angular.toJson));
 
     // legacy
     jstestdriver.testCaseManager.TestCase = jstestdriver.global.TestCase;
