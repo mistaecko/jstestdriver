@@ -15,21 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-import java.util.Timer;
-
-import org.mortbay.component.LifeCycle;
-import org.mortbay.component.LifeCycle.Listener;
-import org.mortbay.jetty.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -41,7 +26,21 @@ import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.server.JettyModule;
 import com.google.jstestdriver.server.handlers.JstdHandlersModule;
-import com.google.jstestdriver.server.proxy.ProxyBehavior;
+
+import org.mortbay.component.LifeCycle;
+import org.mortbay.component.LifeCycle.Listener;
+import org.mortbay.jetty.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
+import java.util.Timer;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -61,7 +60,6 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
   private Timer timer;
 
   private final HandlerPathPrefix handlerPrefix;
-  private final ProxyBehavior proxyHostHeaderMode;
 
   private final Set<ServerListener> listeners;
 
@@ -74,7 +72,6 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
                                 CapturedBrowsers capturedBrowsers,
                                 @Named("browserTimeout") long browserTimeout,
                                 @Named("serverHandlerPrefix") HandlerPathPrefix handlerPrefix,
-                                @Named("proxyHostHeaderMode") ProxyBehavior proxyHostHeaderMode,
                                 Set<ServerListener> listeners,
                                 Set<FileInfoScheme> schemes) {
     this.port = port;
@@ -83,7 +80,6 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
     this.filesCache = preloadedFilesCache;
     this.browserTimeout = browserTimeout;
     this.handlerPrefix = handlerPrefix;
-    this.proxyHostHeaderMode = proxyHostHeaderMode;
     this.listeners = listeners;
     this.schemes = schemes;
     initServer();
@@ -102,7 +98,6 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
                                  filesCache,
                                  browserTimeout,
                                  handlerPrefix,
-                                 proxyHostHeaderMode,
                                  schemes)).getInstance(Server.class);
       server.addLifeCycleListener(new JettyLifeCycleLogger());
     }

@@ -15,23 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.jstestdriver.browser.BrowserIdStrategy;
-import com.google.jstestdriver.hooks.FileInfoScheme;
-import com.google.jstestdriver.hooks.ServerListener;
-import com.google.jstestdriver.model.NullPathPrefix;
-import com.google.jstestdriver.server.proxy.ProxyBehavior;
-import com.google.jstestdriver.util.NullStopWatch;
-
-import junit.framework.TestCase;
-
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -45,6 +28,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import junit.framework.TestCase;
+
+import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.jstestdriver.browser.BrowserIdStrategy;
+import com.google.jstestdriver.hooks.FileInfoScheme;
+import com.google.jstestdriver.hooks.ServerListener;
+import com.google.jstestdriver.model.NullPathPrefix;
+import com.google.jstestdriver.util.NullStopWatch;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -61,7 +60,6 @@ public class JsTestDriverServerTest extends TestCase {
         browsers,
         SlaveBrowser.TIMEOUT,
         new NullPathPrefix(),
-        ProxyBehavior.SPOOF,
         Sets.newHashSet(listener),
         Collections.<FileInfoScheme>emptySet());
     return server;

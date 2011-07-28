@@ -15,15 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.Option;
-
 import com.google.common.collect.Sets;
 import com.google.jstestdriver.browser.BrowserRunner;
 import com.google.jstestdriver.browser.CommandLineBrowserRunner;
@@ -34,7 +25,15 @@ import com.google.jstestdriver.model.ConcretePathPrefix;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.runner.RunnerMode;
-import com.google.jstestdriver.server.proxy.ProxyBehavior;
+
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.Option;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * FlagsParser for the JsTestDriver.
@@ -65,7 +64,6 @@ public class FlagsImpl implements Flags {
   private RunnerMode runnerMode = RunnerMode.QUIET;
   private HashSet<String> requiredBrowsers;
   private HandlerPathPrefix serverHandlerPrefix = new NullPathPrefix();
-  private ProxyBehavior proxyHostHeaderMode = ProxyBehavior.SPOOF;
 
   @Option(name="--port", usage="The port on which to start the JsTestDriver server")
   public void setPort(Integer port) {
@@ -223,16 +221,6 @@ public class FlagsImpl implements Flags {
     return serverHandlerPrefix;
   }
 
-  @Option(name="--proxyHostHeaderMode",
-      usage="Whether to spoof or forward the HTTP HOST header")
-  public void setProxyHostHeaderMode(ProxyBehavior proxyHostHeaderMode) {
-    this.proxyHostHeaderMode = proxyHostHeaderMode;
-  }
-
-  public ProxyBehavior getProxyHostHeaderMode() {
-    return proxyHostHeaderMode;
-  }
-
   @Override
   public String toString() {
     return "FlagsImpl [port=" + port + ",\n sslPort=" + sslPort + ",\n server=" + server
@@ -241,7 +229,6 @@ public class FlagsImpl implements Flags {
         + ",\n displayHelp=" + displayHelp + ",\n verbose=" + verbose + ",\n captureConsole="
         + captureConsole + ",\n preloadFiles=" + preloadFiles + ",\n dryRunFor=" + dryRunFor
         + ",\n arguments=" + arguments + ",\n runnerMode=" + runnerMode + ",\n requiredBrowsers="
-        + requiredBrowsers + ",\n serverHandlerPrefix=" + serverHandlerPrefix
-        + ",\n proxyHostHeaderMode=" + proxyHostHeaderMode + "]";
+        + requiredBrowsers + ",\n serverHandlerPrefix=" + serverHandlerPrefix +  "]";
   }
 }

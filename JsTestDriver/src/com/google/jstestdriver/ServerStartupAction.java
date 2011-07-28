@@ -15,21 +15,20 @@
  */
 package com.google.jstestdriver;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Observer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Sets;
 import com.google.jstestdriver.JsTestDriverServer.Factory;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.model.RunData;
-import com.google.jstestdriver.server.proxy.ProxyBehavior;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -130,7 +129,7 @@ public class ServerStartupAction implements ObservableAction {
 
     public JsTestDriverServer create(int port, int sslPort, FilesCache preloadedFilesCache) {
       return new JsTestDriverServerImpl(port, sslPort, preloadedFilesCache, capturedBrowsers, timeout,
-          nullPathPrefix, ProxyBehavior.SPOOF, Sets.<ServerListener>newHashSet(), Collections.<FileInfoScheme>emptySet());
+          nullPathPrefix, Sets.<ServerListener>newHashSet(), Collections.<FileInfoScheme>emptySet());
     }
   }
 
