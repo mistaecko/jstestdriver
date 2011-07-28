@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.browser.BrowserFileSet;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
 import com.google.jstestdriver.runner.RunnerType;
@@ -70,7 +71,7 @@ public class FileSetRequestHandlerTest extends TestCase {
     browserInfo.setName("firefox");
     final SlaveBrowser browser =
         new SlaveBrowser(new MockTime(0), "1", browserInfo, 100, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
     browser.addFiles(Lists.newArrayList(createFile(fileOne, 1), createFile(fileTwo, 1),
         createFile(fileThree, 1)), new LoadedFiles());
     browsers.addSlave(browser);

@@ -15,12 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import com.google.gson.JsonArray;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -30,6 +24,14 @@ import com.google.jstestdriver.browser.BrowserActionExecutorAction;
 import com.google.jstestdriver.output.PrintXmlTestResultsAction;
 import com.google.jstestdriver.output.XmlPrinter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 /**
  * A builder for creating a sequence of {@link Action}s to be run by the
  * ActionRunner.
@@ -37,15 +39,14 @@ import com.google.jstestdriver.output.XmlPrinter;
  * @author corbinrsmith@gmail.com (Cory Smith)
  */
 public class ActionSequenceBuilder {
+  @SuppressWarnings("unused")
+  private static final Logger logger =
+      LoggerFactory.getLogger(ActionSequenceBuilder.class);
 
   private final ActionFactory actionFactory;
-  private final FileLoader fileLoader;
   private final CapturedBrowsers capturedBrowsers;
-  private HashMap<String, FileInfo> files = new LinkedHashMap<String, FileInfo>();
-  private Set<FileInfo> fileSet;
   private int localServerPort = -1;
   private int localServerSslPort = -1;
-  private boolean preloadFiles = false;
   private boolean reset;
   private List<String> tests = new LinkedList<String>();
   private List<String> dryRunFor = new LinkedList<String>();
@@ -61,13 +62,9 @@ public class ActionSequenceBuilder {
 
   /**
    * Begins the building of an action sequence.
-   * @param failureCheckerAction TODO
-   * @param browserStartup TODO
    */
   @Inject
   public ActionSequenceBuilder(ActionFactory actionFactory,
-                               FileLoader fileLoader,
-                               ResponseStreamFactory responseStreamFactory,
                                BrowserActionExecutorAction browserActionsRunner,
                                FailureCheckerAction failureCheckerAction,
                                UploadAction uploadAction,
@@ -76,7 +73,6 @@ public class ActionSequenceBuilder {
                                ConfigureProxyAction.Factory proxyActionFactory,
                                BrowserStartupAction browserStartup) {
     this.actionFactory = actionFactory;
-    this.fileLoader = fileLoader;
     this.browserActionsRunner = browserActionsRunner;
     this.failureCheckerAction = failureCheckerAction;
     this.uploadAction = uploadAction;
@@ -91,14 +87,9 @@ public class ActionSequenceBuilder {
    * actions.
    */
   private void addServerActions(List<Action> actions, boolean leaveServerRunning) {
-    if (preloadFiles) {
-      for (FileInfo file : fileLoader.loadFiles(fileSet, true)) {
-        files.put(file.getFilePath(), file);
-      }
-    }
     ServerStartupAction serverStartupAction =
         actionFactory.getServerStartupAction(localServerPort, localServerSslPort,
-            capturedBrowsers, new FilesCache(files));
+            capturedBrowsers, new FilesCache(new LinkedHashMap<String, FileInfo>()));
     actions.add(0, serverStartupAction);
     // add browser startup here.
     if (!leaveServerRunning) {
@@ -162,21 +153,6 @@ public class ActionSequenceBuilder {
    */
   public ActionSequenceBuilder reset(boolean reset) {
     this.reset = reset;
-    return this;
-  }
-
-  /**
-   * Defines a list of files that should be loaded into the list of browsers.
-   *
-   * @param fileSet
-   *          The files to be loaded into the browser.
-   * @param preloadFiles
-   *          Indicates if thes files should be preloaded into the server.
-   * @return The current builder.
-   */
-  public ActionSequenceBuilder usingFiles(Set<FileInfo> fileSet, boolean preloadFiles) {
-    this.fileSet = fileSet;
-    this.preloadFiles = preloadFiles;
     return this;
   }
 

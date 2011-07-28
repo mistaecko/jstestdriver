@@ -20,6 +20,7 @@ import com.google.jstestdriver.BrowserInfo;
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.FileUploader;
 import com.google.jstestdriver.SlaveBrowser;
+import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.Time;
 import com.google.jstestdriver.annotations.BrowserTimeout;
 import com.google.jstestdriver.model.HandlerPathPrefix;
@@ -83,7 +84,7 @@ public class BrowserHunter {
     long computedBrowserTimeout = computeTimeout(browserTimeout);
     SlaveBrowser slave =
         new SlaveBrowser(time, id.toString(), browserInfo, computedBrowserTimeout, prefix, mode,
-            type);
+            type, BrowserState.CAPTURED);
 
     capturedBrowsers.addSlave(slave);
     logger.debug("Browser Captured: {}", slave);

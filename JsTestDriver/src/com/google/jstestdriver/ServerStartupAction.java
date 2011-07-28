@@ -75,11 +75,12 @@ public class ServerStartupAction implements ObservableAction {
     return server;
   }
 
+  @Override
   public RunData run(RunData runData) {
     logger.info("Starting server on {}, ssl on {}", port, sslPort);
 
     if (preloadFiles) {
-      logger.debug("Preloading files...", port);
+      logger.debug("Preloading files...");
       for (FileInfo fileInfo : fileLoader.loadFiles(runData.getFileSet(), false)) {
         preloadedFilesCache.addFile(fileInfo);
       }

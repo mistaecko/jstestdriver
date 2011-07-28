@@ -28,6 +28,7 @@ import com.google.jstestdriver.BrowserInfo;
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.MockTime;
 import com.google.jstestdriver.SlaveBrowser;
+import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
 import com.google.jstestdriver.runner.RunnerType;
 
@@ -46,7 +47,7 @@ public class HomeHandlerTest extends TestCase {
     browserInfo.setVersion("1.0");
     SlaveBrowser slave =
         new SlaveBrowser(new MockTime(0), "1", browserInfo, SlaveBrowser.TIMEOUT, null,
-            CaptureHandler.QUIRKS, RunnerType.CLIENT);
+            CaptureHandler.QUIRKS, RunnerType.CLIENT, BrowserState.CAPTURED);
 
     capturedBrowsers.addSlave(slave);
     ByteArrayOutputStream stream = new ByteArrayOutputStream();

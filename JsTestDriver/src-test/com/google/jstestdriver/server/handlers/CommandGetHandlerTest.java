@@ -29,6 +29,7 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.joda.time.Instant;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.jstestdriver.BrowserInfo;
 import com.google.jstestdriver.CapturedBrowsers;
@@ -36,6 +37,7 @@ import com.google.jstestdriver.FileUploader;
 import com.google.jstestdriver.MockTime;
 import com.google.jstestdriver.Response;
 import com.google.jstestdriver.SlaveBrowser;
+import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.StreamMessage;
 import com.google.jstestdriver.Time;
 import com.google.jstestdriver.TimeImpl;
@@ -54,13 +56,13 @@ public class CommandGetHandlerTest extends TestCase {
     browserInfo.setId(1L);
     SlaveBrowser slave =
         new SlaveBrowser(new TimeImpl(), "1", browserInfo, 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
 
     capturedBrowsers.addSlave(slave);
     CommandGetHandler handler = new CommandGetHandler(null, null, new Gson(), capturedBrowsers);
 
-    assertEquals("[{\"id\":1,\"uploadSize\":" + FileUploader.CHUNK_SIZE
-        + ",\"serverReceivedHeartbeat\":false}]", handler.listBrowsers());
+    assertEquals(new Gson().toJson(Lists.newArrayList(slave.getBrowserInfo())),
+      handler.listBrowsers());
   }
 
   public void testBrowserPanic() throws Exception {
@@ -88,7 +90,7 @@ public class CommandGetHandlerTest extends TestCase {
         i += 100;
         return new Instant(i);
       }
-    }, "1", browserInfo, 0, null, CaptureHandler.QUIRKS, RunnerType.CLIENT);
+    }, "1", browserInfo, 0, null, CaptureHandler.QUIRKS, RunnerType.CLIENT, BrowserState.CAPTURED);
     slave.addResponse(new Response(ResponseType.LOG.name(), "", browserInfo, "", -1), true);
     capturedBrowsers.addSlave(slave);
     Gson gson = new Gson();

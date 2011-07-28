@@ -33,6 +33,7 @@ public class RunnerPage implements Page {
     this.testFileUtil = testFileUtil;
   }
 
+  @Override
   public void render(HtmlWriter writer, SlavePageRequest request) throws IOException {
     writer.startHead()
       .writeTitle("Console Runner")
@@ -52,8 +53,8 @@ public class RunnerPage implements Page {
 
     testFileUtil.writeTestFiles(writer);
 
-    writer.writeScript("jstestdriver.runner.listen(" +
-        "jstestdriver.manualResourceTracker.getResults());");
+    writer.writeScript("jstestdriver.jQuery(window).load(function(){jstestdriver.runner.listen(" +
+        "jstestdriver.manualResourceTracker.getResults());});");
     writer.finishHead()
       .startBody()
       .finishBody()

@@ -17,8 +17,6 @@ package com.google.jstestdriver.server.handlers;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.google.jstestdriver.FileSource;
-import com.google.jstestdriver.FileUploader;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.JsonCommand;
 import com.google.jstestdriver.JsonCommand.CommandType;
@@ -37,9 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,7 +52,6 @@ public class BrowserControlledRunnerHandler implements RequestHandler {
   private final Gson gson = new Gson();
   private final SlavePageRequest request;
   private final HttpServletResponse response;
-  private final FilesCache cache;
 
   private final HandlerPathPrefix prefix;
 
@@ -71,11 +66,11 @@ public class BrowserControlledRunnerHandler implements RequestHandler {
       Map<PageType, Page> pages) {
     this.request = request;
     this.response = response;
-    this.cache = cache;
     this.prefix = prefix;
     this.pages = pages;
   }
 
+  @Override
   public void handleIt() throws IOException {
     final SlaveBrowser browser = request.getBrowser();
     if (browser == null) {
@@ -96,26 +91,6 @@ public class BrowserControlledRunnerHandler implements RequestHandler {
   public void service(final SlaveBrowser slaveBrowser) {
     logger.debug("Adding noop command.");
     slaveBrowser.createCommand(gson.toJson(new JsonCommand(CommandType.NOOP, null)));
-
-//    Set<String> filesToload = cache.getAllFileNames();
-//    LinkedList<FileSource> filesSources = new LinkedList<FileSource>();
-//
-//    for (String f : filesToload) {
-//      filesSources.add(new FileSource(prefix.prefixPath("/test/" + f), f, -1));
-//    }
-//    final int size = filesSources.size();
-//
-//    for (int i = 0; i < size; i += FileUploader.CHUNK_SIZE) {
-//      LinkedList<String> loadFilesParameters = new LinkedList<String>();
-//      List<FileSource> chunkedFileSources =
-//          filesSources.subList(i, Math.min(i + FileUploader.CHUNK_SIZE, size));
-//
-//      loadFilesParameters.add(gson.toJson(chunkedFileSources));
-//      loadFilesParameters.add("true");
-//      logger.debug("adding chunked upload command: {}", i);
-//      slaveBrowser.createCommand(gson.toJson(new JsonCommand(CommandType.LOADTEST,
-//          loadFilesParameters)));
-//    }
     LinkedList<String> runAllTestsParameters = new LinkedList<String>();
 
     runAllTestsParameters.add("false");

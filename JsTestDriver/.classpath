@@ -44,8 +44,5 @@
 	<classpathentry exported="true" kind="lib" path="lib/guice/guice-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guice/guice-servlet-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/easymock/easymock-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-codec-1.4/commons-codec-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.1.1/commons-logging-api-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons-httpclient-3.1/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

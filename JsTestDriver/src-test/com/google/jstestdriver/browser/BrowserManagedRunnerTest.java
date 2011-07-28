@@ -40,6 +40,7 @@ public class BrowserManagedRunnerTest extends TestCase {
     final BrowserInfo browserInfo = new BrowserInfo();
     browserInfo.setId(Long.parseLong(browserId));
     browserInfo.setServerReceivedHeartbeat(true);
+    browserInfo.setReady(true);
     final FakeJsTestDriverClient client =
         new FakeJsTestDriverClient(Lists.newArrayList(browserInfo));
     final FakeBrowserRunner runner = new FakeBrowserRunner();

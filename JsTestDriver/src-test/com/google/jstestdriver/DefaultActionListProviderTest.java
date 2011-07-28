@@ -77,17 +77,13 @@ public class DefaultActionListProviderTest extends TestCase {
         Collections.<String>emptyList(),
         reset,
         Collections.<String>emptyList(),
-        false,
         port,
         sslPort,
-        Collections.<FileInfo>emptySet(),
         testOutput,
         processors,
         xmlPrinter,
         new ActionSequenceBuilder(
             actionFactory,
-            null,
-            null,
             new BrowserActionExecutorAction(
                 null,
                 null,
@@ -102,7 +98,8 @@ public class DefaultActionListProviderTest extends TestCase {
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
             newConfigureProxyActionFactory(),
-            new BrowserStartupAction(null, null, null, null, null)), true);
+            new BrowserStartupAction(null, null, null, null, null)),
+        true);
   }
 
   private Factory newConfigureProxyActionFactory() {

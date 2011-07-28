@@ -83,7 +83,8 @@ public class BrowserControl {
   public boolean isBrowserCaptured(String browserId, JsTestDriverClient client) {
     for (BrowserInfo browserInfo : client.listBrowsers()) {
       if (browserId.equals(String.valueOf(browserInfo.getId())) 
-          && browserInfo.serverReceivedHeartbeat()) {
+          && browserInfo.serverReceivedHeartbeat()
+          && browserInfo.browserReady()) {
         logger.debug("Started {}", browserInfo);
         return true;
       }

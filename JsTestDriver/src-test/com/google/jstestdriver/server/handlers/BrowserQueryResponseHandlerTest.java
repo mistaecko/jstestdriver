@@ -41,6 +41,7 @@ import com.google.jstestdriver.LoadedFiles;
 import com.google.jstestdriver.MockTime;
 import com.google.jstestdriver.Response;
 import com.google.jstestdriver.SlaveBrowser;
+import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.TimeImpl;
 import com.google.jstestdriver.JsonCommand.CommandType;
 import com.google.jstestdriver.Response.ResponseType;
@@ -65,7 +66,7 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
     String id = "1";
     SlaveBrowser slave =
         new SlaveBrowser(new TimeImpl(), id, new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
     String data = "hello";
 
     slave.createCommand(data);
@@ -82,7 +83,7 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
     String id = "1";
     SlaveBrowser slave =
         new SlaveBrowser(new TimeImpl(), id, new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
 
     browsers.addSlave(slave);
     BrowserQueryResponseHandler handler =
@@ -112,7 +113,7 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
     SlaveBrowser slave =
         new SlaveBrowser(new TimeImpl(), id, new BrowserInfo(), 20, null,
             CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
 
     slave.setDequeueTimeout(0L, TimeUnit.NANOSECONDS);
     browsers.addSlave(slave);
@@ -129,7 +130,7 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
     MockTime time = new MockTime(42L);
     SlaveBrowser slave =
         new SlaveBrowser(time, id, new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
     String data = "hello";
 
     slave.createCommand(data);
@@ -157,7 +158,7 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
     String id = "1";
     SlaveBrowser slave =
         new SlaveBrowser(new TimeImpl(), id, new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
 
     browsers.addSlave(slave);
     BrowserQueryResponseHandler handler =
@@ -186,16 +187,16 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
     String id = "1";
     SlaveBrowser slave =
         new SlaveBrowser(new TimeImpl(), id, new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
 
     browsers.addSlave(slave);
     BrowserQueryResponseHandler handler =
         new BrowserQueryResponseHandler(null, null, browsers, streamedResponses);
     List<FileResult> fileResults = new LinkedList<FileResult>();
 
-    fileResults.add(new FileResult(new FileSource("/test/filename1.js", "filename1.js", 123), true, ""));
-    fileResults.add(new FileResult(new FileSource("/test/filename2.js", "filename2.js", 456), true, ""));
-    fileResults.add(new FileResult(new FileSource("/test/filename3.js", "filename3.js", 789), true, ""));
+    fileResults.add(new FileResult(new FileSource("/test/filename1.js", "filename1.js", 123, -1), true, ""));
+    fileResults.add(new FileResult(new FileSource("/test/filename2.js", "filename2.js", 456, -1), true, ""));
+    fileResults.add(new FileResult(new FileSource("/test/filename3.js", "filename3.js", 789, -1), true, ""));
     slave.createCommand("awaitingResponse");
     slave.dequeueCommand();
     slave.createCommand("BrowserCommand");
@@ -231,7 +232,7 @@ public class BrowserQueryResponseHandlerTest extends TestCase {
     String id = "1";
     SlaveBrowser slave =
         new SlaveBrowser(new TimeImpl(), id, new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.READY);
 
     browsers.addSlave(slave);
     BrowserQueryResponseHandler handler =

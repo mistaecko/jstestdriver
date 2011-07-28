@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 
 import org.joda.time.Instant;
 
+import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.runner.RunnerType;
 import com.google.jstestdriver.server.handlers.CaptureHandler;
@@ -36,7 +37,7 @@ public class SlaveBrowserTest extends TestCase {
         SlaveBrowser.TIMEOUT,
         null,
         CaptureHandler.QUIRKS,
-        RunnerType.CLIENT);
+        RunnerType.CLIENT, BrowserState.CAPTURED);
 
     assertEquals(new Instant(0), browser.getLastHeartbeat());
     assertEquals(-1.0, browser.getSecondsSinceLastHeartbeat());
@@ -57,7 +58,7 @@ public class SlaveBrowserTest extends TestCase {
         SlaveBrowser.TIMEOUT,
         new NullPathPrefix(),
         CaptureHandler.QUIRKS,
-        RunnerType.CLIENT);
+        RunnerType.CLIENT, BrowserState.CAPTURED);
 
     assertEquals(
         "/slave/id/1/page/CONSOLE/mode/quirks/timeout/" + SlaveBrowser.TIMEOUT + "/upload_size/"

@@ -26,6 +26,7 @@ public class BrowserInfo {
   private String os;
   private Integer uploadSize = FileUploader.CHUNK_SIZE;
   private boolean serverReceivedHeartbeat;
+  private boolean ready = false;
 
   public void setId(Long id) {
     this.id = id;
@@ -107,5 +108,13 @@ public class BrowserInfo {
 
   public void setUploadSize(Integer uploadSize) {
     this.uploadSize = uploadSize;
+  }
+
+  public void setReady(boolean ready) {
+    this.ready = true;
+  }
+  
+  public boolean browserReady() {
+    return ready;
   }
 }

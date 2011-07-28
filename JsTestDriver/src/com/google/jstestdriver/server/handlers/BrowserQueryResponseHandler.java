@@ -15,10 +15,10 @@
  */
 package com.google.jstestdriver.server.handlers;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.inject.Inject;
-import com.google.inject.internal.Lists;
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.Command;
 import com.google.jstestdriver.FileInfo;
@@ -27,8 +27,8 @@ import com.google.jstestdriver.FileSource;
 import com.google.jstestdriver.JsonCommand;
 import com.google.jstestdriver.LoadedFiles;
 import com.google.jstestdriver.Response;
-import com.google.jstestdriver.SlaveBrowser;
 import com.google.jstestdriver.Response.ResponseType;
+import com.google.jstestdriver.SlaveBrowser;
 import com.google.jstestdriver.protocol.BrowserLog;
 import com.google.jstestdriver.protocol.BrowserStreamAcknowledged;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
@@ -76,6 +76,7 @@ class BrowserQueryResponseHandler implements RequestHandler {
     this.streamedResponses = streamedResponses;
   }
 
+  @Override
   public void handleIt() throws IOException {
     logger.trace("Browser Query Post:\n\tpath:{}\n\tresponse:{}\n\tdone:{}\n\tresponseId:{}",
         new Object[] {
@@ -140,6 +141,7 @@ class BrowserQueryResponseHandler implements RequestHandler {
           browser.addResponse(
               new Response(ResponseType.FILE_LOAD_RESULT.toString(), res.getResponse(), browser
                   .getBrowserInfo(), "", res.getExecutionTime()), false);
+          browser.ready();
           break;
         case FILE_LOAD_RESULT:
           handleFileLoadResult(browser, res);
@@ -161,11 +163,11 @@ class BrowserQueryResponseHandler implements RequestHandler {
           browser.resetFileSet();
           logger.debug("Clearing fileset for {}", browser);
           handleFileLoadResult(browser, res);
-          browser.addResponse(res, done);
           // queue the load results for the next command to be run.
           browser.addResponse(
               new Response(ResponseType.FILE_LOAD_RESULT.toString(), res.getResponse(), browser
                   .getBrowserInfo(), "", res.getExecutionTime()), false);
+          browser.addResponse(res, done);
           break;
         case UNKNOWN:
           logger.error("Recieved Unknown: " + response);
@@ -222,15 +224,20 @@ class BrowserQueryResponseHandler implements RequestHandler {
         FileSource fileSource = fileResult.getFileSource();
 
         if (fileResult.isSuccess()) {
-          fileInfos.add(new FileInfo(fileSource.getBasePath(), fileSource.getTimestamp(),
-              -1, false, false, null, fileSource.getFileSrc()));
+          fileInfos.add(fileSource.toFileInfo(null));
         } else {
           errorFiles.add(fileSource);
         }
       }
       browser.addFiles(fileInfos, loadedFiles);
       if (errorFiles.size() > 0) {
-        logger.debug("clearing fileset on browser errors:" + errorFiles.size());
+        logger.debug("clearing fileset on browser errors:" + errorFiles);
+        try {
+          Thread.sleep(120000);
+        } catch (InterruptedException e) {
+          // TODO(corysmith): Auto-generated catch block
+          e.printStackTrace();
+        }
         browser.resetFileSet();
       }
     }

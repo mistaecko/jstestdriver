@@ -151,10 +151,10 @@ public class FileInfo implements Cloneable {
   public FileSource toFileSource(HandlerPathPrefix prefix, Set<FileInfoScheme> schemes) {
     for (FileInfoScheme scheme : schemes) {
       if (scheme.matches(filePath)) {
-        return new FileSource(displayPath, filePath, this.getTimestamp());
+        return new FileSource(displayPath, filePath, this.getTimestamp(), length);
       }
     }
-    return new FileSource(prefix.prefixPath("/test/" + this.getDisplayPath()), filePath, this.getTimestamp());
+    return new FileSource(prefix.prefixPath("/test/" + this.getDisplayPath()), filePath, this.getTimestamp(), length);
   }
 
   @Override

@@ -23,14 +23,16 @@ public class FileSource {
   private String fileSrc;
   private String basePath;
   private long timestamp;
+  private long length;
 
   public FileSource() {
   }
 
-  public FileSource(String fileSrc, String basePath, long timestamp) {
+  public FileSource(String fileSrc, String basePath, long timestamp, long length) {
     this.fileSrc = fileSrc;
     this.basePath = basePath;
     this.timestamp = timestamp;
+    this.length = length;
   }
 
   public String getFileSrc() {
@@ -44,6 +46,27 @@ public class FileSource {
   public String getBasePath() {
     return basePath;
   }
+  
+  /**
+   * @return the length
+   */
+  public long getLength() {
+    return length;
+  }
+
+  /**
+   * @param length the length to set
+   */
+  public void setLength(long length) {
+    this.length = length;
+  }
+
+  /**
+   * @param timestamp the timestamp to set
+   */
+  public void setTimestamp(long timestamp) {
+    this.timestamp = timestamp;
+  }
 
   public void setFileSource(String fileSrc) {
     this.fileSrc = fileSrc;
@@ -56,5 +79,10 @@ public class FileSource {
   @Override
   public String toString() {
     return String.format("%s(%s, %s, %s)", getClass().getSimpleName(), fileSrc, basePath, timestamp);
+  }
+  
+  public FileInfo toFileInfo(String contents) {
+    return new FileInfo(this.getBasePath(), this.getTimestamp(),
+      this.getLength(), false, false, contents, this.getFileSrc());
   }
 }

@@ -40,19 +40,17 @@ public class ActionSequenceBuilderTest extends TestCase {
   public void testAddTestsWithRemoteServerAddress() throws Exception {
     List<String> tests = tests();
     ActionSequenceBuilder builder =
-        new ActionSequenceBuilder(actionFactory, null, null,
-            new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null),
-            new FailureCheckerAction(null, null),
+        new ActionSequenceBuilder(actionFactory, new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null),
             new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
-            newConfigureProxyActionFactory(), null);
+            newConfigureProxyActionFactory(),
+            null);
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ConfigureProxyAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
-    builder.usingFiles(files, false);
 
     List<Action> sequence = builder.addTests(tests).build();
 
@@ -76,12 +74,11 @@ public class ActionSequenceBuilderTest extends TestCase {
             false,
             null,
             null),
-            null, null, new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null),
-        new FailureCheckerAction(null, null),
-        new UploadAction(null),
+            new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
         new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
-            null,
-            newConfigureProxyActionFactory(), null);
+        null,
+        newConfigureProxyActionFactory(),
+            null);
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
@@ -89,7 +86,7 @@ public class ActionSequenceBuilderTest extends TestCase {
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
     expectedActions.add(ServerShutdownAction.class);
-    builder.withLocalServerPort(1001).usingFiles(files, false);
+    builder.withLocalServerPort(1001);
 
     List<Action> sequence = builder.addTests(tests).build();
 
@@ -105,12 +102,11 @@ public class ActionSequenceBuilderTest extends TestCase {
             false,
             null,
             null),
-            null, null, new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null),
-            new FailureCheckerAction(null, null),
-            new UploadAction(null),
+            new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
-            newConfigureProxyActionFactory(), null);
+            newConfigureProxyActionFactory(),
+            null);
     
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
@@ -119,7 +115,7 @@ public class ActionSequenceBuilderTest extends TestCase {
     expectedActions.add(BrowserActionExecutorAction.class);
     expectedActions.add(ServerShutdownAction.class);
     expectedActions.add(FailureCheckerAction.class);
-    builder.withLocalServerPort(1001).usingFiles(files, false);
+    builder.withLocalServerPort(1001);
     
     List<Action> sequence = builder.addTests(tests).raiseOnFailure().build();
     
@@ -136,23 +132,19 @@ public class ActionSequenceBuilderTest extends TestCase {
                 false,
                 null,
                 null),
-            null, null, new BrowserActionExecutorAction(
-                null, null, null, null, null, 0, null, null),
-            new FailureCheckerAction(null, null),
-            new UploadAction(null),
+            new BrowserActionExecutorAction(
+                null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
-            newConfigureProxyActionFactory(), null);
+            newConfigureProxyActionFactory(),
+            null);
 
-    List<Action> actions = builder.addTests(tests).withLocalServerPort(999)
-        .usingFiles(files, false).build();
+    List<Action> actions = builder.addTests(tests).withLocalServerPort(999).build();
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
     expectedActions.add(ConfigureProxyAction.class);
-//    expectedActions.add(BrowserStartupAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
-//    expectedActions.add(BrowserShutdownAction.class);
     expectedActions.add(ServerShutdownAction.class);
     this.<Action>assertSequence(expectedActions, actions);
   }

@@ -40,8 +40,6 @@ public class DefaultActionListProvider implements ActionListProvider {
   private final List<String> dryRunFor;
   private final int port;
   private final int sslPort;
-  private final boolean preloadFiles;
-  private final Set<FileInfo> fileSet;
   private final String testOutput;
   private final Set<ActionListProcessor> processors;
   private final XmlPrinter xmlPrinter;
@@ -56,10 +54,8 @@ public class DefaultActionListProvider implements ActionListProvider {
       @Named("arguments") List<String> arguments,
       @Named("reset") boolean reset,
       @Named("dryRunFor") List<String> dryRunFor,
-      @Named("preloadFiles") boolean preloadFiles,
       @Named("port") int port,
       @Named("sslPort") int sslPort,
-      @Named("fileSet") Set<FileInfo> fileSet,
       @Named("testOutput") String testOutput,
       Set<ActionListProcessor> processors,
       XmlPrinter xmlPrinter,
@@ -69,10 +65,8 @@ public class DefaultActionListProvider implements ActionListProvider {
     this.arguments = arguments;
     this.reset = reset;
     this.dryRunFor = dryRunFor;
-    this.preloadFiles = preloadFiles;
     this.port = port;
     this.sslPort = sslPort;
-    this.fileSet = fileSet;
     this.testOutput = testOutput;
     this.processors = processors;
     this.xmlPrinter = xmlPrinter;
@@ -83,8 +77,7 @@ public class DefaultActionListProvider implements ActionListProvider {
   @Override
   @Provides
   public List<Action> get() {
-    builder.usingFiles(fileSet, preloadFiles)
-           .addTests(tests)
+    builder.addTests(tests)
            .addCommands(arguments)
            .reset(reset)
            .asDryRunFor(dryRunFor)

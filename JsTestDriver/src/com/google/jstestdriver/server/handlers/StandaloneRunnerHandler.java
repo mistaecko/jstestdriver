@@ -17,45 +17,39 @@ package com.google.jstestdriver.server.handlers;
 
 import static com.google.jstestdriver.server.handlers.CaptureHandler.RUNNER_TYPE;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.mortbay.jetty.MimeTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.FileResult;
-import com.google.jstestdriver.FileSource;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.JsonCommand;
+import com.google.jstestdriver.JsonCommand.CommandType;
 import com.google.jstestdriver.LoadedFiles;
 import com.google.jstestdriver.Response;
 import com.google.jstestdriver.SlaveBrowser;
 import com.google.jstestdriver.SlaveResourceService;
 import com.google.jstestdriver.StreamMessage;
 import com.google.jstestdriver.TestResult;
-import com.google.jstestdriver.TestResultGenerator;
-import com.google.jstestdriver.JsonCommand.CommandType;
 import com.google.jstestdriver.TestResult.Result;
-import com.google.jstestdriver.hooks.FileInfoScheme;
+import com.google.jstestdriver.TestResultGenerator;
 import com.google.jstestdriver.model.HandlerPathPrefix;
-import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
 import com.google.jstestdriver.runner.RunnerType;
 import com.google.jstestdriver.server.handlers.pages.Page;
 import com.google.jstestdriver.server.handlers.pages.PageType;
 import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
 import com.google.jstestdriver.util.HtmlWriter;
+
+import org.mortbay.jetty.MimeTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -68,7 +62,6 @@ class StandaloneRunnerHandler implements RequestHandler {
   private final Gson gson = new Gson();
   private final SlavePageRequest request;
   private final HttpServletResponse response;
-  private final FilesCache cache;
   private final ConcurrentMap<SlaveBrowser, Thread> reportingThreads;
   private final TestResultGenerator testResultGenerator = new TestResultGenerator();
 
@@ -87,12 +80,12 @@ class StandaloneRunnerHandler implements RequestHandler {
       HandlerPathPrefix prefix) {
     this.request = request;
     this.response = response;
-    this.cache = cache;
     this.reportingThreads = reportingThreads;
     this.pages = pages;
     this.prefix = prefix;
   }
 
+  @Override
   public void handleIt() throws IOException {
     final SlaveBrowser browser = request.getBrowser();
     if (browser == null) {
@@ -112,26 +105,6 @@ class StandaloneRunnerHandler implements RequestHandler {
 
   public void service(final SlaveBrowser slaveBrowser) {
 
-    LinkedList<FileSource> filesSources = new LinkedList<FileSource>();
-
-    for (FileInfo f : cache.getAllFileInfos()) {
-      filesSources.add(f.toFileSource(new NullPathPrefix(), Collections.<FileInfoScheme>emptySet()));
-    }
-    final int size = filesSources.size();
-    
-    // TODO(corysmith): respect demeter.
-    int chunkSize = slaveBrowser.getBrowserInfo().getUploadSize();
-
-    for (int i = 0; i < size; i += chunkSize) {
-      LinkedList<String> loadFilesParameters = new LinkedList<String>();
-      List<FileSource> chunkedFileSources =
-          filesSources.subList(i, Math.min(i + chunkSize, size));
-
-      loadFilesParameters.add(gson.toJson(chunkedFileSources));
-      loadFilesParameters.add("true");
-      slaveBrowser.createCommand(gson.toJson(new JsonCommand(CommandType.LOADTEST,
-          loadFilesParameters)));
-    }
     LinkedList<String> runAllTestsParameters = new LinkedList<String>();
 
     runAllTestsParameters.add("false");
@@ -142,6 +115,7 @@ class StandaloneRunnerHandler implements RequestHandler {
 
     if (LOGGER.isDebugEnabled() && !reportingThreads.containsKey(slaveBrowser)) {
       final Thread thread = new Thread(new Runnable() {
+        @Override
         public void run() {
           String runnerId = slaveBrowser.getBrowserInfo().toUniqueString();
           final long testStart = System.currentTimeMillis();
@@ -182,8 +156,6 @@ class StandaloneRunnerHandler implements RequestHandler {
                           new Object[] {runnerId, result.getFileSource().getFileSrc()});
                     }
                   }
-                  LOGGER.debug("{}: loaded {} files of {} @ {}s", new Object[] {runnerId,
-                      loaded, size, ((System.currentTimeMillis() - testStart) / 1000)});
                   break;
                 case LOG:
                   LOGGER.debug("{}: test time {}s {}",

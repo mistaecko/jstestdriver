@@ -22,6 +22,7 @@ import com.google.jstestdriver.BrowserInfo;
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.MockTime;
 import com.google.jstestdriver.SlaveBrowser;
+import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.runner.RunnerType;
 import com.google.jstestdriver.server.handlers.CaptureHandler;
 
@@ -35,11 +36,11 @@ public class BrowserReaperTest extends TestCase {
     final MockTime time = new MockTime(1);
     final SlaveBrowser browserOne =
         new SlaveBrowser(time, "1", new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
     browsers.addSlave(browserOne);
     final SlaveBrowser browserTwo =
         new SlaveBrowser(time, "2", new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
     browsers.addSlave(browserTwo);
     final BrowserReaper browserReaper = new BrowserReaper(browsers);
     time.add(8000);
@@ -54,11 +55,11 @@ public class BrowserReaperTest extends TestCase {
     final MockTime time = new MockTime(1);
     final SlaveBrowser browserOne =
         new SlaveBrowser(time, "1", new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
     browsers.addSlave(browserOne);
     final SlaveBrowser browserTwo =
         new SlaveBrowser(time, "2", new BrowserInfo(), 20, null, CaptureHandler.QUIRKS,
-            RunnerType.CLIENT);
+            RunnerType.CLIENT, BrowserState.CAPTURED);
     browsers.addSlave(browserTwo);
     final BrowserReaper browserReaper = new BrowserReaper(browsers);
     time.add(40);

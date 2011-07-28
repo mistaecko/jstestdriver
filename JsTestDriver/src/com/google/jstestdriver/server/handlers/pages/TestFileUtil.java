@@ -26,6 +26,9 @@ import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.util.HtmlWriter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A utility that write The contents of the FilesCache into an HtmlWriter.
  *
@@ -33,6 +36,7 @@ import com.google.jstestdriver.util.HtmlWriter;
  */
 // TODO(corysmith): Probably, horribly, misnamed. Fix.
 public class TestFileUtil {
+  private static final Logger logger = LoggerFactory.getLogger(TestFileUtil.class);
   private final HandlerPathPrefix prefix;
   private final FilesCache cache;
   private final Set<FileInfoScheme> schemes;
@@ -68,6 +72,7 @@ public class TestFileUtil {
         // better safe than sorry.
         break;
       }
+      logger.debug("Writing " + fileSource.getFileSrc());
       writer.writeScript(String.format(
           "jstestdriver.manualResourceTracker.startResourceLoad('%s')",
           gson.toJson(fileSource)));

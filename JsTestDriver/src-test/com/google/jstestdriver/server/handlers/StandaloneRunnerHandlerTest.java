@@ -15,22 +15,29 @@
  */
 package com.google.jstestdriver.server.handlers;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import junit.framework.TestCase;
-
+import com.google.common.collect.Lists;
 import com.google.jstestdriver.BrowserInfo;
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.Command;
 import com.google.jstestdriver.FileInfo;
+import com.google.jstestdriver.FileSource;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.MockTime;
 import com.google.jstestdriver.SlaveBrowser;
+import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.SlaveResourceService;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
+import com.google.jstestdriver.hooks.FileInfoScheme;
+import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.runner.RunnerType;
+
+import junit.framework.TestCase;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -38,19 +45,25 @@ import com.google.jstestdriver.runner.RunnerType;
 public class StandaloneRunnerHandlerTest extends TestCase {
 
   public void testCaptureAddFilesToLoadAndRun() throws Exception {
-    Map<String, FileInfo> files = new LinkedHashMap<String, FileInfo>();
-
-    files.put("file1.js", new FileInfo("file1.js", 30, -1, false, false, "content1", "file1.js"));
-    files.put("file2.js", new FileInfo("file2.js", 5, -1, false, false, "content2", "file2.js"));
-    files.put("file3.js", new FileInfo("file3.js", 53, -1, false, false, "content3", "file3.js"));
-    files.put("file4.js", new FileInfo("file4.js", 1, -1, false, false, "content4", "file4.js"));
+    List<FileInfo> fileList = Lists.newArrayList(
+      new FileInfo("file1.js", 30, -1, false, false, "content1", "file1.js"),
+      new FileInfo("file2.js", 5, -1, false, false, "content2", "file2.js"),
+      new FileInfo("file3.js", 53, -1, false, false, "content3", "file3.js"),
+      new FileInfo("file4.js", 1, -1, false, false, "content4", "file4.js")
+      );
+    List<FileSource> fileSources = Lists.newArrayList();
+    final Map<String, FileInfo> files = new LinkedHashMap<String, FileInfo>();
+    for (FileInfo file : fileList) {
+      fileSources.add(file.toFileSource(new NullPathPrefix(), Collections.<FileInfoScheme>emptySet()));
+      files.put(file.getDisplayPath(), file);
+    }
     FilesCache cache = new FilesCache(files);
     CapturedBrowsers capturedBrowsers = new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0)));
     BrowserInfo browserInfo = new BrowserInfo();
     browserInfo.setUploadSize(50);
     SlaveBrowser slaveBrowser =
         new SlaveBrowser(new MockTime(10), "1", browserInfo, 1200, null,
-            CaptureHandler.QUIRKS, RunnerType.CLIENT);
+            CaptureHandler.QUIRKS, RunnerType.CLIENT, BrowserState.CAPTURED);
     capturedBrowsers.addSlave(slaveBrowser);
     StandaloneRunnerHandler handler =
         new StandaloneRunnerHandler(null, null, cache, new SlaveResourceService(""),
@@ -59,23 +72,6 @@ public class StandaloneRunnerHandlerTest extends TestCase {
 
     assertNotNull(slaveBrowser.peekCommand());
     Command cmd = slaveBrowser.dequeueCommand();
-
-    assertNotNull(cmd);
-    assertEquals("{\"command\":\"loadTest\","
-            + "\"parameters\":[\""
-            + "[{\\\"fileSrc\\\":\\\"/test/file1.js\\\"," +
-                "\\\"basePath\\\":\\\"file1.js\\\",\\\"timestamp\\\":30},"
-            + "{\\\"fileSrc\\\":\\\"/test/file2.js\\\"," +
-                "\\\"basePath\\\":\\\"file2.js\\\",\\\"timestamp\\\":5},"
-            + "{\\\"fileSrc\\\":\\\"/test/file3.js\\\"," +
-                "\\\"basePath\\\":\\\"file3.js\\\",\\\"timestamp\\\":53},"
-            + "{\\\"fileSrc\\\":\\\"/test/file4.js\\\"," +
-                "\\\"basePath\\\":\\\"file4.js\\\",\\\"timestamp\\\":1}"
-            + "]\",\"true\"]}",
-        cmd.getCommand());
-
-    assertNotNull(slaveBrowser.peekCommand());
-    cmd = slaveBrowser.dequeueCommand();
     assertNotNull(cmd);
     assertEquals("{\"command\":\"runAllTests\",\"parameters\":[\"false\",\"false\",\"0\"]}",
         cmd.getCommand());

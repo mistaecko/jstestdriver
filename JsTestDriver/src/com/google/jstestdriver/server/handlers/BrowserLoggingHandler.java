@@ -52,6 +52,7 @@ class BrowserLoggingHandler implements RequestHandler {
     this.response = response;
   }
 
+  @Override
   public void handleIt() throws IOException {
     try{
       Collection<BrowserLog> logs =

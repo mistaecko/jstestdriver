@@ -51,10 +51,12 @@ public class BrowserStartupActionTest extends TestCase {
       this.nextId = nextId;
     }
 
+    @Override
     public Collection<BrowserInfo> listBrowsers() {
       return capturedBrowsers;
     }
 
+    @Override
     public void eval(String id, ResponseStream responseStream, String cmd, JstdTestCase testCase) {
 
     }
@@ -132,6 +134,7 @@ public class BrowserStartupActionTest extends TestCase {
     BrowserInfo browserInfo = new BrowserInfo();
     browserInfo.setId(Long.parseLong(nextId));
     browserInfo.setServerReceivedHeartbeat(true);
+    browserInfo.setReady(true);
     Collection<BrowserInfo> capturedBrowsers = Lists.newArrayList(browserInfo);
 
     String serverAddress = "http://localhost";

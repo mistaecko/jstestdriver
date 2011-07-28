@@ -56,6 +56,7 @@ class FileCacheHandler implements RequestHandler {
     this.strategy = strategy;
   }
 
+  @Override
   public void handleIt() throws IOException {
     String fileSetString = request.getParameter("fileSet");
     Collection<FileInfo> newFiles =

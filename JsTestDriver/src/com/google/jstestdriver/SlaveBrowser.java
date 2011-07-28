@@ -21,6 +21,17 @@ import static com.google.jstestdriver.runner.RunnerType.STANDALONE;
 import static com.google.jstestdriver.server.handlers.CaptureHandler.RUNNER_TYPE;
 import static java.lang.String.format;
 
+import com.google.jstestdriver.Response.ResponseType;
+import com.google.jstestdriver.commands.NoopCommand;
+import com.google.jstestdriver.model.HandlerPathPrefix;
+import com.google.jstestdriver.runner.RunnerType;
+import com.google.jstestdriver.server.handlers.pages.PageType;
+import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
+
+import org.joda.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -28,17 +39,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.joda.time.Instant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.jstestdriver.Response.ResponseType;
-import com.google.jstestdriver.commands.NoopCommand;
-import com.google.jstestdriver.model.HandlerPathPrefix;
-import com.google.jstestdriver.runner.RunnerType;
-import com.google.jstestdriver.server.handlers.pages.PageType;
-import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
 
 /**
  * Represents a captured browser, and brokers the interaction between the client
@@ -48,9 +48,10 @@ import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
  */
 public class SlaveBrowser {
 
-  /**
-   * 
-   */
+  public static enum BrowserState {
+    CAPTURED, READY, HEARTBEAT, DEAD
+  }
+
   private static final LoadedFiles EMPTY_LOADED_FILES = new LoadedFiles();
 
   private static final String CLIENT_CONSOLE_RUNNER = "/slave/id/%s/page/CONSOLE/mode/%s/"
@@ -97,8 +98,10 @@ public class SlaveBrowser {
   private AtomicReference<LoadedFiles> lastloadedFiles =
     new AtomicReference<LoadedFiles>(EMPTY_LOADED_FILES);
 
+  private AtomicReference<BrowserState> state;
+
   public SlaveBrowser(Time time, String id, BrowserInfo browserInfo, long timeout,
-      HandlerPathPrefix prefix, String mode, RunnerType type) {
+      HandlerPathPrefix prefix, String mode, RunnerType type, BrowserState state) {
     this.time = time;
     this.timeout = timeout;
     this.id = id;
@@ -106,6 +109,7 @@ public class SlaveBrowser {
     this.prefix = prefix;
     this.mode = mode;
     this.type = type;
+    this.state = new AtomicReference<BrowserState>(state);
     lastHeartbeat = new AtomicReference<Instant>(new Instant(0));
   }
 
@@ -156,12 +160,13 @@ public class SlaveBrowser {
     this.timeUnit = timeUnit;
   }
 
-  public void heartBeat() {
+  
+  
+  public synchronized void heartBeat() {
     lastHeartbeat.set(time.now());
+    state.set(BrowserState.HEARTBEAT);
 
-    if (!browserInfo.serverReceivedHeartbeat()) {
-      browserInfo.setServerReceivedHeartbeat(true);
-    }
+    browserInfo.setServerReceivedHeartbeat(true);
   }
 
   public Instant getLastHeartbeat() {
@@ -171,6 +176,12 @@ public class SlaveBrowser {
   /** @return true if at least one heartbeat was received from the browser. */
   public boolean receivedHeartbeat() {
     return lastHeartbeat.get().getMillis() != 0;
+  }
+  
+  /** Changes the BrowserState to ready */
+  public synchronized void ready() {
+    state.set(BrowserState.READY);
+    browserInfo.setReady(true);
   }
 
   /**
@@ -252,6 +263,7 @@ public class SlaveBrowser {
     boolean alive = receivedHeartbeat()
         && ((time.now().getMillis() - lastHeartbeat.get().getMillis() < timeout) || timeout == -1);
     if (!alive) {
+      state.set(BrowserState.DEAD);
       LOGGER.debug("Browser dead: {}", toString());
     }
     return alive;

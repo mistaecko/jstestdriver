@@ -206,10 +206,10 @@ public class FileUploader {
           }
         }));
     for (int i = 0; i < numberOfFilesToLoad; i += chunkSize) {
+
       int chunkEndIndex = Math.min(i + chunkSize, numberOfFilesToLoad);
       List<String> loadParameters = new LinkedList<String>();
       List<FileSource> filesToLoad = filesSrc.subList(i, chunkEndIndex);
-
       loadParameters.add(gson.toJson(filesToLoad));
       loadParameters.add("false");
       JsonCommand cmd = new JsonCommand(CommandType.LOADTEST, loadParameters);
@@ -220,6 +220,7 @@ public class FileUploader {
       if (logger.isDebugEnabled()) {
         logger.debug("Sending LOADTEST to {} for {}", browserId,
             Lists.transform(filesToLoad, new Function<FileSource, String>() {
+              @Override
               public String apply(FileSource in) {
                 return "\n" + in.getFileSrc();
               }
