@@ -19,6 +19,7 @@ import com.google.jstestdriver.server.proxy.ProxyServletConfig;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +91,10 @@ public abstract class RequestHandlersModule extends AbstractModule {
   }
 
   @Provides @Singleton HttpClient provideHttpClient() {
-    return new HttpClient(new MultiThreadedHttpConnectionManager());
+    MultiThreadedHttpConnectionManager manager = new MultiThreadedHttpConnectionManager();
+    manager.getParams().setDefaultMaxConnectionsPerHost(100);
+    manager.getParams().setMaxTotalConnections(300);
+    return new HttpClient(manager);
   }
 
   @Provides @Singleton ServletContext provideServletContext(Servlet servlet) {
