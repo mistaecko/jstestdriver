@@ -4,6 +4,7 @@ package com.google.jstestdriver.server.proxy;
 import com.google.inject.Inject;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
 
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -20,6 +21,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
 
 /**
  * An HTTP gateway that forwards requests to another server and feeds the responses back to the

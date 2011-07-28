@@ -13,25 +13,24 @@ import com.google.inject.servlet.RequestParameters;
 import com.google.inject.servlet.RequestScoped;
 import com.google.jstestdriver.annotations.RequestProtocol;
 import com.google.jstestdriver.annotations.ResponseWriter;
-import com.google.jstestdriver.server.proxy.HostSpoofingJstdProxyServlet;
-import com.google.jstestdriver.server.proxy.HostForwardingJstdProxyServlet;
+import com.google.jstestdriver.server.proxy.GatewayServlet;
 import com.google.jstestdriver.server.proxy.JstdProxyServlet;
 import com.google.jstestdriver.server.proxy.ProxyBehavior;
 import com.google.jstestdriver.server.proxy.ProxyServletConfig;
-
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.GenericServlet;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An abstract {@link Guice} module providing an EDSL for binding {@link RequestHandler}s
@@ -88,15 +87,11 @@ public abstract class RequestHandlersModule extends AbstractModule {
         FactoryProvider.newFactory(
             ProxyRequestHandler.Factory.class, ProxyRequestHandler.class));
     bind(ProxyConfiguration.class).in(Singleton.class);
-    switch (proxyHostHeaderMode) {
-      case FORWARD:
-        bind(JstdProxyServlet.class).to(HostForwardingJstdProxyServlet.class);
-        break;
-      default:
-        bind(JstdProxyServlet.class).to(HostSpoofingJstdProxyServlet.class);
-        break;
-    }
+    bind(JstdProxyServlet.class).to(GatewayServlet.class);
+  }
 
+  @Provides @Singleton HttpClient provideHttpClient() {
+    return new HttpClient(new MultiThreadedHttpConnectionManager());
   }
 
   @Provides @Singleton ServletContext provideServletContext(Servlet servlet) {
