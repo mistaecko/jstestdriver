@@ -26,17 +26,6 @@ import static com.google.jstestdriver.server.handlers.pages.PageType.STANDALONE_
 import static com.google.jstestdriver.server.handlers.pages.PageType.VISUAL_STANDALONE_RUNNER;
 import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.UPLOAD_SIZE;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -72,12 +61,24 @@ import com.google.jstestdriver.server.handlers.pages.PageType;
 import com.google.jstestdriver.server.handlers.pages.RunnerPage;
 import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
 import com.google.jstestdriver.server.handlers.pages.StandaloneRunnerPage;
+import com.google.jstestdriver.server.proxy.ProxyBehavior;
 import com.google.jstestdriver.server.proxy.SimpleServletConfig;
 import com.google.jstestdriver.servlet.fileset.BrowserFileCheck;
 import com.google.jstestdriver.servlet.fileset.FileSetRequestHandler;
 import com.google.jstestdriver.servlet.fileset.ServerFileCheck;
 import com.google.jstestdriver.servlet.fileset.ServerFileUpload;
 import com.google.jstestdriver.util.ParameterParser;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Defines {@link RequestHandler} bindings for the JSTD server.
@@ -114,8 +115,9 @@ public class JstdHandlersModule extends RequestHandlersModule {
       FilesCache filesCache,
       long browserTimeout,
       HandlerPathPrefix handlerPrefix,
+      ProxyBehavior proxyHostHeaderMode,
       Set<FileInfoScheme> schemes) {
-    super();
+    super(proxyHostHeaderMode);
     this.capturedBrowsers = capturedBrowsers;
     this.filesCache = filesCache;
     this.browserTimeout = browserTimeout;

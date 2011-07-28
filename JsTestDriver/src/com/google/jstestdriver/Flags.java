@@ -15,13 +15,14 @@
  */
 package com.google.jstestdriver;
 
+import java.util.List;
+import java.util.Set;
+
 import com.google.jstestdriver.browser.BrowserRunner;
 import com.google.jstestdriver.config.ConfigurationSource;
 import com.google.jstestdriver.guice.GuiceBinding;
 import com.google.jstestdriver.model.HandlerPathPrefix;
-
-import java.util.List;
-import java.util.Set;
+import com.google.jstestdriver.server.proxy.ProxyBehavior;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -75,6 +76,9 @@ public interface Flags {
   
   @GuiceBinding(name="serverHandlerPrefix")
   public HandlerPathPrefix getServerHandlerPrefix();
+
+  @GuiceBinding(name="proxyHostHeaderMode")
+  public ProxyBehavior getProxyHostHeaderMode();
   
   public boolean getDisplayHelp();
 }
