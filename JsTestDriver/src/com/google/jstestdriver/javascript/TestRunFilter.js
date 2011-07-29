@@ -13,6 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+goog.provide('jstestdriver.TestRunFilter');
+
+goog.require('jstestdriver');
+
+/**
+ * @constructor
+ */
 jstestdriver.TestRunFilter = function(testCaseInfo) {
   this.testCaseInfo_ = testCaseInfo;
 };
@@ -128,7 +136,7 @@ jstestdriver.TestRunFilter.prototype.filter_ = function(expressions, condition) 
  * @param testMethodMap {Object.<string, string>} A map from test method id to
  *     test method name.
  * @param negativeExpressions {Array.<string>} The negative expression strings.
- * @return {Object<string, boolean>} A map from test method id to boolean that
+ * @return {Object.<string, boolean>} A map from test method id to boolean that
  *     signals whether a test method should be excluded from this test run.
  * @private
  */
@@ -151,7 +159,7 @@ jstestdriver.TestRunFilter.prototype.getExcludedTestIds_ = function(
  * @param testMethodMap {Object.<string, string>} A map from test method id to
  *     test method name.
  * @param positiveExpressions {Array.<string>} The positive expression strings.
- * @param excludedTestIds {Object<string, boolean>} A map from test method id to
+ * @param excludedTestIds {Object.<string, boolean>} A map from test method id to
  *     boolean that signals whether a test method should be excluded from this
  *     test run.
  * @return {Array.<string>} A list of test method names for test methods that

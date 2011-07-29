@@ -31,6 +31,13 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.TestSafeCallbackBuilder');
+
+goog.require('jstestdriver');
+goog.require('jstestdriver.plugins.async.CatchingCallback');
+goog.require('jstestdriver.plugins.async.ExpiringCallback');
+goog.require('jstestdriver.plugins.async.FiniteUseCallback');
+goog.require('jstestdriver.plugins.async.Timeout');
 
 /**
  * Constructs a TestSafeCallbackBuilder.

@@ -22,6 +22,10 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.CallbackPool');
+
+goog.require('jstestdriver');
+goog.require('jstestdriver.plugins.async.TestSafeCallbackBuilder');
 
 /**
  * Constructs a CallbackPool.

@@ -22,6 +22,9 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.DeferredQueueArmor');
+
+goog.require('jstestdriver');
 
 /**
  * Constructs a DeferredQueueArmor.

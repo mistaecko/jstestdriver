@@ -14,6 +14,49 @@
  * the License.
  */
 
+goog.provide('jstestdriver.Console');
+
+
+// TODO(corysmith): Separate this into a Utils namespace that can loaded earlier.
+jstestdriver.FORMAT_MAPPINGS = {
+  's' : function(arg) {
+    if (arg == undefined) {
+      return '';
+    }
+    return String(arg);
+  },
+  'd' : Number,
+  'i' : parseInt,
+  'f' : parseFloat,
+  'o' : jstestdriver.JSON.stringify
+};
+
+
+jstestdriver.formatString = function(str) {
+  var formatArgs = arguments;
+  var idx = 1;
+  var formatted = String(str).replace(/%([sdifo])/g,
+      function(fullmatch, groupOne) {
+    var value = formatArgs[idx++];
+    if (!jstestdriver.FORMAT_MAPPINGS[groupOne]) {
+      throw new Error(groupOne + 'is not a proper format.');
+    }
+    if (value === undefined || value === null) {
+      return value;
+    }
+    return jstestdriver.FORMAT_MAPPINGS[groupOne](value);
+  })
+  while (idx < formatArgs.length) {
+    var currentArg = formatArgs[idx++]
+    if (typeof currentArg == 'object') {
+      currentArg = jstestdriver.JSON.stringify(currentArg);
+    }
+    formatted += " " + currentArg;
+  }
+  return formatted;
+};
+
+
 /**
  * @constructor
  */

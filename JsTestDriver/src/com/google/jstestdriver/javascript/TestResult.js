@@ -13,6 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+goog.provide('jstestdriver.TestResult');
+
+goog.require('jstestdriver');
+
+
 /**
  * @param {string} testCaseName
  * @param {string} testName

@@ -23,6 +23,9 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.FiniteUseCallback');
+
+goog.require('jstestdriver');
 
 /**
  * Constructs a FiniteUseCallback.

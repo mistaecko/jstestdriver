@@ -23,6 +23,9 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.ExpiringCallback');
+
+goog.require('jstestdriver');
 
 /**
  * Constructs an ExpiringCallback.

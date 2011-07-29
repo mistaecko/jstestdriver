@@ -39,5 +39,5 @@ jstd.CssController.prototype.reducePath_ = function(uri) {
       stack.push(parts[i]);
     }
   }
-  return stack.join("'");
+  return stack.join(''/');
 };

@@ -22,6 +22,9 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.CatchingCallback');
+
+goog.require('jstestdriver');
 
 /**
  * Constructs a CatchingCallback.

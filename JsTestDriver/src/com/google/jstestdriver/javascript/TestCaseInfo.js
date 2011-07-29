@@ -14,6 +14,11 @@
  * the License.
  */
 
+goog.provide('jstestdriver.TestCaseInfo');
+
+goog.require('jstestdriver');
+goog.require('jstestdriver.TestRunFilter');
+
 /**
  * @param testCaseName
  * @param template

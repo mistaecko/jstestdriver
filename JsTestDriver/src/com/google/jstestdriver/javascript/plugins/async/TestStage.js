@@ -20,6 +20,12 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.TestStage');
+
+goog.require('jstestdriver');
+goog.require('jstestdriver.setTimeout');
+goog.require('jstestdriver.plugins.async.DeferredQueueArmor');
+goog.require('jstestdriver.plugins.async.DeferredQueue');
 
 /**
  * Constructs a TestStage.

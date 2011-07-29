@@ -34,6 +34,17 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.AsyncTestRunnerPlugin');
+
+goog.require('jstestdriver');
+goog.require('jstestdriver.setTimeout');
+goog.require('jstestdriver.TestCaseInfo');
+goog.require('jstestdriver.TestResult');
+goog.require('jstestdriver.plugins.async.CallbackPool');
+goog.require('jstestdriver.plugins.async.CallbackPoolArmor');
+goog.require('jstestdriver.plugins.async.DeferredQueue');
+goog.require('jstestdriver.plugins.async.DeferredQueueArmor');
+goog.require('jstestdriver.plugins.async.TestStage');
 
 /**
  * Constructs an AsyncTestRunnerPlugin.
@@ -49,8 +60,8 @@
  *     DeferredQueueArmors.
  * @constructor
  */
-jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody, toJson,
-      opt_pauseForHuman, opt_setTimeout, opt_queueConstructor,
+jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody,
+      toJson, opt_pauseForHuman, opt_setTimeout, opt_queueConstructor,
       opt_armorConstructor) {
   this.name = "AsyncTestRunnerPlugin";
   this.dateObj_ = dateObj;

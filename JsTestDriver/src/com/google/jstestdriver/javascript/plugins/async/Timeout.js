@@ -22,6 +22,9 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.Timeout');
+
+goog.require('jstestdriver');
 
 /**
  * Constructs a Timeout. Accepts alternate implementations of setTimeout and

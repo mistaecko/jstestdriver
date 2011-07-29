@@ -13,6 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+goog.provide('jstestdriver.TestRunConfiguration');
+
+goog.require('jstestdriver');
+goog.require('jstestdriver.TestCaseInfo');
+
 /**
  * Represents all of the necessary information to run a test case.
  * @param {jstestdriver.TestCaseInfo} testCaseInfo The test case information, containing

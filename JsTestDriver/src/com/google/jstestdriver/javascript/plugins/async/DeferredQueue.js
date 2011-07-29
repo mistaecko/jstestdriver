@@ -21,6 +21,12 @@
  * @author rdionne@google.com (Robert Dionne)
  */
 
+goog.provide('jstestdriver.plugins.async.DeferredQueue');
+
+goog.require('jstestdriver');
+goog.require('jstestdriver.plugins.async.DeferredQueueArmor');
+goog.require('jstestdriver.plugins.async.CallbackPool');
+goog.require('jstestdriver.plugins.async.CallbackPoolArmor');
 
 /**
  * Constructs a DeferredQueue.

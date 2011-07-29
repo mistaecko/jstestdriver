@@ -14,49 +14,6 @@
  * the License.
  */
 
-jstestdriver.JSON = JSON;
-
-
-jstestdriver.FORMAT_MAPPINGS = {
-  's' : function(arg) {
-    if (arg == undefined) {
-      return '';
-    }
-    return String(arg);
-  },
-  'd' : Number,
-  'i' : parseInt,
-  'f' : parseFloat,
-  'o' : jstestdriver.JSON.stringify
-}
-
-
-
-
-jstestdriver.formatString = function(str) {
-  var formatArgs = arguments;
-  var idx = 1;
-  var formatted = String(str).replace(/%([sdifo])/g,
-      function(fullmatch, groupOne) {
-    var value = formatArgs[idx++];
-    if (!jstestdriver.FORMAT_MAPPINGS[groupOne]) {
-      throw new Error(groupOne + 'is not a proper format.');
-    }
-    if (value === undefined || value === null) {
-      return value;
-    }
-    return jstestdriver.FORMAT_MAPPINGS[groupOne](value);
-  })
-  while (idx < formatArgs.length) {
-    var currentArg = formatArgs[idx++]
-    if (typeof currentArg == 'object') {
-      currentArg = JSON.stringify(currentArg);
-    }
-    formatted += " " + currentArg;
-  }
-  return formatted;
-};
-
 
 jstestdriver.convertToJson = function(delegate) {
   var serialize = jstestdriver.parameterSerialize

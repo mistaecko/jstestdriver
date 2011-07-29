@@ -13,65 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+
+/**
+ * @fileDesciption
+ * Provides the namespaces and necessary function to enable migration to the
+ * Google JsCompiler.
+ *
+ * @author Cory Smith (corbinrsmith@gmail.com)
+ */
+
 var jstestdriver = {};
-jstestdriver.console = null;
-jstestdriver.global = this;
 jstestdriver.plugins = {};
 jstestdriver.plugins.async = {};
 
-jstestdriver.SERVER_URL = "/query/";
-
-jstestdriver.HEARTBEAT_URL = "/heartbeat";
-
-if (typeof console == 'undefined') console = {};
-if (typeof console.log == 'undefined') console.log = function() {};
-if (typeof console.debug == 'undefined') console.debug = function() {};
-if (typeof console.info == 'undefined') console.info = function() {};
-if (typeof console.warn == 'undefined') console.warn = function() {};
-if (typeof console.error == 'undefined') console.error = function() {};
-
-jstestdriver.globalSetTimeout = window.setTimeout;
-jstestdriver.setTimeout = function() {
-  if (jstestdriver.globalSetTimeout.apply) {
-    return jstestdriver.globalSetTimeout.apply(window, arguments);
-  }
-  return jstestdriver.globalSetTimeout(arguments[0], arguments[1]);
+jstestdriver.JSON = JSON || {
+  stringify : function(msg, opt_args){}
 };
 
-jstestdriver.globalClearTimeout = clearTimeout;
-jstestdriver.clearTimeout = function() {
-  if (jstestdriver.globalClearTimeout.apply) {
-    return jstestdriver.globalClearTimeout.apply(window, arguments);
-  }
-  return jstestdriver.globalClearTimeout(arguments[0]);
+var goog = window.goog || {
+  provide : function(symbol){},
+  require : function(symbol){}
 };
 
-jstestdriver.globalSetInterval = setInterval;
-jstestdriver.setInterval = function() {
-  if (jstestdriver.globalSetInterval.apply) {
-    return jstestdriver.globalSetInterval.apply(window, arguments);
-  }
-  return jstestdriver.globalSetInterval(arguments[0], arguments[1]);
-};
-
-//TODO(corysmith): make this configurable.
-jstestdriver.log = function(message) {
-  if (window.console && window.console.log) {
-    window.console.log(message);
-  }
-};
-
-jstestdriver.globalClearInterval = clearInterval;
-jstestdriver.clearInterval = function() {
-  if (jstestdriver.globalClearInterval.apply) {
-    return jstestdriver.globalClearInterval.apply(window, arguments);
-  }
-  return jstestdriver.globalClearInterval(arguments[0]);
-};
-
-document.write = function(str) {
-  //jstestdriver.console.error('Illegal call to document.write.');
-};
-
-
-var noop = jstestdriver.EMPTY_FUNC = function() {};
