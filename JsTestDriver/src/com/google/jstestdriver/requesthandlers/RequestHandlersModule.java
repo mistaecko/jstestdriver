@@ -92,8 +92,8 @@ public abstract class RequestHandlersModule extends AbstractModule {
 
   @Provides @Singleton HttpClient provideHttpClient() {
     MultiThreadedHttpConnectionManager manager = new MultiThreadedHttpConnectionManager();
-    manager.getParams().setDefaultMaxConnectionsPerHost(100);
-    manager.getParams().setMaxTotalConnections(300);
+    manager.getParams().setDefaultMaxConnectionsPerHost(20);
+    manager.getParams().setMaxTotalConnections(200);
     return new HttpClient(manager);
   }
 
