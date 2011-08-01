@@ -150,7 +150,7 @@ public class GatewayServlet extends JstdProxyServlet {
     String host = request.getServerName();
     int port = request.getServerPort();
     URI proxyTo = parseUri(this.proxyTo);
-    if (!location.getHost().equals(proxyTo.getHost())) {
+    if (location.getHost() == null || !location.getHost().equals(proxyTo.getHost())) {
       return;
     }
     if (location.getPort() == proxyTo.getPort()
