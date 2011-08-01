@@ -9,8 +9,8 @@ public class HeartbeatPage implements Page {
     writer.startHead()
       .writeTitle("Heartbeat")
       .writeStyleSheet("/static/heartbeatclient.css")
-      .writeExternalScript("/static/jstestdrivernamespace.js")
       .writeExternalScript("/static/lib/json2.js")
+      .writeExternalScript("/static/jstestdrivernamespace.js")
       .writeExternalScript("/static/lib/jquery-min.js")
       .writeExternalScript("/static/heartbeatclient.js")
       .writeScript("jstestdriver.heartbeat = jstestdriver.createHeartbeat(\"" +

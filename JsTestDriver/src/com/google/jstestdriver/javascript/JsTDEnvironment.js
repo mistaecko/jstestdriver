@@ -28,7 +28,6 @@ goog.require('jstestdriver.Console');
 jstestdriver.global = this;
 jstestdriver.console = null;
 jstestdriver.console = new jstestdriver.Console();
-jstestdriver.JSON = JSON;
 
 jstestdriver.SERVER_URL = "/query/";
 

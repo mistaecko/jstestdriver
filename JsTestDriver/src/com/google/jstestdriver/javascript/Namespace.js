@@ -27,7 +27,7 @@ var jstestdriver = {};
 jstestdriver.plugins = {};
 jstestdriver.plugins.async = {};
 
-jstestdriver.JSON = JSON || {
+jstestdriver.JSON = window.JSON || {
   stringify : function(msg, opt_args){}
 };
 

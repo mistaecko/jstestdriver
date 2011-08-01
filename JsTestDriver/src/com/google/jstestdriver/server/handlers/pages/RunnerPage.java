@@ -37,9 +37,9 @@ public class RunnerPage implements Page {
   public void render(HtmlWriter writer, SlavePageRequest request) throws IOException {
     writer.startHead()
       .writeTitle("Console Runner")
-      .writeExternalScript("/static/jstestdrivernamespace.js")
       .writeExternalScript("/static/lib/json2.js")
       .writeExternalScript("/static/lib/json_sans_eval.js")
+      .writeExternalScript("/static/jstestdrivernamespace.js")
       .writeExternalScript("/static/lib/jquery-min.js")
       .writeExternalScript("/static/runner.js")
       .writeScript(
