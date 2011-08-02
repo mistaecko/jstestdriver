@@ -392,6 +392,40 @@ assertsTest.prototype.testAssertCount = function() {
   assertEquals(3, jstestdriver.assertCount);
 };
 
+assertsTest.prototype.testAssertEqualsDeltaValues = function() {
+  assertEqualsDelta(4.0, 4.0, 0.1);
+  assertEqualsDelta(4.099, 4.0, 0.1);
+  assertEqualsDelta(4.0, 4.099, 0.1);
+
+  var expectFail = function(first, second, delta) {
+    try {
+      assertEqualsDelta(first, second, delta);
+      fail('assertEqualsDelta did not throw an exception');
+    } catch(expected) {
+    }
+  };
+
+  expectFail(4.0, 4.11, 0.1);
+  expectFail(4.11, 4.0, 0.1);
+  expectFail(4.0, 4.1, 0.1);
+  expectFail(4.1, 4.0, 0.1);
+};
+
+assertsTest.prototype.testAssertEqualsDeltaArrays = function() {
+  assertEqualsDelta([1.0, 2.0], [1.0, 2.0], 0.01);
+  assertEqualsDelta([1.009, 2.0], [1.0, 2.009], 0.01);
+
+  var expectFail = function(first, second, delta) {
+    try {
+      assertEqualsDelta(first, second, delta);
+      fail('assertEqualsDelta did not throw an exception');
+    } catch(expected) {
+    }
+  };
+
+  expectFail([1.00, 2.00], [1.1, 2.0], 0.01);
+  expectFail([1.00, 2.10], [1.0, 2.05], 0.01);
+};
 
 (function () {
   var GLOBAL = this;

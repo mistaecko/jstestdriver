@@ -552,5 +552,93 @@ function assertNotInstanceOf(msg, constructor, actual) {
   return true;
 }
 
+/**
+ * Asserts that two doubles, or the elements of two arrays of doubles,
+ * are equal to within a positive delta.
+ */
+function assertEqualsDelta(msg, expected, actual, epsilon) {
+  var args = this.argsWithOptionalMsg_(arguments, 4);
+  jstestdriver.assertCount++;
+  msg = args[0];
+  expected = args[1];
+  actual = args[2];
+  epsilon = args[3];
+
+  if (!compareDelta_(expected, actual, epsilon)) {
+    this.fail(msg + 'expected ' + epsilon + ' within ' +
+              this.prettyPrintEntity_(expected) +
+              ' but was ' + this.prettyPrintEntity_(actual) + '');
+  }
+  return true;
+};
+
+function compareDelta_(expected, actual, epsilon) {
+  var compareDouble = function(e,a,d) {
+    return Math.abs(e - a) <= d;
+  }
+  if (expected === actual) {
+    return true;
+  }
+
+  if (typeof expected == "number" ||
+      typeof actual == "number" ||
+      !expected || !actual) {
+    return compareDouble(expected, actual, epsilon);
+  }
+
+  if (isElement_(expected) || isElement_(actual)) {
+    return false;
+  }
+
+  var key = null;
+  var actualLength   = 0;
+  var expectedLength = 0;
+
+  try {
+    // If an array is expected the length of actual should be simple to
+    // determine. If it is not it is undefined.
+    if (jstestdriver.jQuery.isArray(actual)) {
+      actualLength = actual.length;
+    } else {
+      // In case it is an object it is a little bit more complicated to
+      // get the length.
+      for (key in actual) {
+        if (actual.hasOwnProperty(key)) {
+          ++actualLength;
+        }
+      }
+    }
+
+    // Arguments object
+    if (actualLength == 0 && typeof actual.length == "number") {
+      actualLength = actual.length;
+
+      for (var i = 0, l = actualLength; i < l; i++) {
+        if (!(i in actual)) {
+          actualLength = 0;
+          break;
+        }
+      }
+    }
+
+    for (key in expected) {
+      if (expected.hasOwnProperty(key)) {
+        if (!compareDelta_(expected[key], actual[key], epsilon)) {
+          return false;
+        }
+
+        ++expectedLength;
+      }
+    }
+
+    if (expectedLength != actualLength) {
+      return false;
+    }
+
+    return expectedLength == 0 ? expected.toString() == actual.toString() : true;
+  } catch (e) {
+    return false;
+  }
+};
 
 var assert = assertTrue;
