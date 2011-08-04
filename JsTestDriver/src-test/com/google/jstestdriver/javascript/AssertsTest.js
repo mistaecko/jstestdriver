@@ -400,8 +400,11 @@ assertsTest.prototype.testAssertEqualsDeltaValues = function() {
   var expectFail = function(first, second, delta) {
     try {
       assertEqualsDelta(first, second, delta);
-      fail('assertEqualsDelta did not throw an exception');
-    } catch(expected) {
+    } catch(e) {
+      assertEquals('AssertError', e.name);
+      assertEquals(
+          'expected ' + delta + ' within ' + first + ' but was ' + second,
+          e.message);
     }
   };
 
@@ -409,6 +412,7 @@ assertsTest.prototype.testAssertEqualsDeltaValues = function() {
   expectFail(4.11, 4.0, 0.1);
   expectFail(4.0, 4.1, 0.1);
   expectFail(4.1, 4.0, 0.1);
+  expectFail(4.0, 4.01, 0.1);
 };
 
 assertsTest.prototype.testAssertEqualsDeltaArrays = function() {
@@ -418,8 +422,11 @@ assertsTest.prototype.testAssertEqualsDeltaArrays = function() {
   var expectFail = function(first, second, delta) {
     try {
       assertEqualsDelta(first, second, delta);
-      fail('assertEqualsDelta did not throw an exception');
-    } catch(expected) {
+    } catch(e) {
+      assertEquals('AssertError', e.name);
+      assertEquals(
+          'expected ' + delta + ' within [' + first + '] but was [' + second + ']',
+          e.message);
     }
   };
 
