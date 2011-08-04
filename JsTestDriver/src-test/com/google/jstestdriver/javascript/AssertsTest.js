@@ -396,10 +396,13 @@ assertsTest.prototype.testAssertEqualsDeltaValues = function() {
   assertEqualsDelta(4.0, 4.0, 0.1);
   assertEqualsDelta(4.099, 4.0, 0.1);
   assertEqualsDelta(4.0, 4.099, 0.1);
+  assertEqualsDelta(4.0, 4.1, 0.1);
+  assertEqualsDelta(4.1, 4.0, 0.1);
 
   var expectFail = function(first, second, delta) {
     try {
       assertEqualsDelta(first, second, delta);
+      fail("expectation failure");
     } catch(e) {
       assertEquals('AssertError', e.name);
       assertEquals(
@@ -410,9 +413,6 @@ assertsTest.prototype.testAssertEqualsDeltaValues = function() {
 
   expectFail(4.0, 4.11, 0.1);
   expectFail(4.11, 4.0, 0.1);
-  expectFail(4.0, 4.1, 0.1);
-  expectFail(4.1, 4.0, 0.1);
-  expectFail(4.0, 4.01, 0.1);
 };
 
 assertsTest.prototype.testAssertEqualsDeltaArrays = function() {
@@ -422,6 +422,7 @@ assertsTest.prototype.testAssertEqualsDeltaArrays = function() {
   var expectFail = function(first, second, delta) {
     try {
       assertEqualsDelta(first, second, delta);
+      fail("expectation failure");
     } catch(e) {
       assertEquals('AssertError', e.name);
       assertEquals(
