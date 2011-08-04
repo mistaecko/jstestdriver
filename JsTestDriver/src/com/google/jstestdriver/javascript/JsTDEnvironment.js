@@ -33,7 +33,7 @@ jstestdriver.SERVER_URL = "/query/";
 
 jstestdriver.HEARTBEAT_URL = "/heartbeat";
 
-window['console'] = window['console'] || {};
+if (!window['console']) window['console'] = {};
 if (typeof window['console']['log'] == 'undefined') window['console']['log'] = function(msg) {};
 if (typeof window['console']['debug'] == 'undefined') window['console']['debug'] = function(msg) {};
 if (typeof ['console']['info'] == 'undefined') window['console']['info'] = function(msg) {};
