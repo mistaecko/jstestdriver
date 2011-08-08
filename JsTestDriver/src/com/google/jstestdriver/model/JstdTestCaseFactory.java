@@ -50,22 +50,35 @@ public class JstdTestCaseFactory {
   }
 
   private List<JstdTestCase> resolveDependencies(List<JstdTestCase> testCases) {
-    final List<JstdTestCase> resolved =
-      Lists.newArrayListWithExpectedSize(testCases.size());
-    for (JstdTestCase jstdTestCase : testCases) {
-      for (ResourceDependencyResolver resolver : resolvers) {
-        jstdTestCase = resolver.resolve(jstdTestCase);
+    stopWatch.start("resolveDependencies");
+    try {
+      final List<JstdTestCase> resolved = Lists.newArrayListWithExpectedSize(testCases.size());
+      for (JstdTestCase jstdTestCase : testCases) {
+        for (ResourceDependencyResolver resolver : resolvers) {
+          stopWatch.start(resolver.toString());
+          jstdTestCase = resolver.resolve(jstdTestCase);
+          stopWatch.stop(resolver.toString());
+        }
+        resolved.add(jstdTestCase);
       }
-      resolved.add(jstdTestCase);
+      return resolved;
+    } finally {
+      stopWatch.stop("resolveDependencies");
     }
-    return resolved;
   }
 
   private List<JstdTestCase> processTestCases(List<JstdTestCase> testCases) {
-    for (JstdTestCaseProcessor processor : processors) {
-      testCases = processor.process(testCases.iterator());
+    stopWatch.start("resolveDependencies");
+    try {
+      for (JstdTestCaseProcessor processor : processors) {
+        stopWatch.start(processor.toString());
+        testCases = processor.process(testCases.iterator());
+        stopWatch.stop(processor.toString());
+      }
+      return testCases;
+    } finally {
+      stopWatch.stop("resolveDependencies");
     }
-    return testCases;
   }
 
   // TODO(corysmith): Remove when RunData no longer allows access to the FileSet.
