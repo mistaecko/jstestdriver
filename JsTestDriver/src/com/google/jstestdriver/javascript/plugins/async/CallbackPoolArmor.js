@@ -38,27 +38,29 @@ jstestdriver.plugins.async.CallbackPoolArmor = function(pool) {
 
 /**
  * Adds a callback to the pool.
- * @param {Function} callback The callback to wrap.
- * @param {number} opt_n An optional number of times to wait for the callback to
+ * @param {Object|Function} callback The callback to wrap.
+ * @param {number=} opt_n An optional number of times to wait for the callback to
  *     be called.
- * @param {number} opt_timeout The timeout in milliseconds.
- * @param {string} opt_description The callback description.
+ * @param {number=} opt_timeout The timeout in milliseconds.
+ * @param {string=} opt_description The callback description.
  * @return {Function} The wrapped callback.
  */
 jstestdriver.plugins.async.CallbackPoolArmor.prototype.addCallback = function(
     callback, opt_n, opt_timeout, opt_description) {
   if (typeof callback == 'object') {
     var params = callback;
-    callback = params.callback;
-    opt_n = params.invocations;
-    opt_timeout = params.timeout ? params.timeout * 1000 : null;
-    opt_description = params.description;
+    callback = params['callback'];
+    opt_n = params['invocations'];
+    opt_timeout = params['timeout'] ? params['timeout'] * 1000 : undefined;
+    opt_description = params['description'];
   }
 
   if (typeof callback == 'function' && callback) {
     return this.pool_.addCallback(
         callback, opt_n, opt_timeout, opt_description);
   }
+
+  return null;
 };
 
 
@@ -88,17 +90,19 @@ jstestdriver.plugins.async.CallbackPoolArmor.prototype.add =
 /**
  * A no-op callback that's useful for waiting until an asynchronous operation
  * completes without performing any action.
- * @param {Number} opt_n An optional number of times to wait for the callback to
- *     be called.
- * @param {number} opt_timeout The timeout in milliseconds.
+ * @param {Object|number=} opt_n An optional number of times to wait for the
+ *     callback to be called.
+ * @param {number=} opt_timeout The timeout in milliseconds.
+ * @param {string=} opt_description The description.
  * @return {Function} A noop callback.
  */
 jstestdriver.plugins.async.CallbackPoolArmor.prototype.noop = function(
     opt_n, opt_timeout, opt_description) {
   if (typeof opt_n == 'object') {
-    opt_timeout = opt_n.timeout ? opt_n.timeout * 1000 : null;
-    opt_description = opt_n.description;
-    opt_n = opt_n.invocations;
+    var params = opt_n;
+    opt_timeout = params['timeout'] ? params['timeout'] * 1000 : undefined;
+    opt_description = params['description'];
+    opt_n = params['invocations'];
   }
   return this.pool_.addCallback(
       jstestdriver.EMPTY_FUNC, opt_n, opt_timeout, opt_description);

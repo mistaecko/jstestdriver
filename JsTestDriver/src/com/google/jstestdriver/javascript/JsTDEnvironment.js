@@ -15,7 +15,7 @@
  */
 
 /**
- * @fileDescription
+ * @fileoverview
  * Provides the base jstestdriver environment constants and functions.
  */
 

@@ -16,7 +16,7 @@
 
 
 /**
- * @fileDesciption
+ * @fileoverview
  * Provides the namespaces and necessary function to enable migration to the
  * Google JsCompiler.
  *
@@ -26,10 +26,6 @@
 var jstestdriver = {};
 jstestdriver.plugins = {};
 jstestdriver.plugins.async = {};
-
-jstestdriver.JSON = window.JSON || {
-  stringify : function(msg, opt_args){}
-};
 
 var goog = window.goog || {
   provide : function(symbol){},

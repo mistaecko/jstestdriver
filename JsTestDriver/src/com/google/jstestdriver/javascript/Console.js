@@ -17,6 +17,11 @@
 goog.provide('jstestdriver.Console');
 
 
+jstestdriver.JSON = window['JSON'] || {};
+jstestdriver.JSON.stringify = window['JSON'] ? window['JSON']['stringify'] :
+    function(msg, opt_args) {};
+
+
 // TODO(corysmith): Separate this into a Utils namespace that can loaded earlier.
 jstestdriver.FORMAT_MAPPINGS = {
   's' : function(arg) {

@@ -231,14 +231,14 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.finishTearDown = func
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.buildResult = function() {
   var end = new this.dateObj_().getTime();
-  var result = 'passed';
+  var result = jstestdriver.TestResult.RESULT.PASSED;
   var message = '';
   if (this.errors_.length) {
-    result = 'failed';
+    result = jstestdriver.TestResult.RESULT.FAILED;
     message = this.toJson_(this.errors_);
   } else if (jstestdriver.expectedAssertCount != -1 &&
              jstestdriver.expectedAssertCount != jstestdriver.assertCount) {
-    result = 'failed';
+    result = jstestdriver.TestResult.RESULT.FAILED;
     message = this.toJson_([new Error("Expected '" +
         jstestdriver.expectedAssertCount +
         "' asserts but '" +
