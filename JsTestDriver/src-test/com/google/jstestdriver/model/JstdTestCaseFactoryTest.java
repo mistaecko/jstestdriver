@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.hooks.JstdTestCaseProcessor;
 import com.google.jstestdriver.hooks.ResourceDependencyResolver;
+import com.google.jstestdriver.util.NullStopWatch;
 
 import junit.framework.TestCase;
 
@@ -36,7 +37,7 @@ public class JstdTestCaseFactoryTest extends TestCase {
     List<FileInfo> tests = Lists.newArrayList(testOne, testTwo, testThree);
     final JstdTestCaseFactory testCaseFactory = new JstdTestCaseFactory(
         Collections.<JstdTestCaseProcessor> emptySet(),
-        Collections.<ResourceDependencyResolver>emptySet());
+        Collections.<ResourceDependencyResolver>emptySet(), new NullStopWatch());
 
     List<JstdTestCase> testCases = testCaseFactory.createCases(
         Collections.<FileInfo>emptyList(), files, tests);
@@ -64,7 +65,7 @@ public class JstdTestCaseFactoryTest extends TestCase {
     final JstdTestCaseFactory testCaseFactory =
         new JstdTestCaseFactory(
             Collections.<JstdTestCaseProcessor> emptySet(),
-            Collections.<ResourceDependencyResolver>emptySet());
+            Collections.<ResourceDependencyResolver>emptySet(), new NullStopWatch());
 
     List<JstdTestCase> testCases =
         testCaseFactory.createCases(
@@ -95,7 +96,7 @@ public class JstdTestCaseFactoryTest extends TestCase {
     final JstdTestCaseFactory testCaseFactory =
       new JstdTestCaseFactory(
           Collections.<JstdTestCaseProcessor> emptySet(),
-          Collections.<ResourceDependencyResolver>emptySet());
+          Collections.<ResourceDependencyResolver>emptySet(), new NullStopWatch());
     
     List<JstdTestCase> testCases =
       testCaseFactory.createCases(
@@ -121,7 +122,7 @@ public class JstdTestCaseFactoryTest extends TestCase {
     List<FileInfo> tests = Lists.newArrayList(testOne, testTwo, testThree);
     final JstdTestCaseFactory testCaseFactory = new JstdTestCaseFactory(
         Collections.<JstdTestCaseProcessor> emptySet(),
-        Collections.<ResourceDependencyResolver>emptySet());
+        Collections.<ResourceDependencyResolver>emptySet(), new NullStopWatch());
 
     final List<JstdTestCase> testCases =
         testCaseFactory.createCases(Collections.<FileInfo>emptyList(), files, tests);

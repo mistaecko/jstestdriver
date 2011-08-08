@@ -22,6 +22,7 @@ import com.google.jstestdriver.Response;
 import com.google.jstestdriver.ResponseStream;
 import com.google.jstestdriver.hooks.JstdTestCaseProcessor;
 import com.google.jstestdriver.hooks.ResourceDependencyResolver;
+import com.google.jstestdriver.util.NullStopWatch;
 
 import junit.framework.TestCase;
 
@@ -31,10 +32,12 @@ import java.util.List;
 public class RunDataTest extends TestCase {
 
   private final class NoopStream implements ResponseStream {
+    @Override
     public void stream(Response response) {
 
     }
 
+    @Override
     public void finish() {
 
     }
@@ -74,7 +77,7 @@ public class RunDataTest extends TestCase {
     final JstdTestCaseFactory testCaseFactory =
         new JstdTestCaseFactory(
             Sets.<JstdTestCaseProcessor>newHashSet(),
-            Collections.<ResourceDependencyResolver>emptySet());
+            Collections.<ResourceDependencyResolver>emptySet(), new NullStopWatch());
     final List<JstdTestCase> testCases = testCaseFactory.createCases(
         Collections.<FileInfo>emptyList(),
         Lists.newArrayList(one),

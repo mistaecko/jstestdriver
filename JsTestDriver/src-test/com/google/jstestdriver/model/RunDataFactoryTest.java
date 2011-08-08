@@ -29,6 +29,7 @@ import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.hooks.ResourcePreProcessor;
 import com.google.jstestdriver.hooks.JstdTestCaseProcessor;
 import com.google.jstestdriver.hooks.ResourceDependencyResolver;
+import com.google.jstestdriver.util.NullStopWatch;
 
 /**
  * @author corbinrsmith@gmail.com (Cory Smith)
@@ -62,7 +63,7 @@ public class RunDataFactoryTest extends TestCase {
       Sets.newHashSet(preProcessor),
       Collections.<FileInfo>emptyList(), new JstdTestCaseFactory(
           Collections.<JstdTestCaseProcessor> emptySet(),
-          Collections.<ResourceDependencyResolver>emptySet()));
+          Collections.<ResourceDependencyResolver>emptySet(), new NullStopWatch()), new NullStopWatch());
     
     final List<FileInfo> actual = Lists.newArrayList(factory.get().getFileSet());
 

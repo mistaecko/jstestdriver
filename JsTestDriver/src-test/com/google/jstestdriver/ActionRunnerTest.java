@@ -59,7 +59,7 @@ public class ActionRunnerTest extends TestCase {
             Collections.<FileInfo>emptyList(),
             Collections.<ResourcePreProcessor>emptySet(),
             Collections.<FileInfo>emptyList(), new JstdTestCaseFactory(Collections.<JstdTestCaseProcessor>emptySet(),
-              Collections.<ResourceDependencyResolver>emptySet())));
+              Collections.<ResourceDependencyResolver>emptySet(), new NullStopWatch()), new NullStopWatch()));
 
     runner.runActions();
     assertTrue(action.actionRan());

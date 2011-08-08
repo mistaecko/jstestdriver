@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.hooks.JstdTestCaseProcessor;
 import com.google.jstestdriver.hooks.ResourceDependencyResolver;
+import com.google.jstestdriver.util.StopWatch;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,27 +22,31 @@ public class JstdTestCaseFactory {
 
   private final Set<JstdTestCaseProcessor> processors;
   private final Set<ResourceDependencyResolver> resolvers;
+  private final StopWatch stopWatch;
 
   @Inject
   public JstdTestCaseFactory(Set<JstdTestCaseProcessor> processors,
-                             Set<ResourceDependencyResolver> resolvers) {
+                             Set<ResourceDependencyResolver> resolvers,
+                             StopWatch stopWatch) {
     this.processors = processors;
     this.resolvers = resolvers;
+    this.stopWatch = stopWatch;
   }
 
   public List<JstdTestCase> createCases(
       List<FileInfo> plugins,
       List<FileInfo> deps,
       List<FileInfo> tests) {
-    final List<JstdTestCase> testCases = Lists.newArrayList();
-    if (!(deps.isEmpty() && tests.isEmpty())) {
-      testCases.add(
-          new JstdTestCase(
-              deps,
-              tests,
-              plugins));
+    stopWatch.start("Create TestCases");
+    try {
+      final List<JstdTestCase> testCases = Lists.newArrayList();
+      if (!(deps.isEmpty() && tests.isEmpty())) {
+        testCases.add(new JstdTestCase(deps, tests, plugins));
+      }
+      return processTestCases(resolveDependencies(testCases));
+    } finally {
+      stopWatch.stop("Create TestCases");
     }
-    return processTestCases(resolveDependencies(testCases));
   }
 
   private List<JstdTestCase> resolveDependencies(List<JstdTestCase> testCases) {
