@@ -28,9 +28,9 @@ import java.io.Writer;
 @ImplementedBy(NullStopWatch.class)
 public interface StopWatch {
 
-  public abstract void start(Object operation, Object... args);
+  public abstract void start(String operation, Object... args);
 
-  public abstract void stop(Object operation, Object... args);
+  public abstract void stop(String operation, Object... args);
 
   public abstract void print(Writer writer);
 
