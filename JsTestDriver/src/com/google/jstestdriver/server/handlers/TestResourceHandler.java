@@ -19,6 +19,9 @@ import com.google.inject.Inject;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -29,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
 class TestResourceHandler implements RequestHandler {
+  private static final Logger logger = LoggerFactory.getLogger(TestResourceHandler.class);
 
   private static final String TIME_IN_THE_PAST = "Sat, 22 Sep 1984 00:00:00 GMT";
 
@@ -46,22 +50,28 @@ class TestResourceHandler implements RequestHandler {
     this.filesCache = filesCache;
   }
 
+  @Override
   public void handleIt() throws IOException {
     response.setHeader("Pragma", "no-cache");
     response.setHeader("Cache-Control", "private, no-cache, no-store, max-age=0, must-revalidate");
     response.setHeader("Expires", TIME_IN_THE_PAST);
-    response.setHeader("Content-Type", "text/plain");
     service(request.getPathInfo().substring(1) /* remove the first / */, response.getWriter());
   }
 
-  public void service(String fileName, PrintWriter writer) {
-    String mimeType = parseMimeType(fileName);
-    if (mimeType != null) {
-      response.setContentType(mimeType);
+  public void service(String fileName, PrintWriter writer) throws IOException {
+    try {
+      String fileContent = filesCache.getFileContent(fileName);
+      String mimeType = parseMimeType(fileName);
+      if (mimeType != null) {
+        response.setContentType(mimeType);
+      } else {
+        response.setHeader("Content-Type", "text/plain");
+      }
+      writer.write(fileContent);
+      writer.flush();
+    } catch (FilesCache.MissingFileException e) {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
-    String data = filesCache.getFileContent(fileName);
-    writer.write(data);
-    writer.flush();
   }
 
   private String parseMimeType(String fileName) {

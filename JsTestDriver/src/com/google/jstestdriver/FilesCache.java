@@ -37,7 +37,10 @@ public class FilesCache {
 
   public synchronized String getFileContent(String fileName) {
     FileInfo info = files.get(fileName);
-    return info != null ? info.getData() : "";
+    if (info == null) {
+      throw new MissingFileException();
+    }
+    return info.getData();
   }
 
   public synchronized void clear() {
@@ -58,7 +61,6 @@ public class FilesCache {
   
   /**
    * Returns all files in order.
-   * @return
    */
   public synchronized Collection<FileInfo> getAllFileInfos() {
     return files.values();
@@ -67,5 +69,9 @@ public class FilesCache {
   @Override
   public String toString() {
     return "FilesCache [files=" + files + "]";
+  }
+  
+  public static class MissingFileException extends RuntimeException {
+    
   }
 }

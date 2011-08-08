@@ -232,12 +232,6 @@ class BrowserQueryResponseHandler implements RequestHandler {
       browser.addFiles(fileInfos, loadedFiles);
       if (errorFiles.size() > 0) {
         logger.debug("clearing fileset on browser errors:" + errorFiles);
-        try {
-          Thread.sleep(120000);
-        } catch (InterruptedException e) {
-          // TODO(corysmith): Auto-generated catch block
-          e.printStackTrace();
-        }
         browser.resetFileSet();
       }
     }

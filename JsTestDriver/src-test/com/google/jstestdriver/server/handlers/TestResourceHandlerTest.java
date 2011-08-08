@@ -38,11 +38,14 @@ public class TestResourceHandlerTest extends TestCase {
   private PrintWriter writer = new PrintWriter(out);
 
   public void testEmptyReturnWhenFileNotPresent() throws Exception {
+    HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
+    response.sendError(404);
+    EasyMock.expectLastCall().anyTimes();
+    EasyMock.replay(response);
     TestResourceHandler handler =
-        new TestResourceHandler(null, null, new FilesCache(new HashMap<String, FileInfo>()));
+        new TestResourceHandler(null, response, new FilesCache(new HashMap<String, FileInfo>()));
 
     handler.service("nothing", writer);
-    assertEquals(0, out.toString().length());
   }
 
   public void testServeFile() throws Exception {
