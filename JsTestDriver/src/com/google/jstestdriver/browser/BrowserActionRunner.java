@@ -43,30 +43,33 @@ public class BrowserActionRunner implements Callable<Collection<ResponseStream>>
 
   private final StopWatch stopWatch;
 
-  private final JstdTestCase testCase;
+  private final List<JstdTestCase> testCases;
 
   // TODO(corysmith): enable session manager.
   private final BrowserSessionManager sessionManager;
 
   public BrowserActionRunner(String id, JsTestDriverClient client, List<BrowserAction> actions,
-      StopWatch stopWatch, JstdTestCase testCase, BrowserSessionManager sessionManager) {
+      StopWatch stopWatch, List<JstdTestCase> testCases, BrowserSessionManager sessionManager) {
     this.id = id;
     this.client = client;
     this.actions = actions;
     this.stopWatch = stopWatch;
-    this.testCase = testCase;
+    this.testCases = testCases;
     this.sessionManager = sessionManager;
   }
 
+  @Override
   public Collection<ResponseStream> call() {
     Collection<ResponseStream> responses = Lists.newArrayList();
     String sessionId = sessionManager.startSession(id);
     logger.debug("start session on {} with id {}", id, sessionId);
-    for (BrowserAction action : actions) {
-      stopWatch.start("run %s", action);
-      logger.debug("Running BrowserAction {}", action);
-      responses.add(action.run(id, client, null, testCase));
-      stopWatch.stop("run %s", action);
+    for (JstdTestCase testCase : testCases) {
+      for (BrowserAction action : actions) {
+        stopWatch.start("run %s", action);
+        logger.debug("Running BrowserAction {} with {}", action, testCase);
+        responses.add(action.run(id, client, null, testCase));
+        stopWatch.stop("run %s", action);
+      }
     }
     logger.debug("stopping session on {} with id {}", id, sessionId);
     sessionManager.stopSession(sessionId, id);

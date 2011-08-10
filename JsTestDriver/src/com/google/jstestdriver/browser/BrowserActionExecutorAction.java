@@ -25,7 +25,6 @@ import com.google.jstestdriver.JsTestDriverClient;
 import com.google.jstestdriver.ResponseStream;
 import com.google.jstestdriver.RunTestsAction;
 import com.google.jstestdriver.TestErrors;
-import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.model.RunData;
 import com.google.jstestdriver.util.RetryingCallable;
 import com.google.jstestdriver.util.StopWatch;
@@ -81,6 +80,7 @@ public class BrowserActionExecutorAction implements Action {
     this.sessionManager = sessionManager;
   }
 
+  @Override
   public RunData run(RunData runData) {
     stopWatch.start("run %s", actions);
     logger.trace("Starting BrowserActions {}.", actions);
@@ -93,23 +93,27 @@ public class BrowserActionExecutorAction implements Action {
     // TODO(corysmith): Change the threaded action runner to
     // return useful information about a run.
     List<Callable<Collection<ResponseStream>>> runners = Lists.newLinkedList();
-    for (JstdTestCase testCase : runData.getTestCases()) {
-      for (BrowserInfo browserInfo : browsers) {
-        runners.add(new BrowserActionRunner(browserInfo.getId().toString(),
+    for (BrowserInfo browserInfo : browsers) {
+      runners.add(new BrowserActionRunner(browserInfo.getId().toString(),
+          client,
+          actions,
+          stopWatch,
+          runData.getTestCases(),
+          sessionManager));
+      logger.debug("Queueing BrowserActionRunner {} for {}.", actions, browserInfo);
+    }
+    for (BrowserRunner runner : browserRunners) {
+      String browserId = client.getNextBrowserId();
+      final BrowserActionRunner actionRunner =
+          new BrowserActionRunner(
+            browserId,
             client,
             actions,
             stopWatch,
-            testCase,
-            sessionManager));
-        logger.debug("Queueing BrowserActionRunner {} for {}.", actions, browserInfo);
-      }
-      for (BrowserRunner runner : browserRunners) {
-        String browserId = client.getNextBrowserId();
-        final BrowserActionRunner actionRunner =
-          new BrowserActionRunner(browserId, client, actions, stopWatch, testCase, sessionManager);
-        runners.add(createBrowserManagedRunner(runData, runner, browserId, actionRunner));
-        logger.debug("Queueing BrowserActionRunner {} for {}.", actions, runner);
-      }
+            runData.getTestCases(),
+            sessionManager);
+      runners.add(createBrowserManagedRunner(runData, runner, browserId, actionRunner));
+      logger.debug("Queueing BrowserActionRunner {} for {}.", actions, runner);
     }
     List<Throwable> exceptions = Lists.newLinkedList();
     long currentTimeout = testSuiteTimeout;
