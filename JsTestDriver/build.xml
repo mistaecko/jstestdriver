@@ -548,6 +548,33 @@
     </jar>
   </target>
 
+  <target name="testisolation-plugin-jar-nodeps" depends="jar">
+    <mkdir dir="${bin.dir}/plugins/" />
+    <jar destfile="${bin.dir}/plugins/testisolation.jar" duplicate="preserve">
+      <fileset dir="${obj.dir}">
+        <include name="**/testisolation/**" />
+      </fileset>
+      <manifest>
+        <!-- plugins will need to have a reference to the JsTestDriver jar they are working with.-->
+        <attribute name="Class-Path" value="../JsTestDriver.jar" />
+        <section name="jstd">
+          <attribute name="plugin-initializer"
+              value="com.google.jstestdriver.plugins.testisolation.TestIsolationInitializer" />
+        </section>
+      </manifest>
+    </jar>
+    <jar destfile="${bin.dir}/testisolation-src.jar" duplicate="preserve">
+      <fileset dir="${src.dir}">
+        <include name="**/testisolation/**" />
+      </fileset>
+      <fileset dir="${src-gen.dir}">
+        <include name="**/testisolation/**" />
+      </fileset>
+      <manifest>
+      </manifest>
+     </jar>
+  </target>
+
   <target name="token-jar-nodeps" depends="jar-nodeps">
     <mkdir dir="${bin.dir}" />
     <jar destfile="${bin.dir}/token-nodeps.jar" duplicate="preserve">
@@ -569,7 +596,7 @@
     </jar>
   </target>
 
-  <target name="jar-all-src-nodeps" depends="coverage-plugin-jar-nodeps, token-jar-nodeps, jar-nodeps, src-jar, export-js">
+  <target name="jar-all-src-nodeps" depends="coverage-plugin-jar-nodeps, token-jar-nodeps, jar-nodeps, testisolation-plugin-jar-nodeps, src-jar, export-js">
   </target>
 
   <target name="checkNoLocalChanges">
@@ -609,6 +636,7 @@
     <gcupload labels="Featured, Type-Source" filename="${bin.dir}/${ant.project.name}-src.jar" targetfilename="${ant.project.name}-${release.id}-src.jar" username="${googlecode.username}" password="${googlecode.password}" projectname="js-test-driver" summary="Source code" />
     <gcupload labels="Featured, Type-Executable" filename="${bin.dir}/plugins/coverage.jar" targetfilename="coverage-${release.id}.jar" username="${googlecode.username}" password="${googlecode.password}" projectname="js-test-driver" summary="Coverage Plugin" />
     <gcupload labels="Featured, Type-Archive" filename="${bin.dir}/plugins/coverage-nodeps.jar" targetfilename="coverage-nodeps-${release.id}.jar" username="${googlecode.username}" password="${googlecode.password}" projectname="js-test-driver" summary="Coverage Plugin without bundled dependencies" />
+    <gcupload labels="Featured, Type-Archive" filename="${bin.dir}/plugins/testisolation-nodeps.jar" targetfilename="testisolation-nodeps-${release.id}.jar" username="${googlecode.username}" password="${googlecode.password}" projectname="js-test-driver" summary="Coverage Plugin without bundled dependencies" />
     <echo message="Release has been deployed. You should now remove the 'featured' label from the previous release on the googlecode site." />
   </target>
 

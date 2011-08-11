@@ -41,17 +41,17 @@ jstestdriver.ResetCommand = function(location, signal, now) {
   this.now_ = now;
 };
 
-jstestdriver.ResetCommand.prototype.reset = function() {
+/**
+ * @param {string} method of loading: "load" or "preload", default: "preload"
+ */
+jstestdriver.ResetCommand.prototype.reset = function(loadType) {
   this.signal_.set(true);
-  if (this.location_.href.search('\\?refresh') != -1) {
-    jstestdriver.log("Reloading " + this.location_.href)
-    this.location_.reload();
-  } else {
-    
-    var newUrl = this.location_.protocol + "//" + 
-                 this.location_.host + 
-                 this.location_.pathname +  '?refresh=' + this.now_();
-    jstestdriver.log("Replacing " + newUrl)
-    this.location_.replace(newUrl);
-  }
+  loadType = loadType ? loadType : 'preload';
+  var newUrl = this.location_.protocol + "//" + 
+               this.location_.host + 
+               this.location_.pathname +
+               '?refresh=' + this.now_() +
+               '&type=' + loadType;
+  jstestdriver.log("Replacing " + newUrl)
+  this.location_.replace(newUrl);
 };

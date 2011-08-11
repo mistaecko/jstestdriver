@@ -252,7 +252,7 @@ public class FileUploader {
 
   private void reset(String browserId, ResponseStream stream) {
     stopWatch.start("reset %s", browserId);
-    JsonCommand cmd = new JsonCommand(CommandType.RESET, Collections.<String>emptyList());
+    JsonCommand cmd = new JsonCommand(CommandType.RESET, Lists.newArrayList("load"));
     Map<String, String> resetParams = new LinkedHashMap<String, String>();
 
     resetParams.put("id", browserId);

@@ -49,6 +49,7 @@ import com.google.jstestdriver.model.ConcretePathPrefix;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.output.TestResultListener;
+import com.google.jstestdriver.plugins.testisolation.TestIsolationInitializer;
 import com.google.jstestdriver.runner.RunnerMode;
 import com.google.jstestdriver.util.RetryException;
 

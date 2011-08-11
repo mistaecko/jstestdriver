@@ -51,7 +51,9 @@ public class RunnerPage implements Page {
           "        jstestdriver.now,\n" +
           "        jstestdriver.setTimeout));");
 
-    testFileUtil.writeTestFiles(writer);
+    if (!"load".equals(request.getParameter("type"))) {
+      testFileUtil.writeTestFiles(writer);
+    }
 
     writer.writeScript("jstestdriver.jQuery(window).load(function(){jstestdriver.runner.listen(" +
         "jstestdriver.manualResourceTracker.getResults());});");

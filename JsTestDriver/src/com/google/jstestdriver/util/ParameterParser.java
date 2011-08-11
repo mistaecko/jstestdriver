@@ -20,6 +20,9 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -31,6 +34,7 @@ import com.google.inject.Inject;
  */
 public class ParameterParser {
   private final HttpServletRequest request;
+  private static final Logger logger = LoggerFactory.getLogger(ParameterParser.class);
 
   @Inject
   public ParameterParser(HttpServletRequest request) {
@@ -57,7 +61,7 @@ public class ParameterParser {
         i += parameters.get(component); // increment that number of arguments
         parsedParameterMap.put(component, safeArrayValue(i, components));
       } else if (!blacklist.contains(component) && !component.isEmpty()) {
-        throw new RuntimeException("Unknown argument: " + component + " in " + path);
+        logger.error("Unknown argument: " + component + " in " + path);
       }
     }
     return parsedParameterMap;

@@ -123,4 +123,11 @@ public class SlavePageRequest {
   public String toString() {
     return "SlavePageRequest [parameters=" + parameters + "]";
   }
+
+  /**
+   * @param string
+   */
+  public String getParameter(String key) {
+    return parameters.get(key);
+  }
 }
