@@ -45,6 +45,7 @@ goog.require('jstestdriver.plugins.async.CallbackPoolArmor');
 goog.require('jstestdriver.plugins.async.DeferredQueue');
 goog.require('jstestdriver.plugins.async.DeferredQueueArmor');
 goog.require('jstestdriver.plugins.async.TestStage');
+goog.require('jstestdriver.plugins.async.TestStage.Builder');
 
 /**
  * Constructs an AsyncTestRunnerPlugin.
@@ -85,18 +86,22 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin = function(dateObj, clearBody,
 /**
  * Runs a test case.
  *
- * @param testRunConfiguration the test case configuration
- * @param onTestDone the function to call to report a test is complete
- * @param onTestRunConfigurationComplete the function to call to report a test
- * case is complete 
+ * @param {jstestdriver.TestRunConfiguration} testRunConfiguration the test 
+ *        case configuration
+ * @param {function(jstestdriver.TestResult)} onTestDone the function to call to 
+ *        report a test is complete
+ * @param {function()=} opt_onTestRunConfigurationComplete the function to call 
+ *        to report a test case is complete. A no-op will be used if this is
+ *        not specified.
  */
 jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.runTestConfiguration = function(
-    testRunConfiguration, onTestDone, onTestRunConfigurationComplete) {
+    testRunConfiguration, onTestDone, opt_onTestRunConfigurationComplete) {
   if (testRunConfiguration.getTestCaseInfo().getType() == jstestdriver.TestCaseInfo.ASYNC_TYPE) {
     this.testRunConfiguration_ = testRunConfiguration;
     this.testCaseInfo_ = testRunConfiguration.getTestCaseInfo();
     this.onTestDone_ = onTestDone;
-    this.onTestRunConfigurationComplete_ = onTestRunConfigurationComplete;
+    this.onTestRunConfigurationComplete_ = opt_onTestRunConfigurationComplete ||
+        function() {};
     this.testIndex_ = 0;
     this.nextTest();
     return true;
@@ -146,10 +151,17 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.execute_ = function(
     onStageComplete, invokeMethod) {
   var runner = this;
   var onError = function(error) {runner.errors_.push(error);};
-  var stage = new jstestdriver.plugins.async.TestStage(
-      onError, onStageComplete, this.testCase_, invokeMethod, null,
-      this.pauseForHuman_, this.armorConstructor_, this.queueConstructor_,
-      this.setTimeout_);
+  var stage = new jstestdriver.plugins.async.TestStage.Builder().
+      setOnError(onError).
+      setOnStageComplete(onStageComplete).
+      setTestCase(this.testCase_).
+      setTestMethod(invokeMethod).
+      setPauseForHuman(this.pauseForHuman_).
+      setArmorConstructor(this.armorConstructor_).
+      setQueueConstructor(this.queueConstructor_).
+      setTimeoutSetter(this.setTimeout_).
+      setToJson(this.toJson_).
+      build();
   stage.execute();
 };
 

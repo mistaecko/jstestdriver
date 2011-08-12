@@ -28,9 +28,11 @@ goog.require('jstestdriver');
 
 /**
  * Constructs a DeferredQueueArmor.
+ * @param {function(Object)} toJson a function to convert objects to JSON.
  * @constructor
  */
-jstestdriver.plugins.async.DeferredQueueArmor = function() {
+jstestdriver.plugins.async.DeferredQueueArmor = function(toJson) {
+  this.toJson_ = toJson;
   this.q_ = null;
   this.step_ = 1;
 };
