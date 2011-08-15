@@ -231,7 +231,7 @@ public class SlaveBrowser {
     if (isLast) {
       commandRunning.set(null);
     }
-    LOGGER.debug("adding response type {}", response.getResponseType());
+    LOGGER.debug("adding response type {} done: {}", response.getResponseType(), isLast);
     responses.offer(new StreamMessage(isLast, response));
   }
 

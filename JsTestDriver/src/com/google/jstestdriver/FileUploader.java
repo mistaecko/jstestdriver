@@ -37,6 +37,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.google.jstestdriver.JsonCommand.CommandType;
+import com.google.jstestdriver.Response.ResponseType;
 import com.google.jstestdriver.browser.BrowserFileSet;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
@@ -234,10 +235,12 @@ public class FileUploader {
         logger.trace("LOADTEST response for {}", response);
         stream.stream(response);
         if (message.isLast()) {
+          logger.debug("Finished LOADTEST on {} with {}", browserId, response.getResponseType());
           break;
         }
       }
     }
+    
   }
 
   public void uploadToServer(final List<FileInfo> loadedFiles) {
@@ -260,10 +263,14 @@ public class FileUploader {
     server.post(baseUrl + "/cmd", resetParams);
 
     logger.debug("Starting File Upload Refresh for {}", browserId);
-    String jsonResponse = server.fetch(baseUrl + "/cmd?id=" + browserId);
-    StreamMessage message = gson.fromJson(jsonResponse, StreamMessage.class);
-    Response response = message.getResponse();
-    stream.stream(response);
+    Response response;
+    StreamMessage message;
+    do {
+      String jsonResponse = server.fetch(baseUrl + "/cmd?id=" + browserId);
+      message = gson.fromJson(jsonResponse, StreamMessage.class);
+      response = message.getResponse();
+      stream.stream(response);
+    } while(!(ResponseType.RESET_RESULT.equals(response.getResponseType()) && message.isLast()));
     logger.debug("Finished File Upload Refresh for {}", browserId);
     stopWatch.stop("reset %s", browserId);
   }
