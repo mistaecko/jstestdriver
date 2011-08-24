@@ -4,8 +4,8 @@ package com.google.jstestdriver.server.handlers;
 import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.google.jstestdriver.annotations.ResponseWriter;
+import com.google.jstestdriver.requesthandlers.GatewayConfiguration;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
-import com.google.jstestdriver.requesthandlers.ProxyConfiguration;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
 
 import org.slf4j.Logger;
@@ -20,46 +20,43 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * A {@link RequestHandler} that reads a JSON configuration to update the
- * internal {@link ProxyConfiguration}.
+ * internal {@link GatewayConfiguration}.
  * @author rdionne@google.com (Robert Dionne)
  */
-public class ProxyConfigurationHandler implements RequestHandler {
+public class GatewayConfigurationHandler implements RequestHandler {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(ProxyConfigurationHandler.class);
+      LoggerFactory.getLogger(GatewayConfigurationHandler.class);
 
   private final HttpMethod method;
   private final HttpServletRequest request;
-  private final HttpServletResponse response;
   private final PrintWriter responseWriter;
   private final JsonParser parser;
-  private final ProxyConfiguration proxyConfiguration;
+  private final GatewayConfiguration gatewayConfiguration;
 
   @Inject
-  public ProxyConfigurationHandler(
+  public GatewayConfigurationHandler(
       HttpMethod method,
       HttpServletRequest request,
-      HttpServletResponse response,
       @ResponseWriter PrintWriter responseWriter,
       JsonParser parser,
-      ProxyConfiguration proxyConfiguration) {
+      GatewayConfiguration gatewayConfiguration) {
     this.method = method;
     this.request = request;
-    this.response = response;
     this.responseWriter = responseWriter;
     this.parser = parser;
-    this.proxyConfiguration = proxyConfiguration;
+    this.gatewayConfiguration = gatewayConfiguration;
   }
 
   public void handleIt() throws IOException {
     if (method.equals(HttpMethod.GET)) {
-      responseWriter.println(proxyConfiguration.getProxyConfig());
+      responseWriter.println(gatewayConfiguration.getGatewayConfig());
     } else {
       try {
-        proxyConfiguration.updateConfiguration(
+        gatewayConfiguration.updateConfiguration(
             parser.parse(request.getReader()).getAsJsonArray());
       } catch (ServletException e) {
-        logger.error("Error configuring proxy {}", e);
+        logger.error("Error configuring gateway {}", e);
       }
     }
   }

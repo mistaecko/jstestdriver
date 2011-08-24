@@ -54,7 +54,7 @@ public class YamlParser implements ConfigurationParser {
     File basePath = defaultBasePath;
     long timeOut = 0;
     List<Plugin> plugins = Lists.newLinkedList();
-    JsonArray proxyConfig = new JsonArray();
+    JsonArray gatewayConfig = new JsonArray();
 
     if (data.containsKey("load")) {
       resolvedFilesLoad.addAll(createFileInfos((List<String>) data
@@ -101,7 +101,16 @@ public class YamlParser implements ConfigurationParser {
         JsonObject entry = new JsonObject();
         entry.addProperty("matcher", value.get("matcher"));
         entry.addProperty("server", value.get("server"));
-        proxyConfig.add(entry);
+        gatewayConfig.add(entry);
+      }
+    }
+    if (data.containsKey("gateway")) {
+      for (Map<String, String> value :
+          (List<Map<String, String>>) data.get("gateway")) {
+        JsonObject entry = new JsonObject();
+        entry.addProperty("matcher", value.get("matcher"));
+        entry.addProperty("server", value.get("server"));
+        gatewayConfig.add(entry);
       }
     }
 
@@ -112,7 +121,7 @@ public class YamlParser implements ConfigurationParser {
                                    timeOut,
                                    basePath,
                                    Lists.newArrayList(testFiles),
-                                   proxyConfig,
+                                   gatewayConfig,
                                    doctype);
   }
 

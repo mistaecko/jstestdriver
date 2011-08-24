@@ -28,7 +28,7 @@ class RequestDispatcher {
   private final HttpServletResponse response;
   private final List<RequestMatcher> matchers;
   private final Map<RequestMatcher, Provider<RequestHandler>> handlerProviders;
-  private ProxyConfiguration proxyConfiguration;
+  private GatewayConfiguration gatewayConfiguration;
   private final UnsupportedMethodErrorSender errorSender;
 
   @Inject
@@ -37,13 +37,13 @@ class RequestDispatcher {
       HttpServletResponse response,
       List<RequestMatcher> matchers,
       Map<RequestMatcher, Provider<RequestHandler>> handlerProviders,
-      ProxyConfiguration proxyConfiguration,
+      GatewayConfiguration gatewayConfiguration,
       UnsupportedMethodErrorSender errorSender) {
     this.request = request;
     this.response = response;
     this.matchers = matchers;
     this.handlerProviders = handlerProviders;
-    this.proxyConfiguration = proxyConfiguration;
+    this.gatewayConfiguration = gatewayConfiguration;
     this.errorSender = errorSender;
   }
 
@@ -70,12 +70,12 @@ class RequestDispatcher {
           }
         }
       }
-      for (RequestMatcher matcher : proxyConfiguration.getMatchers()) {
+      for (RequestMatcher matcher : gatewayConfiguration.getMatchers()) {
         if (matcher.uriMatches(uri)) {
           pathMatched = true;
           if (matcher.methodMatches(method)) {
-            logger.trace("proxying {} {}", uri, request);
-            proxyConfiguration.getRequestHandler(matcher).handleIt();
+            logger.trace("gatewaying {} {}", uri, request);
+            gatewayConfiguration.getRequestHandler(matcher).handleIt();
             return;
           }
         }

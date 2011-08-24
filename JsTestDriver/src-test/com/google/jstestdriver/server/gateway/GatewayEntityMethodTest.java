@@ -1,5 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
-package com.google.jstestdriver.server.proxy;
+package com.google.jstestdriver.server.gateway;
 
 import junit.framework.TestCase;
 

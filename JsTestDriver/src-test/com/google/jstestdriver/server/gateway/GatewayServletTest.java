@@ -1,5 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
-package com.google.jstestdriver.server.proxy;
+package com.google.jstestdriver.server.gateway;
 
 import static org.easymock.EasyMock.expect;
 
@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -32,8 +31,7 @@ public class GatewayServletTest extends TestCase {
 
   private IMocksControl control;
   private HttpClient client;
-  private GatewayServlet gateway;
-  private ServletConfig config;
+  private GatewayRequestHandler gateway;
   private HttpServletRequest request;
   private HttpServletResponse response;
 
@@ -41,10 +39,9 @@ public class GatewayServletTest extends TestCase {
   protected void setUp() throws Exception {
     control = EasyMock.createControl();
     client = control.createMock(HttpClient.class);
-    gateway = new GatewayServlet(client);
-    config = control.createMock(ServletConfig.class);
     request = control.createMock(HttpServletRequest.class);
     response = control.createMock(HttpServletResponse.class);
+    gateway = new GatewayRequestHandler(client, request, response, "http://hostname:80", null);
   }
 
   @Override
@@ -53,8 +50,6 @@ public class GatewayServletTest extends TestCase {
   }
 
   public void testService_GET() throws Exception {
-    expect(config.getInitParameter("ProxyTo")).andStubReturn("http://hostname:80");
-    expect(config.getInitParameter("Prefix")).andStubReturn(null);
     expect(request.getMethod()).andStubReturn("GET");
     expect(request.getRequestURI()).andStubReturn("/relativeUri");
     expect(request.getHeaderNames()).andStubReturn(
@@ -76,8 +71,7 @@ public class GatewayServletTest extends TestCase {
     };
     expect(response.getOutputStream()).andStubReturn(out);
     control.replay();
-    gateway.init(config);
-    gateway.service(request, response);
+    gateway.handleIt();
     assertEquals("GET", methodCapture.getValue().getName());
     assertEquals("http://hostname/relativeUri?id=123", methodCapture.getValue().getURI().toString());
     assertEquals("hostname:80", methodCapture.getValue().getRequestHeader("Host").getValue());
@@ -86,8 +80,6 @@ public class GatewayServletTest extends TestCase {
   }
 
   public void testService_POST() throws Exception {
-    expect(config.getInitParameter("ProxyTo")).andStubReturn("http://hostname:80");
-    expect(config.getInitParameter("Prefix")).andStubReturn(null);
     expect(request.getMethod()).andStubReturn("POST");
     expect(request.getRequestURI()).andStubReturn("/relativeUri");
     final ByteArrayInputStream input = new ByteArrayInputStream("ASDF".getBytes());
@@ -117,8 +109,7 @@ public class GatewayServletTest extends TestCase {
     };
     expect(response.getOutputStream()).andStubReturn(out);
     control.replay();
-    gateway.init(config);
-    gateway.service(request, response);
+    gateway.handleIt();
     ByteArrayOutputStream requestBody = new ByteArrayOutputStream();
     ((EntityEnclosingMethod) methodCapture.getValue()).getRequestEntity().writeRequest(requestBody);
     assertEquals("POST", methodCapture.getValue().getName());

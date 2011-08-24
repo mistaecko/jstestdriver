@@ -1,9 +1,10 @@
 // Copyright 2011 Google, Inc. All Rights Reserved.
-package com.google.jstestdriver.server.proxy;
+package com.google.jstestdriver.server.gateway;
 
 import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
-
+import com.google.jstestdriver.requesthandlers.RequestHandler;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -15,15 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Enumeration;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.util.Enumeration;
 
 
 /**
@@ -33,53 +27,48 @@ import java.util.Enumeration;
  * TODO(rdionne): Implement HOST header and 302 redirect host substitution.
  * @author rdionne@google.com (Robert Dionne)
  */
-public class GatewayServlet extends JstdProxyServlet {
+public class GatewayRequestHandler implements RequestHandler {
+
+  public interface Factory {
+    GatewayRequestHandler create(
+        @Assisted("destination") String destination, @Assisted("prefix") String prefix);
+  }
 
   private static final String HOST = "Host";
   private static final String LOCATION = "Location";
-  private static final String DESTROY_NOT_SUPPORTED = "#destroy() not supported.";
-  private static final String GET_SERLVET_CONFIG_NOT_SUPPORTED =
-      "#getSerlvetConfig() not supported.";
-  private static final String GET_SERVLET_INFO_NOT_SUPPORTED = "#getServletInfo() not supported.";
   private static final String REQUEST_URI_DOES_NOT_START_WITH_PREFIX =
       "Request URI '%s' does not start with prefix '%s'.";
 
   private final HttpClient client;
-  private String proxyTo;
-  private String prefix;
+  private final HttpServletRequest request;
+  private final HttpServletResponse response;
+  private final String destination;
+  private final String prefix;
 
   @Inject
-  public GatewayServlet(final HttpClient client) {
+  public GatewayRequestHandler(
+      final HttpClient client, final HttpServletRequest req, final HttpServletResponse res,
+      @Assisted("destination") String destination, @Assisted("prefix") String prefix) {
     this.client = client;
+    this.request = req;
+    this.response = res;
+    this.destination = destination;
+    this.prefix = prefix;
   }
 
   @Override
-  public void init(final ServletConfig servletConfig) throws ServletException {
-    proxyTo = servletConfig.getInitParameter(ProxyServletConfig.PROXY_TO);
-    prefix = servletConfig.getInitParameter(ProxyServletConfig.PREFIX);
-  }
-
-  @Override
-  public ServletConfig getServletConfig() {
-    throw new UnsupportedOperationException(GET_SERLVET_CONFIG_NOT_SUPPORTED);
-  }
-
-  @Override
-  public void service(final ServletRequest req, final ServletResponse res)
-        throws ServletException, IOException {
-    final HttpServletRequest request = (HttpServletRequest) req;
+  public void handleIt() throws IOException {
     final HttpMethodBase method = getMethod(request);
     addRequestHeaders(method, request);
     method.setQueryString(request.getQueryString());
     spoofHostHeader(method);
     final int statusCode = client.executeMethod(method);
-    final HttpServletResponse response = (HttpServletResponse) res;
     response.setStatus(statusCode);
     addResponseHeaders(method, response);
     if (isRedirect(statusCode)) {
       spoofLocationHeader(request, (Response) response);
     }
-    // TODO(rdionne): Substitute the JsTD server address for the proxyTo address in any redirects.
+    // TODO(rdionne): Substitute the JsTD server address for the destination address in any redirects.
     Streams.copy(method.getResponseBodyAsStream(), response.getOutputStream());
     method.releaseConnection();
   }
@@ -92,7 +81,7 @@ public class GatewayServlet extends JstdProxyServlet {
       throw new RuntimeException(
           String.format(REQUEST_URI_DOES_NOT_START_WITH_PREFIX, uri, prefix));
     }
-    String url = prefix == null ? proxyTo + uri : proxyTo + uri.substring(prefix.length());
+    String url = prefix == null ? destination + uri : destination + uri.substring(prefix.length());
     switch (method) {
       case POST:
       case PUT:
@@ -116,7 +105,7 @@ public class GatewayServlet extends JstdProxyServlet {
   }
 
   private void spoofHostHeader(HttpMethodBase method) {
-    method.setRequestHeader(HOST, parseUri(proxyTo).getAuthority());
+    method.setRequestHeader(HOST, parseUri(destination).getAuthority());
   }
 
   private URI parseUri(String uri) {
@@ -149,12 +138,12 @@ public class GatewayServlet extends JstdProxyServlet {
     URI location = parseUri(response.getHeader(LOCATION));
     String host = request.getServerName();
     int port = request.getServerPort();
-    URI proxyTo = parseUri(this.proxyTo);
-    if (location.getHost() == null || !location.getHost().equals(proxyTo.getHost())) {
+    URI destination = parseUri(this.destination);
+    if (location.getHost() == null || !location.getHost().equals(destination.getHost())) {
       return;
     }
-    if (location.getPort() == proxyTo.getPort()
-        || location.getPort() == -1 && (proxyTo.getPort() == 80 || proxyTo.getPort() == 443)) {
+    if (location.getPort() == destination.getPort()
+        || location.getPort() == -1 && (destination.getPort() == 80 || destination.getPort() == 443)) {
       response.setHeader(LOCATION,
           buildLocationHeader(location, host, port));
     }
@@ -171,15 +160,5 @@ public class GatewayServlet extends JstdProxyServlet {
     } catch (URISyntaxException badUriSyntax) {
       throw new RuntimeException(badUriSyntax);
     }
-  }
-
-  @Override
-  public String getServletInfo() {
-    throw new UnsupportedOperationException(GET_SERVLET_INFO_NOT_SUPPORTED);
-  }
-
-  @Override
-  public void destroy() {
-    throw new UnsupportedOperationException(DESTROY_NOT_SUPPORTED);
   }
 }

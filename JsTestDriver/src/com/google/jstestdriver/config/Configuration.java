@@ -59,7 +59,7 @@ public interface Configuration {
    */
   public File getBasePath();
 
-  JsonArray getProxyConfiguration();
+  JsonArray getGatewayConfiguration();
 
   /**
    * Provides the expected doctype for the test environment.

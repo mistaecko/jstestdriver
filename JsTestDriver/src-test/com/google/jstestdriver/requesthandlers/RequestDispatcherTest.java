@@ -33,7 +33,7 @@ public class RequestDispatcherTest extends TestCase {
   private RequestHandler handlerOne;
   private RequestHandler handlerTwo;
 
-  private ProxyConfiguration proxyConfiguration;
+  private GatewayConfiguration gatewayConfiguration;
 
   private UnsupportedMethodErrorSender sender;
   
@@ -52,7 +52,7 @@ public class RequestDispatcherTest extends TestCase {
     handlerOne = control.createMock(RequestHandler.class);
     handlerTwo = control.createMock(RequestHandler.class);
 
-    proxyConfiguration = control.createMock(ProxyConfiguration.class);
+    gatewayConfiguration = control.createMock(GatewayConfiguration.class);
 
     sender = control.createMock(UnsupportedMethodErrorSender.class);
     
@@ -63,7 +63,7 @@ public class RequestDispatcherTest extends TestCase {
         ImmutableMap.of(
             one, Providers.of(handlerOne),
             two, Providers.of(handlerTwo)),
-        proxyConfiguration,
+        gatewayConfiguration,
         sender);
   }
 
@@ -94,7 +94,7 @@ public class RequestDispatcherTest extends TestCase {
   public void testDispatch_POST_methodNotAllowed() throws Exception {
     expect(request.getMethod()).andReturn("POST");
     expect(request.getRequestURI()).andReturn("/one/two").anyTimes();
-    expect(proxyConfiguration.getMatchers())
+    expect(gatewayConfiguration.getMatchers())
         .andReturn(ImmutableList.<RequestMatcher>of());
     /*expect*/ sender.methodNotAllowed();
 
@@ -108,7 +108,7 @@ public class RequestDispatcherTest extends TestCase {
   public void testDispatch_GET_methodNotAllowed() throws Exception {
     expect(request.getMethod()).andReturn("GET");
     expect(request.getRequestURI()).andReturn("/a/b").anyTimes();
-    expect(proxyConfiguration.getMatchers())
+    expect(gatewayConfiguration.getMatchers())
         .andReturn(ImmutableList.<RequestMatcher>of());
     /*expect*/ sender.methodNotAllowed();
 
@@ -133,7 +133,7 @@ public class RequestDispatcherTest extends TestCase {
   public void testDispatch_GET_notFound() throws Exception {
     expect(request.getMethod()).andReturn("GET");
     expect(request.getRequestURI()).andReturn("/nothing").anyTimes();
-    expect(proxyConfiguration.getMatchers())
+    expect(gatewayConfiguration.getMatchers())
         .andReturn(ImmutableList.<RequestMatcher>of());
     /*expect*/ response.sendError(eq(HttpServletResponse.SC_NOT_FOUND), (String) anyObject());
 

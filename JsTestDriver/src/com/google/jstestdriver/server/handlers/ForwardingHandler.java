@@ -17,9 +17,6 @@ import javax.servlet.http.HttpServletResponse;
  * to the {@link ForwardingMapper} mappings between referrer and destination.
  * Relies upon {@link ForwardingServlet} for this logic.
  *
- * TODO(rdionne): Learn what uses the behavior of the ForwardingServlet and
- * deduplicate with the ProxyRequestHandler.
- *
  * @author rdionne@google.com (Robert Dionne)
  */
 class ForwardingHandler implements RequestHandler {

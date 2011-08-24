@@ -36,7 +36,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryProvider;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
-import com.google.jstestdriver.action.ConfigureProxyAction;
+import com.google.jstestdriver.action.ConfigureGatewayAction;
 import com.google.jstestdriver.annotations.BrowserCount;
 import com.google.jstestdriver.browser.BrowserRunner;
 import com.google.jstestdriver.config.DefaultConfiguration;
@@ -62,7 +62,7 @@ public class JsTestDriverModule extends AbstractModule {
   private final long testSuiteTimeout;
   private final List<FileInfo> tests;
   private final List<FileInfo> plugins;
-  private final JsonArray proxyConfig;
+  private final JsonArray gatewayConfig;
 
   public JsTestDriverModule(Flags flags,
       Set<FileInfo> fileSet,
@@ -88,7 +88,7 @@ public class JsTestDriverModule extends AbstractModule {
       long testSuiteTimeout,
       List<FileInfo> tests,
       List<FileInfo> plugins,
-      JsonArray proxyConfig) {
+      JsonArray gatewayConfig) {
     this.flags = flags;
     this.fileSet = fileSet;
     this.serverAddress = serverAddress;
@@ -97,7 +97,7 @@ public class JsTestDriverModule extends AbstractModule {
     this.testSuiteTimeout = testSuiteTimeout;
     this.tests = tests;
     this.plugins = plugins;
-    this.proxyConfig = proxyConfig;
+    this.gatewayConfig = gatewayConfig;
   }
 
   @Override
@@ -111,7 +111,7 @@ public class JsTestDriverModule extends AbstractModule {
           + "testSuiteTimeout:{}\n"
           + "tests:{}\n"
           + "plugins:{}\n"
-          + "proxy:{}", new Object[]{
+          + "gateway:{}", new Object[]{
          flags,
          fileSet,
          serverAddress,
@@ -120,7 +120,7 @@ public class JsTestDriverModule extends AbstractModule {
          testSuiteTimeout,
          tests,
          plugins,
-         proxyConfig
+         gatewayConfig
       });
     }
 
@@ -166,13 +166,14 @@ public class JsTestDriverModule extends AbstractModule {
        .toInstance(plugins);
     bind(Integer.class).annotatedWith(BrowserCount.class).
         toProvider(BrowserCountProvider.class).in(Singleton.class);
-    bind(JsonArray.class).annotatedWith(Names.named("proxy")).toInstance(proxyConfig);
+    bind(JsonArray.class).annotatedWith(Names.named("gateway")).toInstance(
+        gatewayConfig);
 
     Multibinder.newSetBinder(binder(), ServerListener.class);
 
-    bind(ConfigureProxyAction.Factory.class).toProvider(
-        FactoryProvider.newFactory(ConfigureProxyAction.Factory.class,
-            ConfigureProxyAction.class));
+    bind(ConfigureGatewayAction.Factory.class).toProvider(
+        FactoryProvider.newFactory(ConfigureGatewayAction.Factory.class,
+            ConfigureGatewayAction.class));
 
     bind(JsTestDriverServer.Factory.class).toProvider(
         FactoryProvider.newFactory(JsTestDriverServer.Factory.class, JsTestDriverServerImpl.class));

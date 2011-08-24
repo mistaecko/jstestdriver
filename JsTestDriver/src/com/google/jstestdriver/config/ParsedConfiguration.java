@@ -43,12 +43,12 @@ public class ParsedConfiguration implements Configuration {
   private final long testTimeout;
   private final List<FileInfo> tests;
   private final File basePath;
-  private final JsonArray proxyConfig;
+  private final JsonArray gatewayConfig;
   private final DocType doctype;
 
   public ParsedConfiguration(Set<FileInfo> filesList, Set<FileInfo> excludedFiles,
       List<Plugin> plugins, String server, long testTimeout, File basePath, List<FileInfo> tests,
-      JsonArray proxyConfig, DocType doctype) {
+      JsonArray gatewayConfig, DocType doctype) {
     this.filesList = filesList;
     this.excludedFiles = excludedFiles;
     this.plugins = plugins;
@@ -56,7 +56,7 @@ public class ParsedConfiguration implements Configuration {
     this.testTimeout = testTimeout;
     this.basePath = basePath;
     this.tests = tests;
-    this.proxyConfig = proxyConfig;
+    this.gatewayConfig = gatewayConfig;
     this.doctype = doctype;
   }
 
@@ -100,7 +100,7 @@ public class ParsedConfiguration implements Configuration {
         testTimeout,
         basePath,
         Lists.newArrayList(testFiles),
-        proxyConfig);
+        gatewayConfig);
   }
 
   public long getTestSuiteTimeout() {
@@ -115,8 +115,8 @@ public class ParsedConfiguration implements Configuration {
     return basePath;
   }
 
-  public JsonArray getProxyConfiguration() {
-    return proxyConfig;
+  public JsonArray getGatewayConfiguration() {
+    return gatewayConfig;
   }
 
   public DocType getDocType() {

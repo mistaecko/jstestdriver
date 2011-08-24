@@ -220,37 +220,37 @@ public class YamlParserTest extends TestCase {
     assertEquals(new File("/some/path"), config.getBasePath());
   }
 
-  public void testParseProxyConfiguration() throws Exception {
+  public void testParseGatewayConfiguration() throws Exception {
     String configFile =
-        "proxy:\n"
+        "gateway:\n"
       + " - {matcher: /asdf*, server: \"http://www.google.com\"}\n"
       + " - {matcher: /two, server: \"http://docs.google.com\"}\n";
     ByteArrayInputStream bias = new ByteArrayInputStream(configFile.getBytes());
     ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bias), null);
-    JsonArray proxyConfig = config.getProxyConfiguration();
-    assertEquals(2, proxyConfig.size());
-    JsonObject first = proxyConfig.get(0).getAsJsonObject();
+    JsonArray gatewayConfig = config.getGatewayConfiguration();
+    assertEquals(2, gatewayConfig.size());
+    JsonObject first = gatewayConfig.get(0).getAsJsonObject();
     assertTrue(first.has("matcher"));
     assertEquals("/asdf*", first.get("matcher").getAsString());
     assertTrue(first.has("server"));
     assertEquals("http://www.google.com", first.get("server").getAsString());
-    JsonObject second = proxyConfig.get(1).getAsJsonObject();
+    JsonObject second = gatewayConfig.get(1).getAsJsonObject();
     assertTrue(second.has("matcher"));
     assertEquals("/two", second.get("matcher").getAsString());
     assertTrue(second.has("server"));
     assertEquals("http://docs.google.com", second.get("server").getAsString());
   }
 
-  public void testParseProxyConfiguration_empty() throws Exception {
+  public void testParseGatewayConfiguration_empty() throws Exception {
     String configFile = "load:\n - code/*.js\n - test/*.js\nexclude:\n"
       + " - code/code2.js\n - test/test2.js";
     ByteArrayInputStream bais = new ByteArrayInputStream(configFile.getBytes());
     ConfigurationParser parser = new YamlParser();
 
     Configuration config = parser.parse(new InputStreamReader(bais), null);
-    assertEquals(0, config.getProxyConfiguration().size());
+    assertEquals(0, config.getGatewayConfiguration().size());
   }
   
   public void testParseDoctype_strict() throws Exception {

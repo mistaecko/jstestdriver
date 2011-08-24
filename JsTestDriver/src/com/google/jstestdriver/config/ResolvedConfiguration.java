@@ -40,7 +40,7 @@ public class ResolvedConfiguration implements Configuration {
   private final long testSuiteTimeout;
   private final List<FileInfo> tests;
   private final File basePath;
-  private final JsonArray proxyConfig;
+  private final JsonArray gatewayConfig;
 
   public ResolvedConfiguration(Set<FileInfo> filesList,
                                List<Plugin> plugins,
@@ -48,14 +48,14 @@ public class ResolvedConfiguration implements Configuration {
                                long testSuiteTimeout,
                                File basePath,
                                List<FileInfo> tests,
-                               JsonArray proxyConfig) {
+                               JsonArray gatewayConfig) {
     this.filesList = filesList;
     this.plugins = plugins;
     this.server = server;
     this.testSuiteTimeout = testSuiteTimeout;
     this.basePath = basePath;
     this.tests = tests;
-    this.proxyConfig = proxyConfig;
+    this.gatewayConfig = gatewayConfig;
   }
 
   // TODO(corysmith): fix this interface to not require extra information.
@@ -97,8 +97,8 @@ public class ResolvedConfiguration implements Configuration {
     return basePath;
   }
 
-  public JsonArray getProxyConfiguration() {
-    return proxyConfig;
+  public JsonArray getGatewayConfiguration() {
+    return gatewayConfig;
   }
 
   /* (non-Javadoc)

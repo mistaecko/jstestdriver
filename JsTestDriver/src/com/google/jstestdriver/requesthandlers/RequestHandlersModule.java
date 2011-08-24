@@ -13,13 +13,10 @@ import com.google.inject.servlet.RequestParameters;
 import com.google.inject.servlet.RequestScoped;
 import com.google.jstestdriver.annotations.RequestProtocol;
 import com.google.jstestdriver.annotations.ResponseWriter;
-import com.google.jstestdriver.server.proxy.GatewayServlet;
-import com.google.jstestdriver.server.proxy.JstdProxyServlet;
-import com.google.jstestdriver.server.proxy.ProxyServletConfig;
+import com.google.jstestdriver.server.gateway.GatewayRequestHandler;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,14 +77,10 @@ public abstract class RequestHandlersModule extends AbstractModule {
     bind(new Key<List<RequestMatcher>>() {}).toInstance(matchers.build());
     bind(Servlet.class).to(RequestHandlerServlet.class).in(Singleton.class);
 
-    bind(ProxyServletConfig.Factory.class).toProvider(
+    bind(GatewayRequestHandler.Factory.class).toProvider(
         FactoryProvider.newFactory(
-            ProxyServletConfig.Factory.class, ProxyServletConfig.class));
-    bind(ProxyRequestHandler.Factory.class).toProvider(
-        FactoryProvider.newFactory(
-            ProxyRequestHandler.Factory.class, ProxyRequestHandler.class));
-    bind(ProxyConfiguration.class).in(Singleton.class);
-    bind(JstdProxyServlet.class).to(GatewayServlet.class);
+            GatewayRequestHandler.Factory.class, GatewayRequestHandler.class));
+    bind(GatewayConfiguration.class).in(Singleton.class);
   }
 
   @Provides @Singleton HttpClient provideHttpClient() {

@@ -1,5 +1,5 @@
 // Copyright 2010 Google Inc. All Rights Reserved.
-package com.google.jstestdriver.server.proxy;
+package com.google.jstestdriver.server.gateway;
 
 import com.google.common.collect.Iterators;
 import com.google.inject.Inject;

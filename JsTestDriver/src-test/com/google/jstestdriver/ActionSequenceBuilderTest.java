@@ -23,8 +23,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import com.google.gson.JsonArray;
-import com.google.jstestdriver.action.ConfigureProxyAction;
-import com.google.jstestdriver.action.ConfigureProxyAction.Factory;
+import com.google.jstestdriver.action.ConfigureGatewayAction;
+import com.google.jstestdriver.action.ConfigureGatewayAction.Factory;
 import com.google.jstestdriver.action.UploadAction;
 import com.google.jstestdriver.browser.BrowserActionExecutorAction;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
@@ -44,11 +44,11 @@ public class ActionSequenceBuilderTest extends TestCase {
             new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
-            newConfigureProxyActionFactory(),
+            newConfigureGatewayActionFactory(),
             null);
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
-    expectedActions.add(ConfigureProxyAction.class);
+    expectedActions.add(ConfigureGatewayAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
 
@@ -57,10 +57,10 @@ public class ActionSequenceBuilderTest extends TestCase {
     assertSequence(expectedActions, sequence);
   }
 
-  private Factory newConfigureProxyActionFactory() {
+  private Factory newConfigureGatewayActionFactory() {
     return new Factory() {
-      public ConfigureProxyAction create(JsonArray proxyConfig) {
-        return new ConfigureProxyAction(null, null, null, null, proxyConfig);
+      public ConfigureGatewayAction create(JsonArray gatewayConfig) {
+        return new ConfigureGatewayAction(null, null, null, null, gatewayConfig);
       }
     };
   }
@@ -77,12 +77,12 @@ public class ActionSequenceBuilderTest extends TestCase {
             new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
         new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
         null,
-        newConfigureProxyActionFactory(),
+        newConfigureGatewayActionFactory(),
             null);
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
-    expectedActions.add(ConfigureProxyAction.class);
+    expectedActions.add(ConfigureGatewayAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
     expectedActions.add(ServerShutdownAction.class);
@@ -105,12 +105,12 @@ public class ActionSequenceBuilderTest extends TestCase {
             new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
-            newConfigureProxyActionFactory(),
+            newConfigureGatewayActionFactory(),
             null);
     
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
-    expectedActions.add(ConfigureProxyAction.class);
+    expectedActions.add(ConfigureGatewayAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
     expectedActions.add(ServerShutdownAction.class);
@@ -136,13 +136,13 @@ public class ActionSequenceBuilderTest extends TestCase {
                 null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
-            newConfigureProxyActionFactory(),
+            newConfigureGatewayActionFactory(),
             null);
 
     List<Action> actions = builder.addTests(tests).withLocalServerPort(999).build();
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
-    expectedActions.add(ConfigureProxyAction.class);
+    expectedActions.add(ConfigureGatewayAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
     expectedActions.add(ServerShutdownAction.class);

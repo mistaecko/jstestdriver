@@ -1,12 +1,12 @@
 // Copyright 2011 Google, Inc. All Rights Reserved.
-package com.google.jstestdriver.server.proxy;
+package com.google.jstestdriver.server.gateway;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Utilities for copying streams, used by {@link GatewayServlet}.
+ * Utilities for copying streams, used by {@link GatewayRequestHandler}.
  * @author rdionne@google.com (Robert Dionne)
  */
 final class Streams {

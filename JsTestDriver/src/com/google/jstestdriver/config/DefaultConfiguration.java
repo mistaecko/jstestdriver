@@ -75,7 +75,7 @@ public class DefaultConfiguration implements Configuration{
     return basePath;
   }
 
-  public JsonArray getProxyConfiguration() {
+  public JsonArray getGatewayConfiguration() {
     return new JsonArray();
   }
 

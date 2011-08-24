@@ -166,10 +166,10 @@ public class JsTestDriverServerTest extends TestCase {
     JsonObject entry = new JsonObject();
     entry.addProperty("matcher", "/*");
     entry.addProperty("server", "http://localhost:8888/");
-    JsonArray proxyConfig = new JsonArray();
-    proxyConfig.add(entry);
+    JsonArray gatewayConfig = new JsonArray();
+    gatewayConfig.add(entry);
     final HttpServer client = new HttpServer();
-    client.postJson("http://localhost:4224/jstd/proxy", proxyConfig);
+    client.postJson("http://localhost:4224/jstd/gateway", gatewayConfig);
     SocketConnector connector = new SocketConnector();
     connector.setPort(8888);
     org.mortbay.jetty.Server dummy = new org.mortbay.jetty.Server();
@@ -193,7 +193,7 @@ public class JsTestDriverServerTest extends TestCase {
               HttpURLConnection connection = (HttpURLConnection)
                   new URL("http://localhost:4224/asdf").openConnection();
               // TODO(rdionne): Add Content-Type to prevent failure case after
-              // proxy is rewritten.
+              // gateway is rewritten.
               //connection.addRequestProperty("Content-Type", "application/x-www-form-urlencoded");
               connection.setRequestMethod("GET");
               read(connection.getInputStream());

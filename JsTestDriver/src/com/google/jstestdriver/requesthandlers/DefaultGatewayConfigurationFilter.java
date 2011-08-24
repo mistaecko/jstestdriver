@@ -5,34 +5,28 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.jstestdriver.hooks.ProxyConfigurationFilter;
+import com.google.jstestdriver.hooks.GatewayConfigurationFilter;
 import com.google.jstestdriver.hooks.ProxyDestination;
 
 /**
  * @author rdionne@google.com (Robert Dionne)
  */
-public class DefaultProxyConfigurationFilter implements ProxyConfigurationFilter {
+public class DefaultGatewayConfigurationFilter implements
+    GatewayConfigurationFilter {
   
   @Inject(optional=true) private ProxyDestination destination;
 
-  public JsonArray filter(JsonArray proxyConfig) {
+  public JsonArray filter(JsonArray gatewayConfig) {
     if (destination == null) {
-      return proxyConfig;
+      return gatewayConfig;
     } else {
-      JsonObject entry = new JsonObject();
+      final JsonArray newGatewayConfig = new JsonArray();
+      newGatewayConfig.addAll(gatewayConfig);
+      final JsonObject entry = new JsonObject();
       entry.addProperty("matcher", "*");
       entry.addProperty("server", destination.getDestinationAddress());
-      proxyConfig = copy(proxyConfig);
-      proxyConfig.add(entry);
-      return proxyConfig;
+      newGatewayConfig.add(entry);
+      return newGatewayConfig;
     }
-  }
-
-  private JsonArray copy(JsonArray original) {
-    JsonArray copy = new JsonArray();
-    for (JsonElement element : original) {
-      copy.add(element);
-    }
-    return copy;
   }
 }

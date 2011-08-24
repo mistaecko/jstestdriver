@@ -64,6 +64,7 @@ import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
 import com.google.jstestdriver.requesthandlers.RequestHandlersModule;
+import com.google.jstestdriver.server.gateway.SimpleServletConfig;
 import com.google.jstestdriver.server.handlers.pages.BrowserControlledRunnerPage;
 import com.google.jstestdriver.server.handlers.pages.ConsolePage;
 import com.google.jstestdriver.server.handlers.pages.HeartbeatPage;
@@ -72,7 +73,6 @@ import com.google.jstestdriver.server.handlers.pages.PageType;
 import com.google.jstestdriver.server.handlers.pages.RunnerPage;
 import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
 import com.google.jstestdriver.server.handlers.pages.StandaloneRunnerPage;
-import com.google.jstestdriver.server.proxy.SimpleServletConfig;
 import com.google.jstestdriver.servlet.fileset.BrowserFileCheck;
 import com.google.jstestdriver.servlet.fileset.FileSetRequestHandler;
 import com.google.jstestdriver.servlet.fileset.ServerFileCheck;
@@ -142,8 +142,10 @@ public class JstdHandlersModule extends RequestHandlersModule {
 
     serve( GET, handlerPrefix.prefixPath("/heartbeat"), HeartbeatGetHandler.class);
     serve(POST, handlerPrefix.prefixPath("/heartbeat"), HeartbeatPostHandler.class);
-    serve( GET, handlerPrefix.prefixPath("/proxy", JSTD), ProxyConfigurationHandler.class);
-    serve(POST, handlerPrefix.prefixPath("/proxy", JSTD), ProxyConfigurationHandler.class);
+    serve( GET, handlerPrefix.prefixPath("/proxy", JSTD), GatewayConfigurationHandler.class);
+    serve(POST, handlerPrefix.prefixPath("/proxy", JSTD), GatewayConfigurationHandler.class);
+    serve( GET, handlerPrefix.prefixPath("/gateway", JSTD), GatewayConfigurationHandler.class);
+    serve(POST, handlerPrefix.prefixPath("/gateway", JSTD), GatewayConfigurationHandler.class);
 
     serve( GET, handlerPrefix.prefixPath("/hello"), HelloHandler.class);
     serve(POST, handlerPrefix.prefixPath("/log"), BrowserLoggingHandler.class);

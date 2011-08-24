@@ -23,7 +23,7 @@ import com.google.inject.assistedinject.FactoryProvider;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
-import com.google.jstestdriver.action.ConfigureProxyAction;
+import com.google.jstestdriver.action.ConfigureGatewayAction;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.output.MultiTestResultListener;
 import com.google.jstestdriver.output.TestResultListener;
@@ -77,11 +77,11 @@ public class IDEPluginActionBuilderTest extends TestCase {
                        bind(XmlPrinter.class).to(XmlPrinterImpl.class);
                        bind(TestResultListener.class).toInstance(
                            new MultiTestResultListener(Collections.<TestResultListener>emptySet()));
-                       bind(JsonArray.class).annotatedWith(Names.named("proxy"))
+                       bind(JsonArray.class).annotatedWith(Names.named("gateway"))
                            .toInstance(new JsonArray());
-                       bind(ConfigureProxyAction.Factory.class).toProvider(
-                           FactoryProvider.newFactory(ConfigureProxyAction.Factory.class,
-                               ConfigureProxyAction.class));
+                       bind(ConfigureGatewayAction.Factory.class).toProvider(
+                           FactoryProvider.newFactory(ConfigureGatewayAction.Factory.class,
+                               ConfigureGatewayAction.class));
                      }
                    });
     builder.addAllTests();
@@ -108,11 +108,11 @@ public class IDEPluginActionBuilderTest extends TestCase {
                        bind(XmlPrinter.class).to(XmlPrinterImpl.class);
                        bind(TestResultListener.class)
                            .toProvider(Providers.<TestResultListener>of(null));
-                       bind(JsonArray.class).annotatedWith(Names.named("proxy"))
+                       bind(JsonArray.class).annotatedWith(Names.named("gateway"))
                            .toInstance(new JsonArray());
-                       bind(ConfigureProxyAction.Factory.class).toProvider(
-                           FactoryProvider.newFactory(ConfigureProxyAction.Factory.class,
-                               ConfigureProxyAction.class));
+                       bind(ConfigureGatewayAction.Factory.class).toProvider(
+                           FactoryProvider.newFactory(ConfigureGatewayAction.Factory.class,
+                               ConfigureGatewayAction.class));
                      }
                    });
     builder.addAllTests();

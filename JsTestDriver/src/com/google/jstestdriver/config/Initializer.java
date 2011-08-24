@@ -40,12 +40,6 @@ import com.google.jstestdriver.runner.RunnerMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Handles the creation the list of modules necessary to create an ActionRunner.
  * @author corbinrsmith@gmail.com
@@ -114,7 +108,7 @@ public class Initializer {
             resolvedConfiguration.getTests(),
             // TODO(corysmith): pull js plugins from the configuration.
             Collections.<FileInfo>emptyList(),
-            resolvedConfiguration.getProxyConfiguration()));
+            resolvedConfiguration.getGatewayConfiguration()));
     return modules;
   }
 }

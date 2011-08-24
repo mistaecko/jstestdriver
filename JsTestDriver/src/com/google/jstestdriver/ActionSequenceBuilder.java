@@ -18,7 +18,7 @@ package com.google.jstestdriver;
 import com.google.gson.JsonArray;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.google.jstestdriver.action.ConfigureProxyAction;
+import com.google.jstestdriver.action.ConfigureGatewayAction;
 import com.google.jstestdriver.action.UploadAction;
 import com.google.jstestdriver.browser.BrowserActionExecutorAction;
 import com.google.jstestdriver.output.PrintXmlTestResultsAction;
@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A builder for creating a sequence of {@link Action}s to be run by the
@@ -55,9 +54,9 @@ public class ActionSequenceBuilder {
   private final BrowserActionExecutorAction browserActionsRunner;
   private final FailureCheckerAction failureCheckerAction;
   private final UploadAction uploadAction;
-  private final ConfigureProxyAction.Factory proxyActionFactory;
+  private final ConfigureGatewayAction.Factory gatewayActionFactory;
   private boolean raiseOnFailure = false;
-  private JsonArray proxyConfig;
+  private JsonArray gatewayConfig;
   private final BrowserStartupAction browserStartup;
 
   /**
@@ -69,16 +68,16 @@ public class ActionSequenceBuilder {
                                FailureCheckerAction failureCheckerAction,
                                UploadAction uploadAction,
                                CapturedBrowsers capturedBrowsers,
-                               @Named("proxy") JsonArray proxyConfig,
-                               ConfigureProxyAction.Factory proxyActionFactory,
+                               @Named("gateway") JsonArray gatewayConfig,
+                               ConfigureGatewayAction.Factory gatewayActionFactory,
                                BrowserStartupAction browserStartup) {
     this.actionFactory = actionFactory;
     this.browserActionsRunner = browserActionsRunner;
     this.failureCheckerAction = failureCheckerAction;
     this.uploadAction = uploadAction;
     this.capturedBrowsers = capturedBrowsers;
-    this.proxyConfig = proxyConfig;
-    this.proxyActionFactory = proxyActionFactory;
+    this.gatewayConfig = gatewayConfig;
+    this.gatewayActionFactory = gatewayActionFactory;
     this.browserStartup = browserStartup;
   }
 
@@ -120,7 +119,7 @@ public class ActionSequenceBuilder {
   /** Creates and returns a sequence of actions. */
   public List<Action> build() {
     List<Action> actions = new LinkedList<Action>();
-    actions.add(proxyActionFactory.create(proxyConfig));
+    actions.add(gatewayActionFactory.create(gatewayConfig));
     actions.add(uploadAction);
     if (!leaveServerRunning()) {
       actions.add(browserActionsRunner);

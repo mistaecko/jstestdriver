@@ -25,8 +25,8 @@ import junit.framework.TestCase;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
-import com.google.jstestdriver.action.ConfigureProxyAction;
-import com.google.jstestdriver.action.ConfigureProxyAction.Factory;
+import com.google.jstestdriver.action.ConfigureGatewayAction;
+import com.google.jstestdriver.action.ConfigureGatewayAction.Factory;
 import com.google.jstestdriver.action.UploadAction;
 import com.google.jstestdriver.browser.BrowserActionExecutorAction;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
@@ -56,7 +56,7 @@ public class DefaultActionListProviderTest extends TestCase {
 
     ArrayList<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
-    expectedActions.add(ConfigureProxyAction.class);
+    expectedActions.add(ConfigureGatewayAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserStartupAction.class);
     assertSequence(expectedActions, actions);
@@ -97,15 +97,15 @@ public class DefaultActionListProviderTest extends TestCase {
             new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
-            newConfigureProxyActionFactory(),
+            newConfigureGatewayActionFactory(),
             new BrowserStartupAction(null, null, null, null, null)),
         true);
   }
 
-  private Factory newConfigureProxyActionFactory() {
+  private Factory newConfigureGatewayActionFactory() {
     return new Factory() {
-      public ConfigureProxyAction create(JsonArray proxyConfig) {
-        return new ConfigureProxyAction(null, null, null, null, proxyConfig);
+      public ConfigureGatewayAction create(JsonArray gatewayConfig) {
+        return new ConfigureGatewayAction(null, null, null, null, gatewayConfig);
       }
     };
   }
@@ -122,7 +122,7 @@ public class DefaultActionListProviderTest extends TestCase {
     flags.setReset(true);
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
-    expectedActions.add(ConfigureProxyAction.class);
+    expectedActions.add(ConfigureGatewayAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
 
@@ -139,7 +139,7 @@ public class DefaultActionListProviderTest extends TestCase {
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
-    expectedActions.add(ConfigureProxyAction.class);
+    expectedActions.add(ConfigureGatewayAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
     expectedActions.add(ServerShutdownAction.class);
@@ -157,7 +157,7 @@ public class DefaultActionListProviderTest extends TestCase {
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
-    expectedActions.add(ConfigureProxyAction.class);
+    expectedActions.add(ConfigureGatewayAction.class);
     expectedActions.add(UploadAction.class);
     expectedActions.add(BrowserActionExecutorAction.class);
     expectedActions.add(PrintXmlTestResultsAction.class);
