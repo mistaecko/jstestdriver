@@ -46,7 +46,7 @@ class CommandPostHandler implements RequestHandler {
     SlaveBrowser browser = capturedBrowsers.getBrowser(id);
 
     data = translateUrls(data);
-    logger.debug("Adding command to browser queue: {}", data);
+    logger.trace("Adding command to browser queue: {}", data);
     browser.createCommand(data);
   }
 

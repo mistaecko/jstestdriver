@@ -23,12 +23,16 @@ import java.util.Set;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Represents a test resource.
  * 
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
 public class FileInfo implements Cloneable {
+  private static final Logger logger = LoggerFactory.getLogger(FileInfo.class);
 
   private String filePath;
   private Long timestamp;
@@ -159,8 +163,11 @@ public class FileInfo implements Cloneable {
 
   @Override
   public String toString() {
-    return "FileInfo [filePath=" + filePath + ", length=" + length + ", patches=" + patches
-        + ", serveOnly=" + serveOnly + ", timestamp=" + timestamp + "]";
+    if (logger.isDebugEnabled() || logger.isTraceEnabled()) {
+      return "FileInfo [filePath=" + filePath + ", length=" + length + ", patches=" + patches
+          + ", serveOnly=" + serveOnly + ", timestamp=" + timestamp + "]";
+    }
+    return "\n\tFileInfo[" + this.getDisplayPath() + "]";
   }
 
   /**

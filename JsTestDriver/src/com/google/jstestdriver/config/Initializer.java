@@ -16,12 +16,6 @@
 
 package com.google.jstestdriver.config;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Module;
@@ -79,7 +73,6 @@ public class Initializer {
     // Might delegate to the flag parser to remove them, before creating Flags
     // Then, flags can have a method to retrieve them.
     Flags flags = flagsParser.parseArgument(args);
-    logger.debug("Flags: {}", flags);
 
     final List<Module> modules = Lists.newLinkedList();
     Configuration resolvedConfiguration =

@@ -24,7 +24,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.model.RunData;
 import com.google.jstestdriver.model.RunDataFactory;
 import com.google.jstestdriver.util.StopWatch;
@@ -52,6 +55,20 @@ public class ActionRunner {
 
   public void runActions() {
     RunData runData = factory.get();
+    logger.info("TestCases {}", runData.getTestCases().size());
+    if (logger.isDebugEnabled()) {
+      for (JstdTestCase testCase : runData.getTestCases()) {
+        if (testCase.getTests().size() == 1) {
+          logger.debug("{}:\n{}", testCase.getTests().get(0).getDisplayPath(),
+              Lists.transform(testCase.getDependencies(), new Function<FileInfo, String>() {
+                @Override
+                public String apply(FileInfo f) {
+                  return f.getDisplayPath() + "\n";
+                }
+              }));
+        }
+      }
+    }
     Iterator<Action> iterator = actions.iterator();
 
     stopWatch.start("runActions");

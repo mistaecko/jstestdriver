@@ -66,7 +66,7 @@ public class BrowserActionRunner implements Callable<Collection<ResponseStream>>
     for (JstdTestCase testCase : testCases) {
       for (BrowserAction action : actions) {
         stopWatch.start("run %s", action);
-        logger.debug("Running BrowserAction {} with {}", action, testCase);
+        logger.info("Running BrowserAction {} with {}", action, testCase);
         responses.add(action.run(id, client, null, testCase));
         stopWatch.stop("run %s", action);
       }

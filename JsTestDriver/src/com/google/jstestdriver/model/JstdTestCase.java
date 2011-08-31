@@ -20,6 +20,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.jstestdriver.FileInfo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +33,9 @@ import java.util.Set;
  * @author corbinrsmith@gmail.com (Cory Smith)
  */
 public class JstdTestCase {
+  @SuppressWarnings("unused")
+  private static final Logger logger =
+      LoggerFactory.getLogger(JstdTestCase.class);
 
   private final List<FileInfo> dependencies;
   private final List<FileInfo> tests;
@@ -103,7 +109,7 @@ public class JstdTestCase {
 
   @Override
   public String toString() {
-    return "JstdTestCase [dependencies=" + dependencies + ", plugins=" + plugins + ", tests="
+    return "JstdTestCase [dependencies=" + (logger.isDebugEnabled() || logger.isTraceEnabled() ? dependencies : "<elided>") + ", plugins=" + plugins + ", tests="
         + tests + "]";
   }
 }

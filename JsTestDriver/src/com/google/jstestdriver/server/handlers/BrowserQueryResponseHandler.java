@@ -205,7 +205,7 @@ class BrowserQueryResponseHandler implements RequestHandler {
      browser.heartBeat();
     }
     
-    logger.debug("sending command {}", command == null ? "null" : command.getCommand());
+    logger.trace("sending command {}", command == null ? "null" : command.getCommand());
     writer.print(command.getCommand());
   }
 

@@ -66,6 +66,7 @@ public enum RunnerMode {
             .severe("org.mortbay"), false),
   INFO(new LogConfigBuilder()
             .useConsoleHandler()
+            .info("com.google.javascript.jstestdriver.model")
             .info("com.google.javascript.jstestdriver")
             .info("com.google.jstestdriver")
             .severe("org.mortbay"), false),

@@ -32,6 +32,7 @@ import java.util.List;
  */
 public class IsolationTestCaseProcessor implements JstdTestCaseProcessor {
 
+  @Override
   public List<JstdTestCase> process(Iterator<JstdTestCase> testCasesIterator) {
     List<JstdTestCase> isolatedTestCases = Lists.newArrayList();    
     List<JstdTestCase> testCases = Lists.newArrayList(testCasesIterator);
@@ -45,7 +46,7 @@ public class IsolationTestCaseProcessor implements JstdTestCaseProcessor {
             jstdTestCase.getDependencies(), Lists.newArrayList(test), jstdTestCase.getPlugins());
         isolatedTestCases.add(testCase);
       }
-    }  
+    }
 
     return isolatedTestCases;
   }  

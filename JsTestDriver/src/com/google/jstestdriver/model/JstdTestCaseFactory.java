@@ -10,6 +10,9 @@ import com.google.jstestdriver.hooks.JstdTestCaseProcessor;
 import com.google.jstestdriver.hooks.ResourceDependencyResolver;
 import com.google.jstestdriver.util.StopWatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +23,8 @@ import java.util.Set;
  */
 public class JstdTestCaseFactory {
 
+  private static final Logger logger =
+      LoggerFactory.getLogger(JstdTestCaseFactory.class);
   private final Set<JstdTestCaseProcessor> processors;
   private final Set<ResourceDependencyResolver> resolvers;
   private final StopWatch stopWatch;

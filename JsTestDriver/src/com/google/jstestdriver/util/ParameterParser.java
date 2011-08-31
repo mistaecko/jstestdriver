@@ -45,8 +45,8 @@ public class ParameterParser {
   public Map<String, String> getParameterMap(Map<String, Integer> parameters, Set<String> blacklist) {
     final Map<String, String> parsedParameterMap = Maps.newHashMap();
     final Map<String, String[]> requestParameterMap = request.getParameterMap();
-  
-    for (String key : Sets.intersection(requestParameterMap.keySet(), parameters.keySet())) {
+
+    for (String key : requestParameterMap.keySet()) {
       parsedParameterMap.put(key, safeArrayValue(0, requestParameterMap.get(key)));
     }
     final String path = request.getPathInfo();

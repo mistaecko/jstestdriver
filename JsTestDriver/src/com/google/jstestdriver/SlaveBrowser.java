@@ -132,7 +132,7 @@ public class SlaveBrowser {
   public Command dequeueCommand() {
     try {
       Command command = commandsToRun.poll(dequeueTimeout, timeUnit);
-      LOGGER.debug("dequeue {}", command);
+      LOGGER.trace("dequeue {}", command);
 
       synchronized (this) {
         if (command != null) {

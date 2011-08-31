@@ -131,6 +131,7 @@ public class FileUploader {
 
     logger.debug("Files: {}",
         Lists.transform(Lists.newArrayList(files), new Function<FileInfo, String>() {
+          @Override
           public String apply(FileInfo in) {
             return "\n" + in.getFilePath();
           }
@@ -142,6 +143,7 @@ public class FileUploader {
 
     logger.debug("Files: {}",
         Lists.transform(Lists.newArrayList(files), new Function<FileInfo, String>() {
+          @Override
           public String apply(FileInfo in) {
             return "\n" + in.getFilePath();
           }
@@ -152,6 +154,7 @@ public class FileUploader {
 
     logger.debug("Files: {}",
         Lists.transform(Lists.newArrayList(files), new Function<FileInfo, String>() {
+          @Override
           public String apply(FileInfo in) {
             return "\n" + in.getFilePath();
           }
@@ -271,7 +274,7 @@ public class FileUploader {
       response = message.getResponse();
       stream.stream(response);
     } while(!(ResponseType.RESET_RESULT.equals(response.getResponseType()) && message.isLast()));
-    logger.debug("Finished File Upload Refresh for {}", browserId);
+    logger.info("Finished File Upload Refresh for {}", browserId);
     stopWatch.stop("reset %s", browserId);
   }
 

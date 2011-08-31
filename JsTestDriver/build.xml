@@ -550,7 +550,7 @@
 
   <target name="testisolation-plugin-jar-nodeps" depends="jar">
     <mkdir dir="${bin.dir}/plugins/" />
-    <jar destfile="${bin.dir}/plugins/testisolation.jar" duplicate="preserve">
+    <jar destfile="${bin.dir}/plugins/testisolation-nodeps.jar" duplicate="preserve">
       <fileset dir="${obj.dir}">
         <include name="**/testisolation/**" />
       </fileset>
@@ -563,7 +563,7 @@
         </section>
       </manifest>
     </jar>
-    <jar destfile="${bin.dir}/testisolation-src.jar" duplicate="preserve">
+    <jar destfile="${bin.dir}/plugins/testisolation-src.jar" duplicate="preserve">
       <fileset dir="${src.dir}">
         <include name="**/testisolation/**" />
       </fileset>
