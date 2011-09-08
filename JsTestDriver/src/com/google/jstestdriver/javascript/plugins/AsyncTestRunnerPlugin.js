@@ -173,7 +173,7 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.startSetUp = function
   var runner = this;
   this.execute_(function(errors) {
     runner.finishSetUp(errors);
-  }, this.testCase_.setUp);
+  }, this.testCase_['setUp']);
 };
 
 /**
@@ -220,7 +220,7 @@ jstestdriver.plugins.async.AsyncTestRunnerPlugin.prototype.startTearDown = funct
   var runner = this;
   this.execute_(function(errors){
     runner.finishTearDown(errors);
-  }, this.testCase_.tearDown);
+  }, this.testCase_['tearDown']);
 };
 
 
