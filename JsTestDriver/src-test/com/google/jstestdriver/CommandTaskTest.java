@@ -126,7 +126,7 @@ public class CommandTaskTest extends TestCase {
     List<FileInfo> fileSet = Arrays.asList(loadInfo, serveInfo);
 
     final BrowserFileSet browserFileSet =
-        new BrowserFileSet(fileSet, Lists.<FileInfo>newArrayList());
+        new BrowserFileSet(fileSet, Lists.<FileInfo>newArrayList(), false);
 
     // server expects
     server.expect(baseUrl + "heartbeat?id=1", "OK");

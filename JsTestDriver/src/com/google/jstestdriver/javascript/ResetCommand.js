@@ -47,11 +47,16 @@ jstestdriver.ResetCommand = function(location, signal, now) {
 jstestdriver.ResetCommand.prototype.reset = function(loadType) {
   this.signal_.set(true);
   loadType = loadType ? loadType : 'preload';
+  var now = this.now_()
   var newUrl = this.location_.protocol + "//" +
                this.location_.host +
                this.location_.pathname +
-               '?refresh=' + this.now_() +
+               '?refresh=' + now +
                '&type=' + loadType;
-  jstestdriver.log("Replacing " + newUrl)
-  this.location_.replace(newUrl);
+  jstestdriver.log("Replacing " + newUrl);
+  if (this.location_.search.indexOf(now) != -1) {
+    this.location_.reload();
+  } else {
+    this.location_.replace(newUrl);
+  }
 };

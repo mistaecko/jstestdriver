@@ -68,6 +68,13 @@ public class UserAgentParser {
       if (matcher.find()) {
         userAgentVersion = matcher.group(1);
       }
+    } else if (userAgent.contains("Opera")) {
+      userAgentName = "Opera";
+      Matcher matcher = OPERA_VERSION.matcher(userAgent);
+
+      if (matcher.find()) {
+        userAgentVersion = matcher.group(1);
+      }
     } else {
       Matcher matcher = BROWSER_NAME_AND_VERSION.matcher(userAgent);
 

@@ -33,8 +33,9 @@ public class BrowserFileCheck implements FileSetRequestHandler<BrowserFileSet> {
     if (browser == null) {
       logger.debug("no browser, returning empty set.");
       return new BrowserFileSet(Collections.<FileInfo>emptyList(),
-          Collections.<FileInfo>emptyList());
+          Collections.<FileInfo>emptyList(), false);
     }
+    boolean reset = false;
     final List<FileInfo> filesToUpdate = Lists.newLinkedList();
     final List<FileInfo> extraFiles = Lists.newLinkedList();
     // reload all files if Safari, Opera, or Konqueror, because they don't overwrite properly.
@@ -44,14 +45,16 @@ public class BrowserFileCheck implements FileSetRequestHandler<BrowserFileSet> {
         || browser.getBrowserInfo().getName().contains("Konqueror")) {
       logger.debug("Resetting browser fileset to ensure proper overwriting.");
       filesToUpdate.addAll(clientFiles);
+      // TODO(corysmith): Change the browser to handle it's own resets.
       browser.resetFileSet();
+      reset = true;
     } else {
       logger.debug("Determing files to update {}, {}", clientFiles, browser.getFileSet());
       filesToUpdate.addAll(strategy.createExpiredFileSet(clientFiles, browser.getFileSet()));
     }
     extraFiles.addAll(browser.getFileSet());
     extraFiles.removeAll(clientFiles);
-    return new BrowserFileSet(filesToUpdate, extraFiles);
+    return new BrowserFileSet(filesToUpdate, extraFiles, reset);
   }
   
 

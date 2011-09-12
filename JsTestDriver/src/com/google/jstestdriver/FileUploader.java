@@ -105,6 +105,9 @@ public class FileUploader {
       stopWatch.start("resolving browser upload %s", browserId);
       BrowserFileSet browserFileSet = gson.fromJson(postResult, BrowserFileSet.class);
       logger.debug("Updating files {}", browserFileSet.getFilesToUpload());
+      if (browserFileSet.shouldReset()) {
+        reset(browserId, stream);
+      }
 
       // need a linked hashset here to avoid adding a file more than once.
       final Set<FileInfo> finalFilesToUpload = new LinkedHashSet<FileInfo>();

@@ -16,15 +16,17 @@ public class BrowserFileSet {
 
   private List<FileInfo> fileToUpload;
   private List<FileInfo> extraFiles;
+  private final boolean reset;
 
 
   public BrowserFileSet() {
-    this(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList());
+    this(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), false);
   }
 
-  public BrowserFileSet(List<FileInfo> fileToUpload, List<FileInfo> extraFiles) {
+  public BrowserFileSet(List<FileInfo> fileToUpload, List<FileInfo> extraFiles, boolean reset) {
     this.fileToUpload = fileToUpload;
     this.extraFiles = extraFiles;
+    this.reset = reset;
   }
 
   @Override
@@ -67,5 +69,12 @@ public class BrowserFileSet {
   @Override
   public String toString() {
     return "BrowserFileSet [fileToUpload=" + fileToUpload + ", extraFiles=" + extraFiles + "]";
+  }
+
+  /**
+   * @return
+   */
+  public boolean shouldReset() {
+    return reset;
   }
 }

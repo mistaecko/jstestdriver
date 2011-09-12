@@ -79,7 +79,7 @@ public class FileSetRequestHandlerTest extends TestCase {
 
     assertEquals(
         new BrowserFileSet(Lists.newArrayList(createFile(fileOne, 3)),
-            Lists.newArrayList(createFile(fileThree, 3))), browserFileCheck.handle(browser,
+            Lists.newArrayList(createFile(fileThree, 3)), false), browserFileCheck.handle(browser,
             Lists.newArrayList(createFile(fileOne, 3), createFile(fileTwo, 1))));
   }
 
