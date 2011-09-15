@@ -1,12 +1,12 @@
 /*
  * Copyright 2009 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -86,7 +86,7 @@ public class FlagsImpl implements Flags {
   public String getServer() {
     return server;
   }
-  
+
   public List<String> getArguments() {
     return arguments;
   }
@@ -104,8 +104,14 @@ public class FlagsImpl implements Flags {
   @Option(name="--browser", usage="The path to the browser executable")
   public void setBrowser(List<String> browsers) {
     for (String browser : browsers) {
+      String[] splitBrowser = browser.split(";", 2);
+      String browserArgs = "";
+      if (splitBrowser.length == 2) {
+        browserArgs = splitBrowser[1].replace(";", " ");
+        System.out.println(browserArgs);
+      }
       this.browser.add(
-          new CommandLineBrowserRunner(browser, new SimpleProcessFactory()));
+          new CommandLineBrowserRunner(splitBrowser[0], browserArgs, new SimpleProcessFactory()));
     }
   }
 

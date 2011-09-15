@@ -51,6 +51,17 @@ public class FlagsParserTest extends TestCase {
         "Contents/MacOS/Google\\ Chrome"), flags.getBrowser());
   }
 
+  public void testParseBrowserWithArg() throws Exception {
+    Flags flags = new Args4jFlagsParser().parseArgument(new String[]{"--browser",
+      "C:\\Program Files\\Mozilla Firefox\\firefox.exe;--someFlag;--anotherFlag"});
+    Set<BrowserRunner> expected = Sets.newHashSet();
+    expected.add(new CommandLineBrowserRunner(
+        "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+        "--someFlag --anotherFlag",
+        new SimpleProcessFactory()));
+    assertEquals(expected, flags.getBrowser());
+  }
+
   public void testParseListWindowsOpts() throws Exception {
     Flags flags = new Args4jFlagsParser().parseArgument(new String[]{"--browser",
       "C:\\Program Files\\Mozilla Firefox\\firefox.exe," +
@@ -64,17 +75,18 @@ public class FlagsParserTest extends TestCase {
       "C:\\Documents and Settings\\Misko\\Local Settings" +
       "\\Application Data\\Google\\Chrome\\Application\\chrome.exe"), flags.getBrowser());
   }
-  
+
   Set<BrowserRunner> browsers(String... paths) {
     Set<BrowserRunner> browsers = Sets.newHashSet();
     for (String path : paths) {
       browsers.add(new CommandLineBrowserRunner(path,
+          "",
           new SimpleProcessFactory()));
     }
     return browsers;
   }
-  
-  
+
+
   public void testParseInteger() throws Exception {
     Flags flags = new Args4jFlagsParser().parseArgument(new String[]{"--port", "4504"});
     assertEquals(new Integer(4504), flags.getPort());

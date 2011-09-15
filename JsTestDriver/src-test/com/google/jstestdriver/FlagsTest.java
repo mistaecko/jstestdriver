@@ -41,16 +41,16 @@ public class FlagsTest extends TestCase {
 
       flags = parser.parseArgument(new String[] { "--testOutput", "/path/file"});
       assertEquals("/path/file", flags.getTestOutput());
-      flags = parser.parseArgument(new String[] { "--browser", "/path/browser,beep"});
+      flags = parser.parseArgument(new String[] { "--browser", "/path/browser,beep;--beepArg"});
       Set<BrowserRunner> browsers = flags.getBrowser();
 
       assertEquals(2, browsers.size());
       assertTrue(
           browsers.contains(
-              new CommandLineBrowserRunner("/path/browser", null)));
+              new CommandLineBrowserRunner("/path/browser", "", null)));
       assertTrue(
           browsers.contains(
-              new CommandLineBrowserRunner("beep", null)));
+              new CommandLineBrowserRunner("beep", "--beepArg", null)));
 
       flags = parser.parseArgument(new String[] { "--reset" });
       assertTrue(flags.getReset());

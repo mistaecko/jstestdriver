@@ -14,17 +14,52 @@ import com.google.jstestdriver.ProcessFactory;
 public class CommandLineBrowserRunnerTest extends TestCase {
   public void testStartAndStop() throws Exception {
     final String browserPath = "/foo/bar";
+    final String browserArgs = "--helloWorld";
     final String url = "htpp://localhost:42242";
-    
+
     FakeProcessFactory processFactory = new FakeProcessFactory();
     CommandLineBrowserRunner runner =
-        new CommandLineBrowserRunner(browserPath, processFactory);
-    
+        new CommandLineBrowserRunner(browserPath, browserArgs, processFactory);
+
+    runner.startBrowser(url);
+    assertEquals(1, processFactory.processStubs.size());
+    assertEquals(browserPath,
+        processFactory.processStubs.get(0).commands[0]);
+    assertEquals(browserArgs + " " + url,
+        processFactory.processStubs.get(0).commands[1]);
+  }
+
+  public void testNoArgs() throws Exception {
+    final String browserPath = "/foo/bar";
+    final String browserArgs = "";
+    final String url = "htpp://localhost:42242";
+
+    FakeProcessFactory processFactory = new FakeProcessFactory();
+    CommandLineBrowserRunner runner =
+        new CommandLineBrowserRunner(browserPath, browserArgs, processFactory);
+
     runner.startBrowser(url);
     assertEquals(1, processFactory.processStubs.size());
     assertEquals(browserPath,
         processFactory.processStubs.get(0).commands[0]);
     assertEquals(url,
+        processFactory.processStubs.get(0).commands[1]);
+  }
+
+  public void testUrlParam() throws Exception {
+    final String browserPath = "/foo/bar";
+    final String browserArgs = "--app=%s";
+    final String url = "htpp://localhost:42242";
+
+    FakeProcessFactory processFactory = new FakeProcessFactory();
+    CommandLineBrowserRunner runner =
+        new CommandLineBrowserRunner(browserPath, browserArgs, processFactory);
+
+    runner.startBrowser(url);
+    assertEquals(1, processFactory.processStubs.size());
+    assertEquals(browserPath,
+        processFactory.processStubs.get(0).commands[0]);
+    assertEquals("--app=" + url,
         processFactory.processStubs.get(0).commands[1]);
   }
 

@@ -46,7 +46,7 @@ import com.google.jstestdriver.output.XmlPrinterImpl;
 public class DefaultActionListProviderTest extends TestCase {
   Set<BrowserRunner> browsers =
     Sets.<BrowserRunner>newHashSet(
-        new CommandLineBrowserRunner("browser", null));
+        new CommandLineBrowserRunner("browser", "", null));
 
   public void testParseFlagsAndCreateActionQueue() throws Exception {
     DefaultActionListProvider provider =

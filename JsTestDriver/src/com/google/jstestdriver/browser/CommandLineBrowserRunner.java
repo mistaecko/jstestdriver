@@ -1,12 +1,12 @@
 /*
  * Copyright 2009 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -33,18 +33,31 @@ public class CommandLineBrowserRunner implements BrowserRunner {
   private static final Logger logger =
       LoggerFactory.getLogger(CommandLineBrowserRunner.class);
   private final String browserPath;
+  private final String browserArgs;
   private final ProcessFactory processFactory;
   private Process process;
 
   public CommandLineBrowserRunner(String browserPath,
+                                  String browserArgs,
                                   ProcessFactory processFactory) {
     this.browserPath = browserPath;
     this.processFactory = processFactory;
+    this.browserArgs = browserArgs;
   }
 
   public void startBrowser(String serverAddress) {
     try {
-      process = processFactory.start(browserPath, serverAddress);
+      String processArgs = "";
+      if (this.browserArgs.contains("%s")) {
+        processArgs = this.browserArgs.replace("%s", serverAddress);
+      }
+      else {
+        if (this.browserArgs.length() > 0) {
+          processArgs = this.browserArgs + " ";
+        }
+        processArgs += serverAddress;
+      }
+      process = processFactory.start(browserPath, processArgs);
     } catch (IOException e) {
       logger.error("Could not start: {} because {}", browserPath, e.toString());
       throw new RuntimeException(e);
@@ -96,20 +109,17 @@ public class CommandLineBrowserRunner implements BrowserRunner {
       return false;
     }
     CommandLineBrowserRunner other = (CommandLineBrowserRunner) obj;
-    if (browserPath == null) {
-      if (other.browserPath != null) {
-        return false;
-      }
-    } else if (!browserPath.equals(other.browserPath)) {
-      return false;
-    }
-    return true;
+    return (((browserPath == null && other.browserPath == null) ||
+             browserPath.equals(other.browserPath)) &&
+            ((browserArgs == null && other.browserArgs == null) ||
+             browserArgs.equals(other.browserArgs)));
   }
 
   @Override
   public String toString() {
-    return "CommandLineBrowserRunner [\nbrowserPath=" + browserPath
-        + ",\nprocess=" + process + ",\n process log={\n" + getLog() + "\n}]";
+    return "CommandLineBrowserRunner [\nbrowserPath=" + browserPath +
+        "\nargs=" + browserArgs +
+        ",\nprocess=" + process + ",\n process log={\n" + getLog() + "\n}]";
   }
 
   private String getLog() {
