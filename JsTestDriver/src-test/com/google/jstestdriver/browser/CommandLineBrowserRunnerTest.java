@@ -25,8 +25,8 @@ public class CommandLineBrowserRunnerTest extends TestCase {
     assertEquals(1, processFactory.processStubs.size());
     assertEquals(browserPath,
         processFactory.processStubs.get(0).commands[0]);
-    assertEquals(browserArgs + " " + url,
-        processFactory.processStubs.get(0).commands[1]);
+    assertEquals(Lists.newArrayList(new String[]{browserPath, browserArgs, url}),
+        Lists.newArrayList(processFactory.processStubs.get(0).commands));
   }
 
   public void testNoArgs() throws Exception {

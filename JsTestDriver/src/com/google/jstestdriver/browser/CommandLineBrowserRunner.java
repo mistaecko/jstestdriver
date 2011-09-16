@@ -50,14 +50,17 @@ public class CommandLineBrowserRunner implements BrowserRunner {
       String processArgs = "";
       if (this.browserArgs.contains("%s")) {
         processArgs = this.browserArgs.replace("%s", serverAddress);
-      }
-      else {
+      } else {
         if (this.browserArgs.length() > 0) {
           processArgs = this.browserArgs + " ";
         }
         processArgs += serverAddress;
       }
-      process = processFactory.start(browserPath, processArgs);
+      String[] args = processArgs.split(" ");
+      String[] finalArgs = new String[args.length + 1];
+      finalArgs[0] = browserPath;
+      System.arraycopy(args, 0, finalArgs, 1, args.length);
+      process = processFactory.start(finalArgs);
     } catch (IOException e) {
       logger.error("Could not start: {} because {}", browserPath, e.toString());
       throw new RuntimeException(e);
