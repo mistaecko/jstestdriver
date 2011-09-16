@@ -17,13 +17,17 @@
 package com.google.jstestdriver.model;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.jstestdriver.FileInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -60,6 +64,35 @@ public class JstdTestCase {
   public List<FileInfo> getPlugins() {
     return plugins;
   }
+  
+  public JstdTestCase applyDelta(JstdTestCaseDelta delta) {
+    return new JstdTestCase(applyUpdates(dependencies, delta.getDependencies()),
+        applyUpdates(tests, delta.getTests()),
+        applyUpdates(plugins, delta.getPlugins()));
+  }
+
+  /**
+   * @param original
+   * @param update
+   */
+  private List<FileInfo> applyUpdates(List<FileInfo> original, List<FileInfo> update) {
+    Map<String, FileInfo> updates = Maps.newHashMap();
+    List<FileInfo> merged = Lists.newArrayList();
+
+    for (FileInfo fileInfo : update) {
+      updates.put(fileInfo.getFilePath(), fileInfo);
+    }
+
+    for (FileInfo fileInfo : original) {
+      if (updates.containsKey(fileInfo.getFilePath())) {
+        merged.add(updates.get(fileInfo.getFilePath()));
+      } else {
+        merged.add(fileInfo);
+      }
+    }
+    return merged;
+  }
+  
   
   /**
    * Adaptor to translate to fileset for uploading to the server.
