@@ -3,6 +3,7 @@
 package com.google.jstestdriver.model;
 
 import com.google.jstestdriver.FileInfo;
+import com.google.jstestdriver.FileLoader;
 
 import java.util.List;
 
@@ -33,5 +34,12 @@ public class JstdTestCaseDelta {
 
   public List<FileInfo> getPlugins() {
     return plugins;
+  }
+
+  public JstdTestCaseDelta loadFiles(FileLoader fileLoader) {
+    return new JstdTestCaseDelta(
+        fileLoader.loadFiles(dependencies, false),
+        fileLoader.loadFiles(tests, false),
+        fileLoader.loadFiles(plugins, false));
   }
 }

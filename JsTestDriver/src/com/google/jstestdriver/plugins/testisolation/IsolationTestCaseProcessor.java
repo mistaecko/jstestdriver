@@ -43,7 +43,7 @@ public class IsolationTestCaseProcessor implements JstdTestCaseProcessor {
 
       for (FileInfo test : tests) {
         JstdTestCase testCase = new JstdTestCase(
-            jstdTestCase.getDependencies(), Lists.newArrayList(test), jstdTestCase.getPlugins());
+            jstdTestCase.getDependencies(), Lists.newArrayList(test), jstdTestCase.getPlugins(), null);
         isolatedTestCases.add(testCase);
       }
     }

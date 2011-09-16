@@ -15,19 +15,20 @@
  */
 package com.google.jstestdriver;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 /**
- * Represents a test resource.
+ * Represents a test resource. The filePath is considered the canonical identifier
+ * for a resource.
  * 
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
@@ -48,9 +49,9 @@ public class FileInfo implements Cloneable {
   public FileInfo() {
   }
 
-  public FileInfo(String fileName, long timestamp, long length,
+  public FileInfo(String filePath, long timestamp, long length,
       boolean isPatch, boolean serveOnly, String data, String displayPath) {
-    this.filePath = fileName;
+    this.filePath = filePath;
     this.timestamp = timestamp;
     this.length = length;
     this.isPatch = isPatch;
@@ -112,6 +113,10 @@ public class FileInfo implements Cloneable {
 
   public boolean canLoad() {
     return !isWebAddress();
+  }
+
+  public boolean isLoaded() {
+    return data != null;
   }
 
   public File toFile(File basePath) {
@@ -207,17 +212,27 @@ public class FileInfo implements Cloneable {
         fileContent.append(reader.readFile(patch.getFilePath()));
       }
     }
-    return new FileInfo(filePath,
-                        timestamp,
-                        length,
-                        isPatch,
-                        serveOnly,
-                        fileContent.toString(),
-                        displayPath);
+    return load(fileContent.toString(), timestamp);
   }
 
+  @SuppressWarnings("unused")
   @Override
   protected Object clone() throws CloneNotSupportedException {
     return new FileInfo(filePath, timestamp, length, isPatch, serveOnly, data, displayPath);
+  }
+
+  /**
+   * Tests to see if a file is a proper replacement: different timestamp, length.
+   * Also returns false if the paths don't match.
+   */
+  public boolean shouldReplaceWith(FileInfo file) {
+    if (!filePath.equals(file.getFilePath())) {
+      return false;
+    }
+    if (getTimestamp() != file.getTimestamp() ||
+        getLength() != file.getLength()) {
+      return true;
+    }
+    return false;
   }
 }

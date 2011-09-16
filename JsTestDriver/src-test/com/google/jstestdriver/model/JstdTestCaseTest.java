@@ -20,10 +20,24 @@ public class JstdTestCaseTest extends TestCase {
             Lists.newArrayList(fileInfoNew));
     JstdTestCase testCase =
         new JstdTestCase(Lists.<FileInfo>newArrayList(), Lists.<FileInfo>newArrayList(),
-            Lists.<FileInfo>newArrayList(fileInfoOld));
+            Lists.<FileInfo>newArrayList(fileInfoOld), null);
 
     assertEquals(new JstdTestCase(Lists.<FileInfo>newArrayList(), Lists.<FileInfo>newArrayList(),
-        Lists.newArrayList(fileInfoNew)), testCase.applyDelta(delta));
+        Lists.newArrayList(fileInfoNew), null), testCase.applyDelta(delta));
+  }
+
+  public void testApplyDeltaWrongId() throws Exception {
+    FileInfo fileInfoOld = new FileInfo("foo.js", 1, -1, false, false, "", "foo.js");
+    FileInfo fileInfoNew = new FileInfo("foo.js", 2, -1, false, false, "", "foo.js");
+    JstdTestCaseDelta delta =
+      new JstdTestCaseDelta(Lists.<FileInfo>newArrayList(), Lists.<FileInfo>newArrayList(),
+          Lists.newArrayList(fileInfoNew));
+    JstdTestCase testCase =
+      new JstdTestCase(Lists.<FileInfo>newArrayList(), Lists.<FileInfo>newArrayList(),
+          Lists.<FileInfo>newArrayList(fileInfoOld), null);
+
+    assertEquals(new JstdTestCase(Lists.<FileInfo>newArrayList(), Lists.<FileInfo>newArrayList(),
+        Lists.newArrayList(fileInfoNew), null), testCase.applyDelta(delta));
   }
 
   public void testApplyDeltaMerge() throws Exception {
@@ -37,10 +51,10 @@ public class JstdTestCaseTest extends TestCase {
             Lists.<FileInfo>newArrayList(testNew), Lists.<FileInfo>newArrayList());
     JstdTestCase testCase =
         new JstdTestCase(Lists.<FileInfo>newArrayList(dep), Lists.<FileInfo>newArrayList(test,
-            testOld), Lists.<FileInfo>newArrayList(plugin));
+            testOld), Lists.<FileInfo>newArrayList(plugin), null);
 
     assertEquals(
         new JstdTestCase(Lists.<FileInfo>newArrayList(dep), Lists.<FileInfo>newArrayList(test,
-            testNew), Lists.newArrayList(plugin)), testCase.applyDelta(delta));
+            testNew), Lists.newArrayList(plugin), null), testCase.applyDelta(delta));
   }
 }

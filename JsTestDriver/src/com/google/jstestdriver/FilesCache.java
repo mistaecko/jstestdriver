@@ -24,6 +24,7 @@ import java.util.Set;
  */
 public class FilesCache {
 
+
   // TODO(corysmith): replace this with a synchronized collection
   // When the map semantics are clean.
   private final Map<String, FileInfo> files;
@@ -73,5 +74,9 @@ public class FilesCache {
   
   public static class MissingFileException extends RuntimeException {
     
+  }
+
+  public FileInfo getFile(String filePath) {
+    return files.get(filePath);
   }
 }

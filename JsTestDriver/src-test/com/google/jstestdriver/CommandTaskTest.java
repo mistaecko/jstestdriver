@@ -67,7 +67,7 @@ public class CommandTaskTest extends TestCase {
     CommandTask task =
         createCommandTask(server, params, stream, new MockFileLoader(), true);
 
-    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), java.util.Collections.<FileInfo> emptyList()));
+    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), java.util.Collections.<FileInfo> emptyList(), null));
     Response response = stream.getResponse();
 
     assertEquals("response", response.getResponse());
@@ -104,7 +104,7 @@ public class CommandTaskTest extends TestCase {
     CommandTask task = createCommandTask(server, params,
         stream, fileReader, true);
 
-    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), Lists.newArrayList(fileInfo), java.util.Collections.<FileInfo> emptyList()));
+    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), Lists.newArrayList(fileInfo), java.util.Collections.<FileInfo> emptyList(), null));
     Response response = stream.getResponse();
 
     assertEquals("response", response.getResponse());
@@ -182,7 +182,7 @@ public class CommandTaskTest extends TestCase {
     fileReader.addExpectation(serveInfo, serveInfoContents);
     CommandTask task = createCommandTask(server, params, stream, fileReader, true);
 
-    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), fileSet, java.util.Collections.<FileInfo> emptyList()));
+    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), fileSet, java.util.Collections.<FileInfo> emptyList(), null));
     Response response = stream.getResponse();
 
     assertEquals("{\"loadedFiles\":[]}", response.getResponse());

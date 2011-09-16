@@ -24,8 +24,6 @@ import com.google.jstestdriver.FileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,12 +43,16 @@ public class JstdTestCase {
   private final List<FileInfo> tests;
   private final List<FileInfo> plugins;
 
+  private final String id;
+
   public JstdTestCase(List<FileInfo> dependencies,
                       List<FileInfo> tests,
-                      List<FileInfo> plugins) {
+                      List<FileInfo> plugins,
+                      String id) {
     this.dependencies = dependencies;
     this.tests = tests;
     this.plugins = plugins;
+    this.id = id;
   }
 
   public List<FileInfo> getTests() {
@@ -66,9 +68,35 @@ public class JstdTestCase {
   }
   
   public JstdTestCase applyDelta(JstdTestCaseDelta delta) {
-    return new JstdTestCase(applyUpdates(dependencies, delta.getDependencies()),
+    return new JstdTestCase(
+        applyUpdates(dependencies, delta.getDependencies()),
         applyUpdates(tests, delta.getTests()),
-        applyUpdates(plugins, delta.getPlugins()));
+        applyUpdates(plugins, delta.getPlugins()),
+        id);
+  }
+
+  /**
+   * Creates a delta of unloaded files that need to be loaded.
+   * Used when the current process does not have access to a FileLoader.
+   */
+  public JstdTestCaseDelta createUnloadedDelta() {
+    return new JstdTestCaseDelta(
+        findUnloaded(dependencies),
+        findUnloaded(tests),
+        findUnloaded(plugins));
+  }
+
+  /**
+   * finds all the FileInfo's that are not loaded in a list.
+   */
+  private List<FileInfo> findUnloaded(List<FileInfo> files) {
+    List<FileInfo> unloaded = Lists.newArrayList();
+    for (FileInfo file : files) {
+      if (!file.isLoaded()) {
+        unloaded.add(file);
+      }
+    }
+    return unloaded;
   }
 
   /**
@@ -93,7 +121,6 @@ public class JstdTestCase {
     return merged;
   }
   
-  
   /**
    * Adaptor to translate to fileset for uploading to the server.
    */
@@ -109,7 +136,7 @@ public class JstdTestCase {
       Lists.newArrayListWithExpectedSize(plugins.size() + this.plugins.size());
     combined.addAll(this.plugins);
     combined.addAll(plugins);
-    return new JstdTestCase(dependencies, tests, combined);
+    return new JstdTestCase(dependencies, tests, combined, id);
   }
 
   @Override
@@ -119,6 +146,7 @@ public class JstdTestCase {
     result = prime * result + ((dependencies == null) ? 0 : dependencies.hashCode());
     result = prime * result + ((plugins == null) ? 0 : plugins.hashCode());
     result = prime * result + ((tests == null) ? 0 : tests.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
     return result;
   }
 
@@ -137,6 +165,9 @@ public class JstdTestCase {
     if (tests == null) {
       if (other.tests != null) return false;
     } else if (!tests.equals(other.tests)) return false;
+    if (id == null) {
+      if (other.id != null) return false;
+    } else if (!id.equals(other.id)) return false;
     return true;
   }
 
@@ -144,5 +175,12 @@ public class JstdTestCase {
   public String toString() {
     return "JstdTestCase [dependencies=" + (logger.isDebugEnabled() || logger.isTraceEnabled() ? dependencies : "<elided>") + ", plugins=" + plugins + ", tests="
         + tests + "]";
+  }
+
+  /**
+   * Access for the id.
+   */
+  public String getId() {
+    return id;
   }
 }
