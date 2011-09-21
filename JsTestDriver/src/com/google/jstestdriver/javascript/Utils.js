@@ -168,3 +168,54 @@ jstestdriver.createSynchPost = function(jQuery) {
     });
   });
 };
+
+jstestdriver.utils = {};
+
+jstestdriver.utils.serializeObject = function(obj) {
+  var out = [];
+  jstestdriver.utils.serializeObjectToArray(obj, out);
+  return out.join('');
+};
+
+
+jstestdriver.utils.serializeObjectToArray =
+   function(obj, opt_out){
+  var out = opt_out || out;
+  if (obj instanceof Array) {
+      out.push('[');
+      var arr = /** @type {Array.<Object>} */
+      obj;
+      for ( var i = 0; i < arr.length; i++) {
+        this.serializeObjectToArray(arr[i], out);
+        if (i < arr.length - 1) {
+          out.push(',');
+        }
+      }
+      out.push(']');
+    } else if (obj instanceof Error) {
+      out.push('{');
+      out.push('"message":');
+      this.serializeObjectToArray(obj.message, out);
+      this.serializePropertyOnObject('name', obj, out);
+      this.serializePropertyOnObject('description', obj, out);
+      this.serializePropertyOnObject('fileName', obj, out);
+      this.serializePropertyOnObject('lineNumber', obj, out);
+      this.serializePropertyOnObject('number', obj, out);
+      this.serializePropertyOnObject('stack', obj, out);
+      out.push('}');
+    } else {
+      out.push(jstestdriver.angular.toJson(obj));
+    }
+    return out;
+  };
+
+
+jstestdriver.utils.serializePropertyOnObject = function(name, obj, out) {
+  if (name in obj) {
+    out.push(',');
+    out.push('"' + name + '":');
+    this.serializeObjectToArray(obj[name], out);
+  }
+};
+
+

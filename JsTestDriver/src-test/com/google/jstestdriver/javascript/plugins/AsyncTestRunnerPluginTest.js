@@ -136,7 +136,11 @@ asyncTestRunnerPluginTest.prototype.
   var priorAssertCount = jstestdriver.assertCount;
 
   var asyncTestRunner = new jstestdriver.plugins.async.AsyncTestRunnerPlugin(
-      Date, function() {}, jstestdriver.angular.toJson, false, function(callback) {callback();});
+      Date,
+      function() {},
+      jstestdriver.utils.serializeObject,
+      false,
+      function(callback) {callback();});
 
   var testCase = function() {};
   testCase.prototype.testWithExpectAsserts = function() {
