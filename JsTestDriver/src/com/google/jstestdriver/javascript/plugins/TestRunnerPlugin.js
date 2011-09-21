@@ -185,5 +185,48 @@ jstestdriver.plugins.TestRunnerPlugin.prototype.runTest =
  *@param {Error} e
  */
 jstestdriver.plugins.TestRunnerPlugin.prototype.serializeError = function(e) {
-  return jstestdriver.angular.toJson(e);
+  var out = []
+  this.serializeObject(e, out);
+  jstestdriver.log(out.join(''));
+  return out.join('');
 };
+
+jstestdriver.plugins.TestRunnerPlugin.prototype.serializeObject =
+    function(obj, out){
+  if (obj instanceof Array) {
+    out.push('[');
+    var arr = /** @type {Array.<Object>} */ obj;
+    for(var i = 0; i < arr.length; i++) {
+      this.serializeObject(arr[i], out);
+      if (i < arr.length -1) {
+        out.push(',');
+      }
+    }
+    out.push(']');
+  } else if (obj instanceof Error) {
+    out.push('{');
+    out.push('"message":');
+    this.serializeObject(obj.message, out);
+    this.serializePropertyOnObject('name', obj, out);
+    this.serializePropertyOnObject('description', obj, out);
+    this.serializePropertyOnObject('fileName', obj, out);
+    this.serializePropertyOnObject('lineNumber', obj, out);
+    this.serializePropertyOnObject('number', obj, out);
+    this.serializePropertyOnObject('stack', obj, out);
+    out.push('}');
+  } else {
+    out.push(jstestdriver.angular.toJson(obj));
+  }
+  return out;
+};
+
+jstestdriver.plugins.TestRunnerPlugin.prototype.serializePropertyOnObject = 
+    function(name, obj, out) {
+  if (name in obj) {
+    out.push(',');
+    out.push('"' + name + '":');
+    this.serializeObject(obj[name], out);
+  }
+};
+
+
