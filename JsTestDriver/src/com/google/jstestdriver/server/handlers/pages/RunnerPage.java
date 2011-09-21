@@ -15,10 +15,12 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import java.io.IOException;
+import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.LOAD_TYPE;
 
 import com.google.inject.Inject;
 import com.google.jstestdriver.util.HtmlWriter;
+
+import java.io.IOException;
 
 /**
  * Runner page 
@@ -51,7 +53,7 @@ public class RunnerPage implements Page {
           "        jstestdriver.now,\n" +
           "        jstestdriver.setTimeout));");
 
-    if (!"load".equals(request.getParameter("type"))) {
+    if (!"load".equals(request.getParameter(LOAD_TYPE))) {
       testFileUtil.writeTestFiles(writer);
     }
 

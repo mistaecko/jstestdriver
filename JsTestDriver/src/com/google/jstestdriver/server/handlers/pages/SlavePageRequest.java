@@ -15,20 +15,20 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.SlaveBrowser;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.runner.RunnerType;
 import com.google.jstestdriver.server.handlers.CaptureHandler;
 import com.google.jstestdriver.util.HtmlWriter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Wrapper for the HttpServletRequest object with Page specific logic.
@@ -42,6 +42,8 @@ public class SlavePageRequest {
   public static final String MODE = "mode";
   public static final String TIMEOUT = "timeout";
   public static final String UPLOAD_SIZE = "upload_size";
+  public static final String LOAD_TYPE = "load_type";
+  public static final String REFRESH = "refresh";
 
   private static final Logger logger =
       LoggerFactory.getLogger(SlavePageRequest.class);

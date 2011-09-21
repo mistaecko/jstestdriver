@@ -203,7 +203,7 @@ jstestdriver.CommandExecutor.prototype.dryRunFor = function(args) {
 
 jstestdriver.CommandExecutor.prototype.listen = function(loadResults) {
   var response;
-  if (window.location.href.search('\\?refresh') != -1) {
+  if (window.location.href.search('refresh') != -1) {
     response =
         new jstestdriver.Response(jstestdriver.RESPONSE_TYPES.RESET_RESULT,
                                   '{"loadedFiles":' + JSON.stringify(loadResults) + '}',

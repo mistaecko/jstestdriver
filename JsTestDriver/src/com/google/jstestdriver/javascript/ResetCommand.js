@@ -51,8 +51,8 @@ jstestdriver.ResetCommand.prototype.reset = function(loadType) {
   var newUrl = this.location_.protocol + "//" +
                this.location_.host +
                this.location_.pathname +
-               '?refresh=' + now +
-               '&type=' + loadType;
+               '/refresh/' + now +
+               '/load_type/' + loadType;
   jstestdriver.log("Replacing " + newUrl);
   if (this.location_.search.indexOf(now) != -1) {
     this.location_.reload();
