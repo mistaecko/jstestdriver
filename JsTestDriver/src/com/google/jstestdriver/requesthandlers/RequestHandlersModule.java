@@ -17,6 +17,7 @@ import com.google.jstestdriver.server.gateway.GatewayRequestHandler;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +88,9 @@ public abstract class RequestHandlersModule extends AbstractModule {
     MultiThreadedHttpConnectionManager manager = new MultiThreadedHttpConnectionManager();
     manager.getParams().setDefaultMaxConnectionsPerHost(20);
     manager.getParams().setMaxTotalConnections(200);
-    return new HttpClient(manager);
+    HttpClient client = new HttpClient(manager);
+    client.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
+    return client;
   }
 
   @Provides @Singleton ServletContext provideServletContext(Servlet servlet) {
