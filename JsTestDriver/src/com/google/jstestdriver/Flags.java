@@ -38,6 +38,8 @@ public interface Flags {
   // server is not bound into Guice.
   public String getServer();
 
+  public String getCaptureAddress();
+
   @GuiceBinding(name="arguments", parameterizedType = String.class)
   public List<String> getArguments();
 
@@ -69,12 +71,12 @@ public interface Flags {
 
   @GuiceBinding(name="dryRunFor", parameterizedType = String.class)
   public List<String> getDryRunFor();
-  
+
   @GuiceBinding(name="browserTimeout")
   public long getBrowserTimeout();
-  
+
   @GuiceBinding(name="serverHandlerPrefix")
   public HandlerPathPrefix getServerHandlerPrefix();
-  
+
   public boolean getDisplayHelp();
 }

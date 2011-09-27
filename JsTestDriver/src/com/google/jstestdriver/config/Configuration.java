@@ -41,6 +41,9 @@ public interface Configuration {
   // TODO(corysmith): replace this with a URI/URL model.
   public String getServer(String flagValue, int port, HandlerPathPrefix handlerPrefix);
 
+  /** Creates a capture address. */
+  public String getCaptureAddress(String server, String captureAddress, HandlerPathPrefix prefix);
+
   /** A list of plugin from the configuration file. */
   public List<Plugin> getPlugins();
   

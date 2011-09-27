@@ -94,13 +94,19 @@ public class Initializer {
 
     modules.add(new HtmlDocModule()); // by default the html plugin is installed.
     modules.add(new DebugModule(runnerMode.isDebug()));
+    String serverAddress = resolvedConfiguration.getServer(
+        flags.getServer(),
+        flags.getPort(),
+        flags.getServerHandlerPrefix());
+    String captureAddress = resolvedConfiguration.getCaptureAddress(
+        serverAddress,
+        flags.getCaptureAddress(),
+        flags.getServerHandlerPrefix());
     modules.add(
         new JsTestDriverModule(flags,
             resolvedConfiguration.getFilesList(),
-            resolvedConfiguration.getServer(
-                flags.getServer(),
-                flags.getPort(),
-                flags.getServerHandlerPrefix()),
+            serverAddress,
+            captureAddress,
             outputStream,
             basePath,
             resolvedConfiguration.getTestSuiteTimeout(),

@@ -48,6 +48,7 @@ public class FlagsImpl implements Flags {
   private Integer port = -1;
   private Integer sslPort = -1;
   private String server;
+  private String captureAddress;
   private String testOutput = "";
   private Set<BrowserRunner> browser = Sets.newHashSet();
   private boolean reset;
@@ -74,6 +75,11 @@ public class FlagsImpl implements Flags {
     return port;
   }
 
+  @Option(name="--sslPort", usage="The SSL port on which to start the JsTestDriver server")
+  public void setSslPort(Integer sslPort) {
+    this.sslPort = sslPort;
+  }
+
   public Integer getSslPort() {
     return sslPort;
   }
@@ -85,6 +91,16 @@ public class FlagsImpl implements Flags {
 
   public String getServer() {
     return server;
+  }
+
+  @Option(name="--captureAddress", usage="The address to capture the browser.")
+  public void setCaptureAddress(String captureAddress) {
+    this.captureAddress = captureAddress;
+  }
+
+  @Override
+  public String getCaptureAddress() {
+    return captureAddress;
   }
 
   public List<String> getArguments() {

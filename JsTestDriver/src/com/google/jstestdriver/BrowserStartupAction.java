@@ -37,7 +37,7 @@ import com.google.jstestdriver.util.StopWatch;
 public class BrowserStartupAction implements Action {
 
   private final Set<BrowserRunner> browsers;
-  private final String serverAddress;
+  private final String captureAddress;
   private final JsTestDriverClient client;
   private final StopWatch stopWatch;
   private final ExecutorService executor;
@@ -46,12 +46,12 @@ public class BrowserStartupAction implements Action {
   public BrowserStartupAction(Set<BrowserRunner> browsers,
                               StopWatch stopWatch,
                               JsTestDriverClient client,
-                              @Named("server") String serverAddress,
+                              @Named("captureAddress") String captureAddress,
                               ExecutorService executor) {
       this.browsers = browsers;
       this.stopWatch = stopWatch;
       this.client = client;
-      this.serverAddress = serverAddress;
+      this.captureAddress = captureAddress;
       this.executor = executor;
   }
 
@@ -62,7 +62,7 @@ public class BrowserStartupAction implements Action {
       browserIds.add(executor.submit(new Callable<String>() {
         @Override
         public String call() throws Exception {
-          return new BrowserControl(browser, serverAddress, stopWatch, client)
+          return new BrowserControl(browser, captureAddress, stopWatch, client)
               .captureBrowser(client.getNextBrowserId());
         }
       }));
@@ -85,6 +85,6 @@ public class BrowserStartupAction implements Action {
   }
 
   public String getServerAddress() {
-    return serverAddress;
+    return captureAddress;
   }
 }

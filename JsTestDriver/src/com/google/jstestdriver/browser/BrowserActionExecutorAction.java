@@ -54,7 +54,7 @@ public class BrowserActionExecutorAction implements Action {
   private final List<BrowserAction> actions;
   private final ExecutorService executor;
   private final Set<BrowserRunner> browserRunners;
-  private final String serverAddress;
+  private final String captureAddress;
   private final long testSuiteTimeout;
 
   private final StopWatch stopWatch;
@@ -66,7 +66,7 @@ public class BrowserActionExecutorAction implements Action {
       List<BrowserAction> actions,
       ExecutorService executor,
       Set<BrowserRunner> browserRunners,
-      @Named("server") String serverAddress,
+      @Named("captureAddress") String captureAddress,
       @Named("testSuiteTimeout") long testTimeout,
       StopWatch stopWatch,
       BrowserSessionManager sessionManager) {
@@ -74,7 +74,7 @@ public class BrowserActionExecutorAction implements Action {
     this.actions = actions;
     this.executor = executor;
     this.browserRunners = browserRunners;
-    this.serverAddress = serverAddress;
+    this.captureAddress = captureAddress;
     this.testSuiteTimeout = testTimeout;
     this.stopWatch = stopWatch;
     this.sessionManager = sessionManager;
@@ -158,7 +158,7 @@ public class BrowserActionExecutorAction implements Action {
       String browserId, BrowserActionRunner actionRunner) {
     return new RetryingCallable<Collection<ResponseStream>>(runner.getNumStartupTries(),
         new BrowserCallable<Collection<ResponseStream>>(actionRunner, browserId,
-      new BrowserControl(runner, serverAddress, stopWatch, client))) ;
+      new BrowserControl(runner, captureAddress, stopWatch, client)));
   }
 
   public List<BrowserAction> getActions() {

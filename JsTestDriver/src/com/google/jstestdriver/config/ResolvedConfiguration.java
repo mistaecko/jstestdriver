@@ -73,6 +73,16 @@ public class ResolvedConfiguration implements Configuration {
     return handlerPrefix.suffixServer(String.format("http://%s:%d", "127.0.0.1", port));
   }
 
+  @Override
+  public String getCaptureAddress(String server, String captureAddress,
+      HandlerPathPrefix prefix) {
+    if (captureAddress != null && !captureAddress.isEmpty()) {
+      return prefix.suffixServer(captureAddress);
+    } else {
+      return server;
+    }
+  }
+
   public Set<FileInfo> getFilesList() {
     return filesList;
   }

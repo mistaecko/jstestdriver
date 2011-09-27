@@ -175,6 +175,10 @@ public class ConfigurationParser {
     return server;
   }
 
+  public String getCaptureAddress() {
+    return server;
+  }
+
   public List<Plugin> getPlugins() {
     return plugins;
   }

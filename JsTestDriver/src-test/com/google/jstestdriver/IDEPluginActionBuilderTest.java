@@ -67,7 +67,7 @@ public class IDEPluginActionBuilderTest extends TestCase {
         new ConfigurationParser(tmpDir, configReader, new DefaultPathRewriter());
 
     IDEPluginActionBuilder builder = new IDEPluginActionBuilder(configParser, "http://localhost:42242",
-        new ResponseStreamFactoryStub(), new File("."));
+        "http://localhost:42242", new ResponseStreamFactoryStub(), new File("."));
     builder.install(new AbstractModule(){
                      @Override
                      protected void configure() {
@@ -98,7 +98,7 @@ public class IDEPluginActionBuilderTest extends TestCase {
         new ConfigurationParser(tmpDir, configReader, new DefaultPathRewriter());
 
     IDEPluginActionBuilder builder = new IDEPluginActionBuilder(configParser, "http://address",
-        new ResponseStreamFactoryStub(), new File("."));
+        "http://address", new ResponseStreamFactoryStub(), new File("."));
     builder.install(new AbstractModule(){
                      @Override
                      protected void configure() {

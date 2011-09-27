@@ -49,6 +49,7 @@ public class IDEPluginActionBuilder {
 
   private final ConfigurationParser configParser;
   private final String serverAddress;
+  private final String captureAddress;
   private final ResponseStreamFactory responseStreamFactory;
 
   private List<String> tests = new LinkedList<String>();
@@ -58,10 +59,11 @@ public class IDEPluginActionBuilder {
   private File basePath;
 
   public IDEPluginActionBuilder(ConfigurationParser configParser,
-      String serverAddress, ResponseStreamFactory responseStreamFactory,
-      File basePath) {
+      String serverAddress, String captureAddress,
+      ResponseStreamFactory responseStreamFactory, File basePath) {
     this.configParser = configParser;
     this.serverAddress = serverAddress;
+    this.captureAddress = captureAddress;
     this.responseStreamFactory = responseStreamFactory;
     this.basePath = basePath;
   }
@@ -97,6 +99,7 @@ public class IDEPluginActionBuilder {
     Injector injector = Guice.createInjector(new ActionFactoryModule(),
         new ConfigurationModule(modules, tests, reset, dryRunFor,
             serverAddress != null ? serverAddress : configParser.getServer(),
+            captureAddress != null ? captureAddress : configParser.getCaptureAddress(),
             basePath, configParser.getFilesList(), responseStreamFactory));
 
     return injector.getInstance(ActionRunner.class);
@@ -109,6 +112,7 @@ public class IDEPluginActionBuilder {
     private final boolean reset;
     private final List<String> dryRunFor;
     private final String serverAddress;
+    private final String captureAddress;
     private final File basePath;
     private final Set<FileInfo> fileSet;
     private final ResponseStreamFactory responseStreamFactory;
@@ -116,13 +120,14 @@ public class IDEPluginActionBuilder {
 
     public ConfigurationModule(LinkedList<Module> modules, List<String> tests,
         boolean reset, List<String> dryRunFor, String serverAddress,
-        File basePath, Set<FileInfo> fileSet,
+        String captureAddress, File basePath, Set<FileInfo> fileSet,
         ResponseStreamFactory responseStreamFactory) {
       this.modules = modules;
       this.tests = tests;
       this.reset = reset;
       this.dryRunFor = dryRunFor;
       this.serverAddress = serverAddress;
+      this.captureAddress = captureAddress;
       this.basePath = basePath;
       this.fileSet = fileSet;
       this.responseStreamFactory = responseStreamFactory;
@@ -141,6 +146,9 @@ public class IDEPluginActionBuilder {
       bind(String.class)
           .annotatedWith(Names.named("server"))
           .toInstance(serverAddress);
+      bind(String.class)
+          .annotatedWith(Names.named("captureAddress"))
+          .toInstance(captureAddress);
       bind(Boolean.class)
           .annotatedWith(Names.named("debug"))
           .toInstance(Boolean.FALSE);

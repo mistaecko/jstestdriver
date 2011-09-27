@@ -57,6 +57,7 @@ public class JsTestDriverModule extends AbstractModule {
   private final Flags flags;
   private final Set<FileInfo> fileSet;
   private final String serverAddress;
+  private final String captureAddress;
   private final PrintStream outputStream;
   private final File basePath;
   private final long testSuiteTimeout;
@@ -67,11 +68,13 @@ public class JsTestDriverModule extends AbstractModule {
   public JsTestDriverModule(Flags flags,
       Set<FileInfo> fileSet,
       String serverAddress,
+      String captureAddress,
       PrintStream outputStream,
       File basePath) {
     this(flags,
          fileSet,
          serverAddress,
+         captureAddress,
          outputStream,
          basePath,
          DefaultConfiguration.DEFAULT_TEST_TIMEOUT,
@@ -83,6 +86,7 @@ public class JsTestDriverModule extends AbstractModule {
   public JsTestDriverModule(Flags flags,
       Set<FileInfo> fileSet,
       String serverAddress,
+      String captureAddress,
       PrintStream outputStream,
       File basePath,
       long testSuiteTimeout,
@@ -92,6 +96,7 @@ public class JsTestDriverModule extends AbstractModule {
     this.flags = flags;
     this.fileSet = fileSet;
     this.serverAddress = serverAddress;
+    this.captureAddress = captureAddress;
     this.outputStream = outputStream;
     this.basePath = basePath;
     this.testSuiteTimeout = testSuiteTimeout;
@@ -105,7 +110,9 @@ public class JsTestDriverModule extends AbstractModule {
     if (logger.isDebugEnabled()) {
       logger.debug("Configured with:\n"
           + "flags:{}\n"
-          + "Files:{}\nserver:{}\n"
+          + "Files:{}\n"
+          + "server:{}\n"
+          + "captureAddress:{}\n"
           + "outputStream:{}\n"
           + "basePath:{}\n"
           + "testSuiteTimeout:{}\n"
@@ -115,6 +122,7 @@ public class JsTestDriverModule extends AbstractModule {
          flags,
          fileSet,
          serverAddress,
+         captureAddress,
          outputStream,
          basePath,
          testSuiteTimeout,
@@ -132,6 +140,8 @@ public class JsTestDriverModule extends AbstractModule {
         "The server address cannot be empty, null, or missing the protocol:" + serverAddress);
     bind(String.class)
          .annotatedWith(Names.named("server")).toInstance(serverAddress);
+    bind(String.class)
+        .annotatedWith(Names.named("captureAddress")).toInstance(captureAddress);
     bind(Boolean.class)
          .annotatedWith(Names.named("raiseOnFailure")).toInstance(true);
 
