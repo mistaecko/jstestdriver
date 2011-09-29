@@ -127,7 +127,7 @@ public class FileUploader {
     fileSetParams.put("id", browserId);
     fileSetParams.put("data", gson.toJson(testCase));
     fileSetParams.put("action", BrowserFileCheck.ACTION);
-    logger.info("FileParams: {}", fileSetParams);
+    //logger.info("FileParams: {}", fileSetParams);
     String postResult = server.post(baseUrl + "/fileSet", fileSetParams);
     stopWatch.stop("get upload set %s", browserId);
 
@@ -225,11 +225,11 @@ public class FileUploader {
 
   private void reset(String browserId, ResponseStream stream, JstdTestCase testCase) {
     stopWatch.start("reset %s", browserId);
-    JsonCommand cmd = new JsonCommand(CommandType.RESET, Lists.newArrayList("load"));
+    JsonCommand cmd = new JsonCommand(CommandType.RESET,
+        Lists.newArrayList("load", testCase.getId()));
     Map<String, String> resetParams = new LinkedHashMap<String, String>();
 
     resetParams.put("id", browserId);
-    resetParams.put("testCase", testCase.getId());
     resetParams.put("data", gson.toJson(cmd));
     server.post(baseUrl + "/cmd", resetParams);
 

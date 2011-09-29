@@ -76,7 +76,7 @@ public class BrowserControl {
           }
         }
       } finally {
-        stopWatch.start("Capturing browser", browserId);
+        stopWatch.stop("Capturing browser", browserId);
       }
       logger.debug("Browser {} started with id {}", runner, browserId);
       return browserId;

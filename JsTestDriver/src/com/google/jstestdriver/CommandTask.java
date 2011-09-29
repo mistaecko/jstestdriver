@@ -94,6 +94,7 @@ public class CommandTask {
   }
 
   public void run(JstdTestCase testCase) {
+    stopWatch.start("run %s", testCase.getId());
     String browserId = params.get("id");
     try {
       stopWatch.start("checkBrowser %s", browserId);
@@ -112,9 +113,9 @@ public class CommandTask {
         getBrowser(browserId).getUploadSize());
       }
       logger.debug("Finished upload for {}", browserId);
-      stopWatch.start("send cmd %s", params);
+      stopWatch.start("post %s", params);
       server.post(baseUrl + "/cmd", params);
-      stopWatch.stop("send cmd %s", params);
+      stopWatch.stop("post %s", params);
     } finally {
       
     }
@@ -139,6 +140,7 @@ public class CommandTask {
     } finally {
       stopWatch.stop("execution %s", params.get("data"));
       logger.debug("finished {} for {}", params.get("data"), browserId);
+      stopWatch.stop("run %s", testCase.getId());
     }
   }
 }

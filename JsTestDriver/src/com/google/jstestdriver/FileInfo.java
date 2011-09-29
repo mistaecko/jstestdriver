@@ -227,10 +227,15 @@ public class FileInfo implements Cloneable {
    */
   public boolean shouldReplaceWith(FileInfo file) {
     if (!filePath.equals(file.getFilePath())) {
+      logger.trace("paths not equal {} {}", getDisplayPath(), file.getDisplayPath());
       return false;
     }
-    if (getTimestamp() != file.getTimestamp() ||
-        getLength() != file.getLength()) {
+    if (getTimestamp() != file.getTimestamp()) {
+      logger.trace("replace {} because {} != {}", new Object[]{getDisplayPath(), getTimestamp(), file.getTimestamp()});
+      return true;
+    }
+    if (getLength() != file.getLength()) {
+      logger.trace("replace {} because {} != {}", new Object[]{getDisplayPath(), getLength(), file.getLength()});
       return true;
     }
     return false;

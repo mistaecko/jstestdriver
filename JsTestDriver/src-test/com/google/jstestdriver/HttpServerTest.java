@@ -15,6 +15,8 @@
  */
 package com.google.jstestdriver;
 
+import com.google.jstestdriver.util.NullStopWatch;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class HttpServerTest extends TestCase {
 
   public void testConvertMapToUrlEncodedString() throws Exception {
     Map<String, String> map = new LinkedHashMap<String, String>(); // preserves order
-    HttpServer server = new HttpServer();
+    HttpServer server = new HttpServer(new NullStopWatch());
 
     map.put("data", "1+3");
     map.put("id", "2");

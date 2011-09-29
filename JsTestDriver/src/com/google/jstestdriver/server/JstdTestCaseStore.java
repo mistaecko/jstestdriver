@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -45,6 +46,7 @@ public class JstdTestCaseStore {
           updateCache(testCase.getTests()),
           updateCache(testCase.getPlugins())));
     }
+    logger.info("adding TestCase {} to {}", testCase.getId(), this);
     cases.put(testCase.getId(), updatedTestCase);
     return updatedTestCase.createUnloadedDelta();
   }
@@ -56,21 +58,22 @@ public class JstdTestCaseStore {
   private List<FileInfo> updateCache(List<FileInfo> newFiles) {
     List<FileInfo> replace = Lists.newArrayList();
     for (FileInfo file : newFiles) {
-      FileInfo oldFile = files.getFile(file.getFilePath());
+      FileInfo oldFile = files.getFile(file.getDisplayPath());
       if (oldFile == null) {
         files.addFile(file);
-        logger.debug("not replacing {} with {}", oldFile, file);
+        logger.debug("adding {}", file.getDisplayPath());
       } else if (oldFile.shouldReplaceWith(file)) {
-        logger.debug("replacing {} with {}", oldFile, file);
+        logger.debug("replacing {}", oldFile.getDisplayPath());
         files.addFile(file);
-      } else if (oldFile.isLoaded()){
-        logger.debug("not replacing {} (loaded) with {}", oldFile, file);
+      } else if (file.isLoaded()) {
+        logger.debug("updating {} (loaded)", file.getDisplayPath());
+        files.addFile(file);
+      } else if (oldFile.isLoaded() && !file.isLoaded()){
+        logger.debug("not replacing {}", file.getDisplayPath());
         // the old file the same as the new, except the old is loaded.
         replace.add(oldFile);
-      } else if (file.isLoaded()) {
-        files.addFile(file);
       } else {
-        logger.debug("files are equal {}, {}", oldFile, file);
+        logger.debug("files are equal {}", file.getDisplayPath());
       }
     }
     return replace;
@@ -112,9 +115,11 @@ public class JstdTestCaseStore {
       updateCache(delta.getPlugins());
     }
     synchronized (cases) {
+      Map<String, JstdTestCase> applied = Maps.newHashMap();
       for (Entry<String, JstdTestCase> entry : cases.entrySet()) {
-        entry.setValue(entry.getValue().applyDelta(delta));
+        applied.put(entry.getKey(), entry.getValue().applyDelta(delta));
       }
+      cases.putAll(applied);
     }
   }
 }

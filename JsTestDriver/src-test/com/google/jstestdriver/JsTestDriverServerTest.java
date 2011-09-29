@@ -132,7 +132,7 @@ public class JsTestDriverServerTest extends TestCase {
            ImmutableSet.<FileInfoScheme>of(new HttpFileInfoScheme()),
            new NullPathPrefix()),
         "http://localhost:4224",
-        new HttpServer(),
+        new HttpServer(new NullStopWatch()),
         false,
         null,
         new NullStopWatch());
@@ -169,7 +169,7 @@ public class JsTestDriverServerTest extends TestCase {
     entry.addProperty("server", "http://localhost:8888/");
     JsonArray gatewayConfig = new JsonArray();
     gatewayConfig.add(entry);
-    final HttpServer client = new HttpServer();
+    final HttpServer client = new HttpServer(new NullStopWatch());
     client.postJson("http://localhost:4224/jstd/gateway", gatewayConfig);
     SocketConnector connector = new SocketConnector();
     connector.setPort(8888);

@@ -27,6 +27,7 @@ import static com.google.jstestdriver.server.handlers.pages.PageType.VISUAL_STAN
 import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.LOAD_TYPE;
 import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.REFRESH;
 import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.UPLOAD_SIZE;
+import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.TESTCASE_ID;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -197,6 +198,7 @@ public class JstdHandlersModule extends RequestHandlersModule {
     .put(UPLOAD_SIZE, 1)
     .put(LOAD_TYPE, 1)
     .put(REFRESH, 1)
+    .put(TESTCASE_ID, 1)
     .build();
 
   private static final Set<String> BLACKLIST = ImmutableSet.<String>builder().build();

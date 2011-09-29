@@ -16,6 +16,8 @@
 package com.google.jstestdriver;
 
 import com.google.gson.JsonElement;
+import com.google.inject.Inject;
+import com.google.jstestdriver.util.StopWatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +38,16 @@ import java.util.Map;
  */
 public class HttpServer implements Server {
   private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
+  private final StopWatch stopWatch;
+  
+  @Inject
+  public HttpServer(StopWatch stopWatch) {
+    this.stopWatch = stopWatch;
+  }
 
   @Override
   public String fetch(String url) {
+    stopWatch.start("fetch %s", url);
     HttpURLConnection connection = null;
     logger.trace("Fetching {}", url);
 
@@ -56,6 +65,7 @@ public class HttpServer implements Server {
       if (connection != null) {
         connection.disconnect();
       }
+      stopWatch.stop("fetch %s", url);
     }
   }
 
@@ -93,7 +103,9 @@ public class HttpServer implements Server {
     return sb.toString();
   }
 
+  @Override
   public String post(String url, Map<String, String> params) {
+    stopWatch.start("post %s", url);
     HttpURLConnection connection = null;
 
     try {
@@ -121,10 +133,13 @@ public class HttpServer implements Server {
       if (connection != null) {
         connection.disconnect();
       }
+      stopWatch.stop("post %s", url);
     }
   }
 
+  @Override
   public String postJson(String url, JsonElement json) {
+    stopWatch.start("postJson %s", url);
     HttpURLConnection connection = null;
     try {
       logger.trace("Post url:{}\nJSON:\n{}\n", url, json);
@@ -149,6 +164,7 @@ public class HttpServer implements Server {
       if (connection != null) {
         connection.disconnect();
       }
+      stopWatch.stop("postJson %s", url);
     }
   }
 
@@ -173,10 +189,12 @@ public class HttpServer implements Server {
     return sb.toString();
   }
 
+  @Override
   public String startSession(String baseUrl, String id) {
     return fetch(baseUrl + "/fileSet?id=" + id + "&session=start");
   }
 
+  @Override
   public void stopSession(String baseUrl, String id, String sessionId) {
     fetch(baseUrl + "/fileSet?id=" + id + "&session=stop" + "&sessionId=" + sessionId);
   }

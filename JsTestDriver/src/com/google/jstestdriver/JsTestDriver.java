@@ -42,6 +42,7 @@ import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.output.TestResultListener;
 import com.google.jstestdriver.runner.RunnerMode;
+import com.google.jstestdriver.util.NullStopWatch;
 import com.google.jstestdriver.util.RetryException;
 
 import org.slf4j.Logger;
@@ -198,7 +199,7 @@ public class JsTestDriver {
         new StringBuilder(defaultConfiguration.getServer(serverAddress, port, prefix));
     urlBuilder.append("/");
     urlBuilder.append("quit");
-    new HttpServer().ping(urlBuilder.toString());
+    new HttpServer(new NullStopWatch()).ping(urlBuilder.toString());
 
   }
 

@@ -42,21 +42,23 @@ jstestdriver.ResetCommand = function(location, signal, now) {
 };
 
 /**
- * @param {string} method of loading: "load" or "preload", default: "preload"
+ * @param {string} loadType method of loading: "load" or "preload", default: "preload"
+ * @param {string} testCaseId id of the test case to be run.
  */
-jstestdriver.ResetCommand.prototype.reset = function(loadType) {
+jstestdriver.ResetCommand.prototype.reset = function(loadType, testCaseId) {
   this.signal_.set(true);
   loadType = loadType ? loadType : 'preload';
+  if (!testCaseId) {
+    loadType = 'load'
+  }
+
   var now = this.now_()
   var newUrl = this.location_.protocol + "//" +
                this.location_.host +
                this.location_.pathname +
                '/refresh/' + now +
-               '/load_type/' + loadType;
-  jstestdriver.log("Replacing " + newUrl);
-  if (this.location_.search.indexOf(now) != -1) {
-    this.location_.reload();
-  } else {
-    this.location_.replace(newUrl);
-  }
+               '/load_type/' + loadType +
+               '/testcase_id/' + testCaseId;
+  jstestdriver.log('Replacing ' + newUrl);
+  this.location_.replace(newUrl);
 };

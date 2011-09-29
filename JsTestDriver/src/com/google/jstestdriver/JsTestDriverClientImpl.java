@@ -93,8 +93,10 @@ public class JsTestDriverClientImpl implements JsTestDriverClient {
 
     params.put("data", cmd);
     params.put("id", browserId);
+    watch.start("getCommandTask: %s %s", browserId, cmd);
     CommandTask task =
         commandTaskFactory.getCommandTask(stream, baseUrl, server, params, uploadFiles);
+    watch.stop("getCommandTask: %s %s", browserId, cmd);
 
     // TODO(corysmith): Work out the contradiction between ResponseStream and
     // RunData, possibly returning runData here.
