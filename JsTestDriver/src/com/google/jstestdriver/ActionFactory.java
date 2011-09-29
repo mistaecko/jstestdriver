@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.jstestdriver.hooks.TestsPreProcessor;
 import com.google.jstestdriver.server.JstdTestCaseStore;
+import com.google.jstestdriver.util.StopWatch;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -44,18 +45,21 @@ public class ActionFactory {
   private final boolean preloadFiles;
   private final FileLoader fileLoader;
   private final JsTestDriverServer.Factory factory;
+  private final StopWatch stopWatch;
 
   @Inject
   public ActionFactory(Provider<JsTestDriverClient> clientProvider,
                        Set<TestsPreProcessor> testPreProcessors,
                        @Named("preloadFiles") boolean preloadFiles,
                        FileLoader fileLoader,
-                       JsTestDriverServer.Factory factory) {
+                       JsTestDriverServer.Factory factory,
+                       StopWatch stopWatch) {
     this.clientProvider = clientProvider;
     this.testPreProcessors = testPreProcessors;
     this.preloadFiles = preloadFiles;
     this.fileLoader = fileLoader;
     this.factory = factory;
+    this.stopWatch = stopWatch;
   }
 
   public ServerStartupAction getServerStartupAction(Integer port,
@@ -98,7 +102,7 @@ public class ActionFactory {
 
   public RunTestsAction createRunTestsAction(ResponseStreamFactory responseStreamFactory,
       List<String> tests, boolean captureConsole) {
-    return new RunTestsAction(responseStreamFactory, tests, captureConsole, testPreProcessors);
+    return new RunTestsAction(responseStreamFactory, tests, captureConsole, testPreProcessors, stopWatch);
   }
 
   public EvalAction createEvalAction(ResponseStreamFactory responseStreamFactory, String cmd) {

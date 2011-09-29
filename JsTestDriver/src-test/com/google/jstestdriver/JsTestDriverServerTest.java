@@ -134,7 +134,8 @@ public class JsTestDriverServerTest extends TestCase {
         "http://localhost:4224",
         new HttpServer(),
         false,
-        null);
+        null,
+        new NullStopWatch());
 
     TestListener listener = new TestListener();
     createServer(listener);

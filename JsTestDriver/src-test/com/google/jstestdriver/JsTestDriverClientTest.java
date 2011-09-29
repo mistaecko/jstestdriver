@@ -123,7 +123,7 @@ public class JsTestDriverClientTest extends TestCase {
             ImmutableSet.<FileInfoScheme>of(new HttpFileInfoScheme()),
             new NullPathPrefix());
     JsTestDriverClient client = new JsTestDriverClientImpl(commandTaskFactory, "http://localhost",
-        server, false, null);
+        server, false, null, new NullStopWatch());
     FakeResponseStream stream = new FakeResponseStream();
 
     client.eval("1", stream, "cmd",
@@ -163,7 +163,7 @@ public class JsTestDriverClientTest extends TestCase {
         ImmutableSet.<FileInfoScheme>of(new HttpFileInfoScheme()),
         new NullPathPrefix());
     JsTestDriverClient client = new JsTestDriverClientImpl(commandTaskFactory, "http://localhost",
-        server, false, null);
+        server, false, null, new NullStopWatch());
     Collection<BrowserInfo> browsersCollection = client.listBrowsers();
     List<BrowserInfo> browsers = new ArrayList<BrowserInfo>(browsersCollection);
 
@@ -216,7 +216,7 @@ public class JsTestDriverClientTest extends TestCase {
           }
         }, stopWatch, ImmutableSet.<FileInfoScheme>of(new HttpFileInfoScheme()), new NullPathPrefix());
     JsTestDriverClient client = new JsTestDriverClientImpl(commandTaskFactory, "http://localhost",
-        server, false, null);
+        server, false, null, new NullStopWatch());
     FakeResponseStream stream = new FakeResponseStream();
 
     client.runAllTests("1", stream, false,
@@ -260,7 +260,7 @@ public class JsTestDriverClientTest extends TestCase {
         schemes,
         new NullPathPrefix());
     JsTestDriverClient client = new JsTestDriverClientImpl(commandTaskFactory, "http://localhost",
-        server, false, null);
+        server, false, null, new NullStopWatch());
     FakeResponseStream stream = new FakeResponseStream();
 
     ArrayList<String> tests = new ArrayList<String>();

@@ -28,6 +28,7 @@ import com.google.common.collect.Sets;
 import com.google.jstestdriver.hooks.TestsPreProcessor;
 import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.model.RunData;
+import com.google.jstestdriver.util.NullStopWatch;
 
 /**
  * @author corysmith@google.com (Cory Smith)
@@ -44,7 +45,7 @@ public class RunTestsActionTest extends TestCase {
 
     final RunTestsAction action =
         new RunTestsAction(new FakeResponseStreamFactory(stream), tests, captureConsole,
-            Collections.<TestsPreProcessor> emptySet());
+            Collections.<TestsPreProcessor> emptySet(), new NullStopWatch());
     final FakeJsTestDriverClient client = new FakeJsTestDriverClient(Collections.<BrowserInfo>emptyList());
     action.run(browserId, client, new RunData(
         Collections.<ResponseStream>emptyList(),
@@ -73,7 +74,7 @@ public class RunTestsActionTest extends TestCase {
 
     final RunTestsAction action =
         new RunTestsAction(new FakeResponseStreamFactory(stream), tests, captureConsole,
-            preProcessors);
+            preProcessors, new NullStopWatch());
     final FakeJsTestDriverClient client = new FakeJsTestDriverClient(Collections.<BrowserInfo>emptyList());
     action.run(browserId, client, new RunData(Collections.<ResponseStream>emptyList(), Collections.<JstdTestCase>emptyList(), null), null);
 

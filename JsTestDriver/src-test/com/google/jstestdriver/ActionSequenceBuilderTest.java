@@ -15,13 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-
-import junit.framework.TestCase;
-
 import com.google.gson.JsonArray;
 import com.google.jstestdriver.action.ConfigureGatewayAction;
 import com.google.jstestdriver.action.ConfigureGatewayAction.Factory;
@@ -29,13 +22,19 @@ import com.google.jstestdriver.action.UploadAction;
 import com.google.jstestdriver.browser.BrowserActionExecutorAction;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
 import com.google.jstestdriver.hooks.TestsPreProcessor;
+import com.google.jstestdriver.util.NullStopWatch;
+
+import junit.framework.TestCase;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ActionSequenceBuilderTest extends TestCase {
 
-  private LinkedHashSet<FileInfo> files = new LinkedHashSet<FileInfo>();
   ActionFactory actionFactory =
       new ActionFactory(null, Collections.<TestsPreProcessor>emptySet(), false,
-          null, null);
+          null, null, new NullStopWatch());
 
   public void testAddTestsWithRemoteServerAddress() throws Exception {
     List<String> tests = tests();
@@ -59,6 +58,7 @@ public class ActionSequenceBuilderTest extends TestCase {
 
   private Factory newConfigureGatewayActionFactory() {
     return new Factory() {
+      @Override
       public ConfigureGatewayAction create(JsonArray gatewayConfig) {
         return new ConfigureGatewayAction(null, null, null, null, gatewayConfig);
       }
@@ -73,7 +73,8 @@ public class ActionSequenceBuilderTest extends TestCase {
             Collections.<TestsPreProcessor> emptySet(),
             false,
             null,
-            null),
+            null,
+            new NullStopWatch()),
             new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
         new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
         null,
@@ -101,12 +102,14 @@ public class ActionSequenceBuilderTest extends TestCase {
             Collections.<TestsPreProcessor> emptySet(),
             false,
             null,
-            null),
+            null,
+            new NullStopWatch()),
             new BrowserActionExecutorAction(null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
             newConfigureGatewayActionFactory(),
-            null, null);
+            null,
+            null);
     
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
@@ -131,7 +134,8 @@ public class ActionSequenceBuilderTest extends TestCase {
                 Collections.<TestsPreProcessor>emptySet(),
                 false,
                 null,
-                null),
+                null,
+                new NullStopWatch()),
             new BrowserActionExecutorAction(
                 null, null, null, null, null, 0, null, null), new FailureCheckerAction(null, null), new UploadAction(null),
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),

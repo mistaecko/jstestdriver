@@ -18,6 +18,7 @@ package com.google.jstestdriver;
 import com.google.jstestdriver.hooks.TestsPreProcessor;
 import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.model.RunData;
+import com.google.jstestdriver.util.StopWatch;
 
 import java.util.List;
 import java.util.Set;
@@ -32,15 +33,18 @@ public class RunTestsAction implements BrowserAction {
   private final boolean captureConsole;
   private final Set<TestsPreProcessor> preProcessors;
   private final ResponseStreamFactory responseStreamFactory;
+  private final StopWatch stopWatch;
 
   public RunTestsAction(ResponseStreamFactory responseStreamFactory,
                         List<String> tests,
                         boolean captureConsole,
-                        Set<TestsPreProcessor> preProcessors) {
+                        Set<TestsPreProcessor> preProcessors,
+                        StopWatch stopWatch) {
     this.responseStreamFactory = responseStreamFactory;
     this.tests = tests;
     this.captureConsole = captureConsole;
     this.preProcessors = preProcessors;
+    this.stopWatch = stopWatch;
   }
 
   /**
@@ -52,16 +56,20 @@ public class RunTestsAction implements BrowserAction {
     for (TestsPreProcessor preProcessor : preProcessors) {
       // makes sure that the preProcessor doesn't modify the base test list
       // by providing an Iterator
+      stopWatch.start("TestsPreProcessor: %s", preProcessor);
       testsToRun = preProcessor.process(id, testsToRun.iterator());
+      stopWatch.stop("TestsPreProcessor: %s", preProcessor);
     }
     final ResponseStream runTestsActionResponseStream =
           responseStreamFactory.getRunTestsActionResponseStream(id);
 
+    stopWatch.start("RunTests: %s", id);
     if (testsToRun.size() == 1 && testsToRun.get(0).equals("all")) {
       client.runAllTests(id, runTestsActionResponseStream, captureConsole, testCase);
     } else if (testsToRun.size() > 0) {
       client.runTests(id, runTestsActionResponseStream, testsToRun, captureConsole, testCase);
     }
+    stopWatch.stop("RunTests: %s", id);
     return runTestsActionResponseStream;
   }
 

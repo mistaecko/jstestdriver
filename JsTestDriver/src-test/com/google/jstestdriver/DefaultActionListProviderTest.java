@@ -38,6 +38,7 @@ import com.google.jstestdriver.output.FileNameFormatter;
 import com.google.jstestdriver.output.PrintXmlTestResultsAction;
 import com.google.jstestdriver.output.XmlPrinter;
 import com.google.jstestdriver.output.XmlPrinterImpl;
+import com.google.jstestdriver.util.NullStopWatch;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -71,7 +72,7 @@ public class DefaultActionListProviderTest extends TestCase {
                                                    XmlPrinter xmlPrinter) {
     ActionFactory actionFactory =
         new ActionFactory(null, Collections.<TestsPreProcessor>emptySet(), false,
-            null, null);
+            null, null, new NullStopWatch());
     return new DefaultActionListProvider(
         tests,
         Collections.<String>emptyList(),

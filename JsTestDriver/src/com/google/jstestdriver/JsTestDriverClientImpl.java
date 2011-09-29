@@ -23,6 +23,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.jstestdriver.JsonCommand.CommandType;
 import com.google.jstestdriver.model.JstdTestCase;
+import com.google.jstestdriver.util.StopWatch;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -47,32 +48,47 @@ public class JsTestDriverClientImpl implements JsTestDriverClient {
 
   private final FileUploader uploader;
 
+  private final StopWatch watch;
+
   @Inject
   public JsTestDriverClientImpl(CommandTaskFactory commandTaskFactory,
                                 @Named("server") String baseUrl,
                                 Server server,
                                 @Named("debug") Boolean debug,
-                                FileUploader uploader) {
+                                FileUploader uploader,
+                                StopWatch watch) {
     this.commandTaskFactory = commandTaskFactory;
     this.baseUrl = baseUrl;
     this.server = server;
     this.debug = debug;
     this.uploader = uploader;
+    this.watch = watch;
   }
 
   @Override
   public Collection<BrowserInfo> listBrowsers() {
-    return gson.fromJson(server.fetch(baseUrl + "/cmd?listBrowsers"),
-        new TypeToken<Collection<BrowserInfo>>() {}.getType());
+    try {
+      watch.start("listBrowsers");
+      return gson.fromJson(server.fetch(baseUrl + "/cmd?listBrowsers"),
+          new TypeToken<Collection<BrowserInfo>>() {}.getType());
+    } finally {
+      watch.stop("listBrowsers");
+    }
   }
 
   @Override
   public String getNextBrowserId() {
-    return server.fetch(baseUrl + "/cmd?nextBrowserId");
+    try {
+      watch.start("getNextBrowserId");
+      return server.fetch(baseUrl + "/cmd?nextBrowserId");
+    } finally {
+      watch.stop("getNextBrowserId");
+    }
   }
 
   private void sendCommand(String browserId, ResponseStream stream, String cmd,
       boolean uploadFiles, JstdTestCase testCase) {
+    watch.start("sendCommand: %s %s", browserId, cmd);
     Map<String, String> params = new LinkedHashMap<String, String>();
 
     params.put("data", cmd);
@@ -83,6 +99,7 @@ public class JsTestDriverClientImpl implements JsTestDriverClient {
     // TODO(corysmith): Work out the contradiction between ResponseStream and
     // RunData, possibly returning runData here.
     task.run(testCase);
+    watch.stop("sendCommand: %s %s", browserId, cmd);
   }
 
   @Override

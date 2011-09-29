@@ -56,21 +56,33 @@ public class BrowserControl {
 
   /** Slaves a new browser window with the provided id. */
   public String captureBrowser(String browserId) throws InterruptedException {
-    final String url = String.format(CAPTURE_URL, serverAddress, browserId, runner.getHeartbeatTimeout(), runner.getUploadSize());
-    runner.startBrowser(url);
-    long timeOut = TimeUnit.MILLISECONDS.convert(runner.getTimeout(), TimeUnit.SECONDS);
-    long start = System.currentTimeMillis();
-    // TODO(corysmith): replace this with a stream from the client on browser
-    // updates.
-    while (!isBrowserCaptured(browserId, client)) {
-      Thread.sleep(50);
-      if (System.currentTimeMillis() - start > timeOut) {
-        throw new RuntimeException("Could not start browser " + runner + " in "
-            + runner.getTimeout());
+    try {
+      stopWatch.start("browser start %s", browserId);
+      final String url =
+          String.format(CAPTURE_URL, serverAddress, browserId, runner.getHeartbeatTimeout(),
+              runner.getUploadSize());
+      runner.startBrowser(url);
+      long timeOut = TimeUnit.MILLISECONDS.convert(runner.getTimeout(), TimeUnit.SECONDS);
+      long start = System.currentTimeMillis();
+      // TODO(corysmith): replace this with a stream from the client on browser
+      // updates.
+      try {
+        stopWatch.start("Capturing browser", browserId);
+        while (!isBrowserCaptured(browserId, client)) {
+          Thread.sleep(50);
+          if (System.currentTimeMillis() - start > timeOut) {
+            throw new RuntimeException("Could not start browser " + runner + " in "
+                + runner.getTimeout());
+          }
+        }
+      } finally {
+        stopWatch.start("Capturing browser", browserId);
       }
+      logger.debug("Browser {} started with id {}", runner, browserId);
+      return browserId;
+    } finally {
+      stopWatch.stop("browser start %s", browserId);
     }
-    logger.debug("Browser {} started with id {}", runner, browserId);
-    return browserId;
   }
 
   /** Stop a browser window. */
