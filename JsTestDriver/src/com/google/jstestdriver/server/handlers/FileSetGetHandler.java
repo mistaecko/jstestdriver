@@ -15,22 +15,22 @@
  */
 package com.google.jstestdriver.server.handlers;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Date;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Inject;
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.Lock;
 import com.google.jstestdriver.SlaveBrowser;
 import com.google.jstestdriver.annotations.ResponseWriter;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

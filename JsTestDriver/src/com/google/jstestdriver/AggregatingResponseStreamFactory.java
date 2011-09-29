@@ -15,11 +15,11 @@
  */
 package com.google.jstestdriver;
 
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Aggregates a set of {@link ResponseStreamFactory}s by providing an AggregatingResponseStream.
@@ -35,6 +35,7 @@ public class AggregatingResponseStreamFactory implements ResponseStreamFactory {
     this.factories = factories;
   }
 
+  @Override
   public ResponseStream getDryRunActionResponseStream() {
     List<ResponseStream> streams = defaultStreams();
     for (ResponseStreamFactory factory : factories) {
@@ -49,6 +50,7 @@ public class AggregatingResponseStreamFactory implements ResponseStreamFactory {
     return defaultStreams;
   }
 
+  @Override
   public ResponseStream getEvalActionResponseStream() {
     List<ResponseStream> streams = defaultStreams();
     for (ResponseStreamFactory factory : factories) {
@@ -57,6 +59,7 @@ public class AggregatingResponseStreamFactory implements ResponseStreamFactory {
     return new AggregatingResponseStream(streams);
   }
 
+  @Override
   public ResponseStream getResetActionResponseStream() {
     List<ResponseStream> streams = defaultStreams();
     for (ResponseStreamFactory factory : factories) {
@@ -65,6 +68,7 @@ public class AggregatingResponseStreamFactory implements ResponseStreamFactory {
     return new AggregatingResponseStream(streams);
   }
 
+  @Override
   public ResponseStream getRunTestsActionResponseStream(String browserId) {
     List<ResponseStream> streams = defaultStreams();
     for (ResponseStreamFactory factory : factories) {
@@ -81,12 +85,14 @@ public class AggregatingResponseStreamFactory implements ResponseStreamFactory {
       this.streams = streams;
     }
 
+    @Override
     public void finish() {
       for (ResponseStream stream : streams) {
         stream.finish();
       }
     }
 
+    @Override
     public void stream(Response response) {
       for (ResponseStream stream : streams) {
         stream.stream(response);

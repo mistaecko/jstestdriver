@@ -2,10 +2,7 @@
 
 package com.google.jstestdriver.servlet.fileset;
 
-import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.SlaveBrowser;
-
-import java.util.Collection;
 
 
 
@@ -15,6 +12,6 @@ import java.util.Collection;
  * @author corysmith@google.com (Cory Smith)
  */
 public interface FileSetRequestHandler<T> {
-  T handle(SlaveBrowser browser, Collection<FileInfo> data);
+  T handle(SlaveBrowser browser, String data);
   boolean canHandle(String action);
 }

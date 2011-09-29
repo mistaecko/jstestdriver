@@ -15,18 +15,19 @@
  */
 package com.google.jstestdriver;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import com.google.jstestdriver.hooks.TestsPreProcessor;
+import com.google.jstestdriver.server.JstdTestCaseStore;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observer;
 import java.util.Set;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.google.jstestdriver.hooks.TestsPreProcessor;
 
 /**
  * Produces instances of Actions, so they can have observers, and other stuff.
@@ -59,11 +60,11 @@ public class ActionFactory {
 
   public ServerStartupAction getServerStartupAction(Integer port,
       Integer sslPort, CapturedBrowsers capturedBrowsers,
-      FilesCache preloadedFilesCache) {
+      JstdTestCaseStore testCaseStore) {
     ServerStartupAction serverStartupAction =
         new ServerStartupAction(port,
                                 sslPort,
-                                preloadedFilesCache,
+                                testCaseStore,
                                 preloadFiles,
                                 fileLoader,
                                 factory);

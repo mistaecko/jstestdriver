@@ -20,7 +20,6 @@ import static com.google.jstestdriver.server.handlers.CaptureHandler.RUNNER_TYPE
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.jstestdriver.FileResult;
-import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.JsonCommand;
 import com.google.jstestdriver.JsonCommand.CommandType;
 import com.google.jstestdriver.LoadedFiles;
@@ -73,7 +72,6 @@ class StandaloneRunnerHandler implements RequestHandler {
   public StandaloneRunnerHandler(
       SlavePageRequest request,
       HttpServletResponse response,
-      FilesCache cache,
       SlaveResourceService service,
       ConcurrentMap<SlaveBrowser, Thread> reportingThreads,
       Map<PageType, Page> pages,

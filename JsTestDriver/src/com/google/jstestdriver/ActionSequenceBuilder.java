@@ -23,11 +23,11 @@ import com.google.jstestdriver.action.UploadAction;
 import com.google.jstestdriver.browser.BrowserActionExecutorAction;
 import com.google.jstestdriver.output.PrintXmlTestResultsAction;
 import com.google.jstestdriver.output.XmlPrinter;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,6 +59,8 @@ public class ActionSequenceBuilder {
   private JsonArray gatewayConfig;
   private final BrowserStartupAction browserStartup;
 
+  private final JstdTestCaseStore testCaseStore;
+
   /**
    * Begins the building of an action sequence.
    */
@@ -70,7 +72,8 @@ public class ActionSequenceBuilder {
                                CapturedBrowsers capturedBrowsers,
                                @Named("gateway") JsonArray gatewayConfig,
                                ConfigureGatewayAction.Factory gatewayActionFactory,
-                               BrowserStartupAction browserStartup) {
+                               BrowserStartupAction browserStartup,
+                               JstdTestCaseStore testCaseStore) {
     this.actionFactory = actionFactory;
     this.browserActionsRunner = browserActionsRunner;
     this.failureCheckerAction = failureCheckerAction;
@@ -79,6 +82,7 @@ public class ActionSequenceBuilder {
     this.gatewayConfig = gatewayConfig;
     this.gatewayActionFactory = gatewayActionFactory;
     this.browserStartup = browserStartup;
+    this.testCaseStore = testCaseStore;
   }
 
   /**
@@ -88,7 +92,7 @@ public class ActionSequenceBuilder {
   private void addServerActions(List<Action> actions, boolean leaveServerRunning) {
     ServerStartupAction serverStartupAction =
         actionFactory.getServerStartupAction(localServerPort, localServerSslPort,
-            capturedBrowsers, new FilesCache(new LinkedHashMap<String, FileInfo>()));
+            capturedBrowsers, testCaseStore);
     actions.add(0, serverStartupAction);
     // add browser startup here.
     if (!leaveServerRunning) {

@@ -46,7 +46,8 @@ public class JstdTestCaseFactory {
     try {
       final List<JstdTestCase> testCases = Lists.newArrayList();
       if (!(deps.isEmpty() && tests.isEmpty())) {
-        testCases.add(new JstdTestCase(deps, tests, plugins, null));
+        logger.debug("creating default test case");
+        testCases.add(new JstdTestCase(deps, tests, plugins, "default"));
       }
       return processTestCases(resolveDependencies(testCases));
     } finally {

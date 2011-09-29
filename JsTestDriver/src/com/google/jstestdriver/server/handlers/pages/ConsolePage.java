@@ -15,9 +15,9 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import java.io.IOException;
-
 import com.google.jstestdriver.util.HtmlWriter;
+
+import java.io.IOException;
 
 public class ConsolePage implements Page {
   public void render(HtmlWriter writer, SlavePageRequest request) throws IOException {

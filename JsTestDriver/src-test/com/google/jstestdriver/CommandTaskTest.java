@@ -49,7 +49,12 @@ public class CommandTaskTest extends TestCase {
 
     server.expect(baseUrl + "heartbeat?id=1", "OK");
     server.expect(baseUrl + "fileSet?POST?{data=[], action=serverFileCheck}", "[]");
-    server.expect(baseUrl + "fileSet?POST?{id=1, data=[], action=browserFileCheck}", gson.toJson(new BrowserFileSet()));
+    server.expect(
+        baseUrl
+            + "fileSet?POST?{id=1, data="
+            + gson.toJson(new JstdTestCase(Collections.<FileInfo>emptyList(), Collections
+                .<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), null))
+            + ", action=browserFileCheck}", gson.toJson(new BrowserFileSet()));
     server.expect(baseUrl + "cmd?POST?{data={mooh}, id=1}", "");
     BrowserInfo browserInfo = new BrowserInfo();
     browserInfo.setId(Long.parseLong(id));
@@ -58,7 +63,7 @@ public class CommandTaskTest extends TestCase {
     server.expect(baseUrl + "cmd?id=1", "{\"response\":{\"response\":\"response\","
         + "\"browser\":{\"name\":\"browser\"},\"error\":\"error\",\"executionTime\":123},"
         + "\"last\":true}");
-    
+
     Map<String, String> params = new LinkedHashMap<String, String>();
 
     params.put("data", "{mooh}");
@@ -80,11 +85,13 @@ public class CommandTaskTest extends TestCase {
     String id = "1";
     MockServer server = new MockServer();
     FileInfo fileInfo = new FileInfo("foo.js", 1232, -1, false, false, null, "foo.js");
+    List<FileInfo> fileList = Arrays.asList(fileInfo);
+    JstdTestCase testCase = new JstdTestCase(Collections.<FileInfo>emptyList(), fileList, Collections.<FileInfo>emptyList(), "");
 
     server.expect(baseUrl + "heartbeat?id=1", "OK");
-    server.expect(baseUrl + "fileSet?POST?{data=" + gson.toJson(Arrays.asList(fileInfo))
+    server.expect(baseUrl + "fileSet?POST?{data=" + gson.toJson(testCase)
         + ", action=serverFileCheck}", "[]");
-    server.expect(baseUrl + "fileSet?POST?{id=1, data=" + gson.toJson(Arrays.asList(fileInfo))
+    server.expect(baseUrl + "fileSet?POST?{id=1, data=" + gson.toJson(testCase)
       + ", action=browserFileCheck}", gson.toJson(new BrowserFileSet()));
     server.expect(baseUrl + "cmd?POST?{data={mooh}, id=1}", "");
     server.expect(baseUrl + "cmd?id=1", "{\"response\":{\"response\":\"response\","
@@ -104,7 +111,7 @@ public class CommandTaskTest extends TestCase {
     CommandTask task = createCommandTask(server, params,
         stream, fileReader, true);
 
-    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), Lists.newArrayList(fileInfo), java.util.Collections.<FileInfo> emptyList(), null));
+    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), Lists.newArrayList(fileInfo), java.util.Collections.<FileInfo> emptyList(), ""));
     Response response = stream.getResponse();
 
     assertEquals("response", response.getResponse());
@@ -127,10 +134,18 @@ public class CommandTaskTest extends TestCase {
 
     final BrowserFileSet browserFileSet =
         new BrowserFileSet(fileSet, Lists.<FileInfo>newArrayList(), false);
+    JstdTestCase jstdTestCase = new JstdTestCase(Collections.<FileInfo>emptyList(),
+        Arrays.asList(
+            new FileInfo(loadInfo.getFilePath(), loadInfo.getTimestamp(), -1, loadInfo
+                .isPatch(), loadInfo.isServeOnly(), loadInfoContents, loadInfo
+                .getFilePath()),
+                new FileInfo(serveInfo.getFilePath(), serveInfo.getTimestamp(), -1, serveInfo
+                    .isPatch(), serveInfo.isServeOnly(), serveInfoContents, loadInfo
+                    .getFilePath())), Collections.<FileInfo>emptyList(), "foo");
 
     // server expects
     server.expect(baseUrl + "heartbeat?id=1", "OK");
-    server.expect(baseUrl + "fileSet?POST?{id=1, data=" + gson.toJson(Arrays.asList(loadInfo)) + ", action=browserFileCheck}",
+    server.expect(baseUrl + "fileSet?POST?{id=1, data=" + gson.toJson(jstdTestCase) + ", action=browserFileCheck}",
         gson.toJson(browserFileSet));
     server.expect(baseUrl + "fileSet?POST?{data=" + gson.toJson(fileSet) + ", action=serverFileCheck}",
       "[]");
@@ -150,13 +165,7 @@ public class CommandTaskTest extends TestCase {
     server.expect(
         baseUrl
                 + "fileSet?POST?{data="
-                + gson.toJson(Arrays.asList(
-                    new FileInfo(loadInfo.getFilePath(), loadInfo.getTimestamp(), -1, loadInfo
-                        .isPatch(), loadInfo.isServeOnly(), loadInfoContents, loadInfo
-                        .getFilePath()),
-                    new FileInfo(serveInfo.getFilePath(), serveInfo.getTimestamp(), -1, serveInfo
-                        .isPatch(), serveInfo.isServeOnly(), serveInfoContents, loadInfo
-                        .getFilePath()))) + ", action=serverFileCheck}", "");
+                + gson.toJson(jstdTestCase) + ", action=serverFileCheck}", "");
 
     String url =
         baseUrl
@@ -182,7 +191,7 @@ public class CommandTaskTest extends TestCase {
     fileReader.addExpectation(serveInfo, serveInfoContents);
     CommandTask task = createCommandTask(server, params, stream, fileReader, true);
 
-    task.run(new JstdTestCase(Collections.<FileInfo>emptyList(), fileSet, java.util.Collections.<FileInfo> emptyList(), null));
+    task.run(jstdTestCase);
     Response response = stream.getResponse();
 
     assertEquals("{\"loadedFiles\":[]}", response.getResponse());

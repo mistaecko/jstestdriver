@@ -15,10 +15,10 @@
  */
 package com.google.jstestdriver;
 
-import java.util.List;
-
 import com.google.inject.ImplementedBy;
 import com.google.inject.Provider;
+
+import java.util.List;
 
 
 /**
@@ -27,6 +27,7 @@ import com.google.inject.Provider;
  * @author corysmith@google.com (Cory Smith)
  */
 @ImplementedBy(DefaultActionListProvider.class)
-public interface ActionListProvider  extends Provider<List<Action>>{
-  public abstract List<Action> get();
+public interface ActionListProvider extends Provider<List<Action>>{
+  @Override
+  List<Action> get();
 }

@@ -15,9 +15,9 @@
  */
 package com.google.jstestdriver.config;
 
-import java.util.List;
-
 import com.google.common.base.Joiner;
+
+import java.util.List;
 
 /**
  * Thrown when files are are unredable.

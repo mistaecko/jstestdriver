@@ -2,9 +2,12 @@
 
 package com.google.jstestdriver.model;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.FileLoader;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,10 +17,12 @@ import java.util.List;
  */
 public class JstdTestCaseDelta {
 
-  private final List<FileInfo> dependencies;
-  private final List<FileInfo> tests;
-  private final List<FileInfo> plugins;
+  private List<FileInfo> dependencies;
+  private List<FileInfo> tests;
+  private List<FileInfo> plugins;
 
+  public JstdTestCaseDelta() {}
+  
   public JstdTestCaseDelta(List<FileInfo> dependencies, List<FileInfo> tests, List<FileInfo> plugins) {
     this.dependencies = dependencies;
     this.tests = tests;
@@ -41,5 +46,20 @@ public class JstdTestCaseDelta {
         fileLoader.loadFiles(dependencies, false),
         fileLoader.loadFiles(tests, false),
         fileLoader.loadFiles(plugins, false));
+  }
+
+  @Override
+  public String toString() {
+    Function<FileInfo, String> fileInfoToPath = new Function<FileInfo, String>() {
+      @Override
+      public String apply(FileInfo in) {
+        return "\n\t\t" + in.getFilePath();
+      }
+    };
+
+    return String.format("JstdTestCaseDelta(\n\tdependencies[%s],\n\ttests[%s],\n\tplugins[%s])",
+        Lists.transform(dependencies, fileInfoToPath),
+        Lists.transform(tests, fileInfoToPath),
+        Lists.transform(plugins, fileInfoToPath));
   }
 }

@@ -15,10 +15,10 @@
  */
 package com.google.jstestdriver.util;
 
-import java.io.File;
-
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+
+import java.io.File;
 
 /**
  * Handles the clean up and sanitization of paths to be displayed in the browser.

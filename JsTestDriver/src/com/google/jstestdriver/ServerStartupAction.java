@@ -15,20 +15,22 @@
  */
 package com.google.jstestdriver;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Sets;
 import com.google.jstestdriver.JsTestDriverServer.Factory;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
+import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.model.RunData;
+import com.google.jstestdriver.server.JstdTestCaseStore;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Observer;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -37,7 +39,7 @@ public class ServerStartupAction implements ObservableAction {
   private static final Logger logger = LoggerFactory.getLogger(ServerStartupAction.class);
   private final int port;
   private final int sslPort;
-  private final FilesCache preloadedFilesCache;
+  private final JstdTestCaseStore testCaseStore;
   private JsTestDriverServer server;
   private List<Observer> observerList = new LinkedList<Observer>();
   private final boolean preloadFiles;
@@ -50,21 +52,21 @@ public class ServerStartupAction implements ObservableAction {
    */
   @Deprecated
   public ServerStartupAction(int port, int sslPort, CapturedBrowsers capturedBrowsers,
-      FilesCache preloadedFilesCache, URLTranslator urlTranslator, URLRewriter urlRewriter) {
-    this(port, sslPort, preloadedFilesCache, false, null, new DefaultServerFactory(capturedBrowsers,
+      JstdTestCaseStore testCaseStore, URLTranslator urlTranslator, URLRewriter urlRewriter) {
+    this(port, sslPort, testCaseStore, false, null, new DefaultServerFactory(capturedBrowsers,
         SlaveBrowser.TIMEOUT, new NullPathPrefix()));
   }
 
   public ServerStartupAction(
       int port,
       int sslPort,
-      FilesCache preloadedFilesCache,
+      JstdTestCaseStore testCaseStore,
       boolean preloadFiles,
       FileLoader fileLoader,
       Factory serverFactory) {
     this.port = port;
     this.sslPort = sslPort;
-    this.preloadedFilesCache = preloadedFilesCache;
+    this.testCaseStore = testCaseStore;
     this.preloadFiles = preloadFiles;
     this.fileLoader = fileLoader;
     this.serverFactory = serverFactory;
@@ -80,12 +82,12 @@ public class ServerStartupAction implements ObservableAction {
 
     if (preloadFiles) {
       logger.debug("Preloading files...");
-      for (FileInfo fileInfo : fileLoader.loadFiles(runData.getFileSet(), false)) {
-        preloadedFilesCache.addFile(fileInfo);
+      for (JstdTestCase testCase :runData.getTestCases()) {
+        testCaseStore.addCase(testCase.applyDelta(testCase.createUnloadedDelta().loadFiles(fileLoader)));
       }
     }
 
-    server = serverFactory.create(port, sslPort, preloadedFilesCache);
+    server = serverFactory.create(port, sslPort, testCaseStore);
 
     if (!observerList.isEmpty()) {
       throw new RuntimeException("Observers not supported during the transition to listeners.");
@@ -127,8 +129,8 @@ public class ServerStartupAction implements ObservableAction {
       this.nullPathPrefix = nullPathPrefix;
     }
 
-    public JsTestDriverServer create(int port, int sslPort, FilesCache preloadedFilesCache) {
-      return new JsTestDriverServerImpl(port, sslPort, preloadedFilesCache, capturedBrowsers, timeout,
+    public JsTestDriverServer create(int port, int sslPort, JstdTestCaseStore testCaseStore) {
+      return new JsTestDriverServerImpl(port, sslPort, testCaseStore, capturedBrowsers, timeout,
           nullPathPrefix, Sets.<ServerListener>newHashSet(), Collections.<FileInfoScheme>emptySet());
     }
   }

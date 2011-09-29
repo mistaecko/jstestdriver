@@ -15,6 +15,11 @@
  */
 package com.google.jstestdriver;
 
+import com.google.gson.JsonElement;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -25,11 +30,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.JsonElement;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

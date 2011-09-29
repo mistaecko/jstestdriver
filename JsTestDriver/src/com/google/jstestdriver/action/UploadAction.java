@@ -34,8 +34,9 @@ public class UploadAction implements Action {
     this.uploader = uploader;
   }
 
+  @Override
   public RunData run(RunData runData) {
-    uploader.uploadToServer(uploader.determineServerFileSet(runData.getFileSet()));
+    uploader.uploadToServer(uploader.determineServerFileSet(runData.getTestCases()));
     return runData;
   }
 }

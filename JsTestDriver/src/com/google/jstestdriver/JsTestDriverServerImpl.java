@@ -25,6 +25,7 @@ import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.server.JettyModule;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 import com.google.jstestdriver.server.handlers.JstdHandlersModule;
 
 import org.mortbay.component.LifeCycle;
@@ -54,7 +55,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
   private final int port;
   private final int sslPort;
   private final CapturedBrowsers capturedBrowsers;
-  private final FilesCache filesCache;
+  private final JstdTestCaseStore testCaseStore;
   private final long browserTimeout;
 
   private Timer timer;
@@ -68,7 +69,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
   @Inject
   public JsTestDriverServerImpl(@Assisted("port") int port,
                                 @Assisted("sslPort") int sslPort,
-                                @Assisted FilesCache preloadedFilesCache,
+                                @Assisted JstdTestCaseStore testCaseStore,
                                 CapturedBrowsers capturedBrowsers,
                                 @Named("browserTimeout") long browserTimeout,
                                 @Named("serverHandlerPrefix") HandlerPathPrefix handlerPrefix,
@@ -77,7 +78,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
     this.port = port;
     this.sslPort = sslPort;
     this.capturedBrowsers = capturedBrowsers;
-    this.filesCache = preloadedFilesCache;
+    this.testCaseStore = testCaseStore;
     this.browserTimeout = browserTimeout;
     this.handlerPrefix = handlerPrefix;
     this.listeners = listeners;
@@ -95,7 +96,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
       server = Guice.createInjector(
           new JettyModule(port, sslPort, handlerPrefix),
           new JstdHandlersModule(capturedBrowsers,
-                                 filesCache,
+                                 testCaseStore,
                                  browserTimeout,
                                  handlerPrefix,
                                  schemes)).getInstance(Server.class);

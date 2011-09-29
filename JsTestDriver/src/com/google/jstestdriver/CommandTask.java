@@ -17,18 +17,18 @@ package com.google.jstestdriver;
 
 import static java.lang.String.format;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.jstestdriver.Response.ResponseType;
 import com.google.jstestdriver.browser.BrowserPanicException;
 import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.util.StopWatch;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Handles the communication of a command to the JsTestDriverServer from the
@@ -96,7 +96,9 @@ public class CommandTask {
   public void run(JstdTestCase testCase) {
     String browserId = params.get("id");
     try {
+      stopWatch.start("checkBrowser %s", browserId);
       checkBrowser();
+      stopWatch.stop("checkBrowser %s", browserId);
       logger.debug("Starting upload for {}", browserId);
       // TODO(corysmith): Move the loading of files to a browser into the server.
       if (upload) {
@@ -105,16 +107,21 @@ public class CommandTask {
             stream,
             fileUploader.determineBrowserFileSet(
                 browserId,
-                testCase.toFileSet(),
+                testCase,
                 stream),
         getBrowser(browserId).getUploadSize());
       }
       logger.debug("Finished upload for {}", browserId);
+      stopWatch.start("send cmd %s", params);
       server.post(baseUrl + "/cmd", params);
-      StreamMessage streamMessage = null;
-
-      stopWatch.start("execution %s", params.get("data"));
+      stopWatch.stop("send cmd %s", params);
+    } finally {
+      
+    }
+    try {
       logger.debug("Starting {} for {}", params.get("data"), browserId);
+      stopWatch.start("execution %s", params.get("data"));
+      StreamMessage streamMessage = null;
       do {
         String response = server.fetch(baseUrl + "/cmd?id=" + browserId);
         try {
@@ -128,9 +135,9 @@ public class CommandTask {
         }
         stream.stream(resObj);
       } while (!streamMessage.isLast());
-      stopWatch.stop("execution %s", params.get("data"));
       logger.debug("finished {} for {} with {}", new Object[] {params.get("data"), browserId, streamMessage.getResponse().getResponseType()});
     } finally {
+      stopWatch.stop("execution %s", params.get("data"));
       logger.debug("finished {} for {}", params.get("data"), browserId);
     }
   }

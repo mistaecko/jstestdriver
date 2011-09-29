@@ -15,10 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -30,6 +26,10 @@ import com.google.jstestdriver.FailureParser.Failure;
 import com.google.jstestdriver.Response.ResponseType;
 import com.google.jstestdriver.TestResult.Result;
 import com.google.jstestdriver.model.NullPathPrefix;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Generates the test results given a gson and a response.

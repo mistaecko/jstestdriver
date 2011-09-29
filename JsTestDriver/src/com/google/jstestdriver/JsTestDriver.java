@@ -16,14 +16,6 @@
 package com.google.jstestdriver;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.LogManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
@@ -49,9 +41,16 @@ import com.google.jstestdriver.model.ConcretePathPrefix;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.output.TestResultListener;
-import com.google.jstestdriver.plugins.testisolation.TestIsolationInitializer;
 import com.google.jstestdriver.runner.RunnerMode;
 import com.google.jstestdriver.util.RetryException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.LogManager;
 
 public class JsTestDriver {
 

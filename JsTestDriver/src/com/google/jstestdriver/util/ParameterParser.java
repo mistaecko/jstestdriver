@@ -15,17 +15,16 @@
  */
 package com.google.jstestdriver.util;
 
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
+import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.inject.Inject;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Parses parameter from a request object.

@@ -15,12 +15,12 @@
  */
 package com.google.jstestdriver;
 
-import java.lang.reflect.Type;
-import java.util.Collection;
-
 import com.google.gson.reflect.TypeToken;
 import com.google.jstestdriver.protocol.BrowserLog;
 import com.google.jstestdriver.protocol.Noop;
+
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 
 /**

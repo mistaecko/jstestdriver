@@ -15,13 +15,13 @@
  */
 package com.google.jstestdriver.config;
 
+import com.google.jstestdriver.Flags;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-
-import com.google.jstestdriver.Flags;
 
 /**
  * Defines the default configuration source.

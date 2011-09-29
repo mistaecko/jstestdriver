@@ -10,7 +10,6 @@ import com.google.jstestdriver.JsTestDriver;
 import com.google.jstestdriver.PluginLoader;
 import com.google.jstestdriver.config.Configuration;
 import com.google.jstestdriver.config.ConfigurationSource;
-
 import com.google.jstestdriver.config.UserConfigurationSource;
 import com.google.jstestdriver.config.YamlParser;
 import com.google.jstestdriver.hooks.PluginInitializer;

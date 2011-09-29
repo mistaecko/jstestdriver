@@ -15,13 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -29,6 +22,13 @@ import com.google.jstestdriver.browser.BrowserControl;
 import com.google.jstestdriver.browser.BrowserRunner;
 import com.google.jstestdriver.model.RunData;
 import com.google.jstestdriver.util.StopWatch;
+
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Starts a list of browsers when run.

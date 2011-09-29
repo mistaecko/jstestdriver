@@ -15,18 +15,18 @@
  */
 package com.google.jstestdriver.server.handlers;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.http.HttpServletResponse;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.jstestdriver.requesthandlers.RequestHandler;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.jstestdriver.requesthandlers.RequestHandler;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class QuitHandler implements RequestHandler {
   private final HttpServletResponse response;

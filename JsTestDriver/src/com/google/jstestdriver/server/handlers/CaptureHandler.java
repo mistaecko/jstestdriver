@@ -3,15 +3,6 @@ package com.google.jstestdriver.server.handlers;
 
 import static com.google.jstestdriver.runner.RunnerType.CLIENT;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
@@ -22,6 +13,15 @@ import com.google.jstestdriver.requesthandlers.RequestHandler;
 import com.google.jstestdriver.runner.RunnerType;
 import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
 import com.google.jstestdriver.util.ParameterParser;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * "Captures" a browser by redirecting it to RemoteConsoleRunner url, and adds

@@ -16,6 +16,7 @@
 
 package com.google.jstestdriver.model;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -24,6 +25,7 @@ import com.google.jstestdriver.FileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,16 +36,18 @@ import java.util.Set;
  * 
  * @author corbinrsmith@gmail.com (Cory Smith)
  */
-public class JstdTestCase {
+public class JstdTestCase implements Iterable<FileInfo> {
   @SuppressWarnings("unused")
   private static final Logger logger =
       LoggerFactory.getLogger(JstdTestCase.class);
 
-  private final List<FileInfo> dependencies;
-  private final List<FileInfo> tests;
-  private final List<FileInfo> plugins;
+  private List<FileInfo> dependencies;
+  private List<FileInfo> tests;
+  private List<FileInfo> plugins;
 
-  private final String id;
+  private String id;
+  
+  public JstdTestCase() {}
 
   public JstdTestCase(List<FileInfo> dependencies,
                       List<FileInfo> tests,
@@ -182,5 +186,24 @@ public class JstdTestCase {
    */
   public String getId() {
     return id;
+  }
+
+  @Override
+  public Iterator<FileInfo> iterator() {
+    return Iterables.concat(plugins, dependencies, tests).iterator();
+  }
+
+  /**
+   * @return A list of files that are not serve only.
+   */
+  public List<FileInfo> getServable() {
+    List<FileInfo> servable =
+        Lists.newArrayListWithExpectedSize(tests.size() + plugins.size() + dependencies.size());
+    for (FileInfo file : this) {
+      if (!file.isServeOnly()) {
+        servable.add(file);
+      }
+    }
+    return servable;
   }
 }

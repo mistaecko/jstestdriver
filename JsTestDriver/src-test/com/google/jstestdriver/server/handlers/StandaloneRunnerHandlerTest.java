@@ -66,7 +66,7 @@ public class StandaloneRunnerHandlerTest extends TestCase {
             CaptureHandler.QUIRKS, RunnerType.CLIENT, BrowserState.CAPTURED);
     capturedBrowsers.addSlave(slaveBrowser);
     StandaloneRunnerHandler handler =
-        new StandaloneRunnerHandler(null, null, cache, new SlaveResourceService(""),
+        new StandaloneRunnerHandler(null, null, new SlaveResourceService(""),
             new ConcurrentHashMap<SlaveBrowser, Thread>(), null, null);
     handler.service(slaveBrowser);
 

@@ -1,16 +1,16 @@
 package com.google.jstestdriver.servlet.fileset;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.jstestdriver.FileInfo;
-import com.google.jstestdriver.FileSetCacheStrategy;
 import com.google.jstestdriver.SlaveBrowser;
 import com.google.jstestdriver.browser.BrowserFileSet;
+import com.google.jstestdriver.model.JstdTestCase;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,42 +22,56 @@ public class BrowserFileCheck implements FileSetRequestHandler<BrowserFileSet> {
   private static final Logger logger = LoggerFactory.getLogger(BrowserFileCheck.class);
 
   public static final String ACTION = "browserFileCheck";
-  private final FileSetCacheStrategy strategy;
+
+  private final Gson gson;
 
   @Inject
-  public BrowserFileCheck(FileSetCacheStrategy strategy) {
-    this.strategy = strategy;
+  public BrowserFileCheck(Gson gson) {
+    this.gson = gson;
   }
 
-  public BrowserFileSet handle(SlaveBrowser browser, Collection<FileInfo> clientFiles) {
+  @Override
+  public BrowserFileSet handle(SlaveBrowser browser, String data) {
+    JstdTestCase testCase = gson.fromJson(data, JstdTestCase.class);
     if (browser == null) {
       logger.debug("no browser, returning empty set.");
       return new BrowserFileSet(Collections.<FileInfo>emptyList(),
           Collections.<FileInfo>emptyList(), false);
     }
-    boolean reset = false;
     final List<FileInfo> filesToUpdate = Lists.newLinkedList();
     final List<FileInfo> extraFiles = Lists.newLinkedList();
+    boolean reset = false;
     // reload all files if Safari, Opera, or Konqueror, because they don't overwrite properly.
     // TODO(corysmith): Replace this with polymorphic browser classes.
     if (browser.getBrowserInfo().getName().contains("Safari")
         || browser.getBrowserInfo().getName().contains("Opera")
         || browser.getBrowserInfo().getName().contains("Konqueror")) {
       logger.debug("Resetting browser fileset to ensure proper overwriting.");
-      filesToUpdate.addAll(clientFiles);
+      filesToUpdate.addAll(testCase.toFileSet());
       // TODO(corysmith): Change the browser to handle it's own resets.
       browser.resetFileSet();
       reset = true;
     } else {
-      logger.debug("Determing files to update {}, {}", clientFiles, browser.getFileSet());
-      filesToUpdate.addAll(strategy.createExpiredFileSet(clientFiles, browser.getFileSet()));
+      logger.debug("Determing files to update {}, {}", testCase.toFileSet(), browser.getFileSet());
+      for (FileInfo newFile : testCase.getServable()) {
+        if (browser.getFileSet().contains(newFile)) {
+          for (FileInfo oldFile : browser.getFileSet()) {
+            if (oldFile.shouldReplaceWith(newFile)) {
+              filesToUpdate.add(newFile);
+            }
+          }
+        } else {
+          filesToUpdate.add(newFile);
+        }
+      }
+      extraFiles.addAll(browser.getFileSet());
+      extraFiles.removeAll(testCase.toFileSet());
     }
-    extraFiles.addAll(browser.getFileSet());
-    extraFiles.removeAll(clientFiles);
     return new BrowserFileSet(filesToUpdate, extraFiles, reset);
   }
   
 
+  @Override
   public boolean canHandle(String action) {
     return ACTION.equalsIgnoreCase(action);
   }

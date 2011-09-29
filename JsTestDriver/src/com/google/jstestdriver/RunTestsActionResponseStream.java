@@ -15,11 +15,11 @@
  */
 package com.google.jstestdriver;
 
-import java.util.Collection;
-
 import com.google.gson.Gson;
 import com.google.jstestdriver.browser.BrowserPanicException;
 import com.google.jstestdriver.output.TestResultListener;
+
+import java.util.Collection;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

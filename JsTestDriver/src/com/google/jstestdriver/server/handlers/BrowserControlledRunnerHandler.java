@@ -61,7 +61,6 @@ public class BrowserControlledRunnerHandler implements RequestHandler {
   public BrowserControlledRunnerHandler(
       SlavePageRequest request,
       HttpServletResponse response,
-      FilesCache cache,
       HandlerPathPrefix prefix,
       Map<PageType, Page> pages) {
     this.request = request;

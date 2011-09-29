@@ -17,6 +17,7 @@
 package com.google.jstestdriver;
 
 import com.google.inject.assistedinject.Assisted;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 
 
 public interface JsTestDriverServer {
@@ -24,7 +25,7 @@ public interface JsTestDriverServer {
   public interface Factory {
     JsTestDriverServer create(@Assisted("port") int port,
                               @Assisted("sslPort") int sslPort,
-                              FilesCache preloadedFilesCache);
+                              JstdTestCaseStore testCaseStore);
   }
 
   void start();

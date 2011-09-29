@@ -98,7 +98,7 @@ public class DefaultActionListProviderTest extends TestCase {
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
             newConfigureGatewayActionFactory(),
-            new BrowserStartupAction(null, null, null, null, null)),
+            new BrowserStartupAction(null, null, null, null, null), null),
         true);
   }
 

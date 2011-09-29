@@ -15,9 +15,6 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import java.io.IOException;
-import java.util.Set;
-
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.jstestdriver.FileInfo;
@@ -25,7 +22,12 @@ import com.google.jstestdriver.FileSource;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
+import com.google.jstestdriver.model.JstdTestCase;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 import com.google.jstestdriver.util.HtmlWriter;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * Runner page 
@@ -33,14 +35,14 @@ import com.google.jstestdriver.util.HtmlWriter;
  * @author corbinrsmith@gmail.com (Cory Smith)
  */
 public class BrowserControlledRunnerPage implements Page {
-  private final FilesCache cache;
+  private final JstdTestCaseStore store;
   private final Gson gson = new Gson();
   private final Set<FileInfoScheme> schemes;
   private final HandlerPathPrefix prefix;
 
   @Inject
-  BrowserControlledRunnerPage(FilesCache cache, HandlerPathPrefix prefix, Set<FileInfoScheme> schemes) {
-    this.cache = cache;
+  BrowserControlledRunnerPage(JstdTestCaseStore store, HandlerPathPrefix prefix, Set<FileInfoScheme> schemes) {
+    this.store = store;
     this.prefix = prefix;
     this.schemes = schemes;
   }
@@ -57,22 +59,30 @@ public class BrowserControlledRunnerPage implements Page {
             "jstestdriver.console = new jstestdriver.Console();" +
             "jstestdriver.runner = jstestdriver.config.createRunner(\n"+
             "    jstestdriver.config.createVisualExecutor);");
-    for (FileInfo file : cache.getAllFileInfos()) {
-      if (!file.canLoad()) {
-        continue;
+    
+    if (!store.getCases().isEmpty()) {
+      JstdTestCase testCase = store.getCase(request.getParameter("test"));
+      if (testCase == null && !store.getCases().isEmpty()) {
+        testCase = store.getCases().iterator().next();
       }
-      FileSource fileSource = file.toFileSource(prefix, schemes);
-      writer.writeScript(String.format(
-        "jstestdriver.manualResourceTracker.startResourceLoad('%s')",
-        gson.toJson(fileSource)));
-      if (fileSource.getFileSrc().endsWith(".css")) {
-        writer.writeStyleSheet(fileSource.getFileSrc());
-      } else {
-        writer.writeExternalScript(fileSource.getFileSrc());
+      
+      for (FileInfo file : testCase) {
+        if (!file.canLoad()) {
+          continue;
+        }
+        FileSource fileSource = file.toFileSource(prefix, schemes);
+        writer.writeScript(String.format(
+          "jstestdriver.manualResourceTracker.startResourceLoad('%s')",
+          gson.toJson(fileSource)));
+        if (fileSource.getFileSrc().endsWith(".css")) {
+          writer.writeStyleSheet(fileSource.getFileSrc());
+        } else {
+          writer.writeExternalScript(fileSource.getFileSrc());
+        }
+        writer.writeScript("jstestdriver.manualResourceTracker.finishResourceLoad()");
       }
-      writer.writeScript("jstestdriver.manualResourceTracker.finishResourceLoad()");
-    }
 
+    }
     writer.writeScript("jstestdriver.reporter.addLoadedFileResults(" +
         "jstestdriver.manualResourceTracker.getResults());");
 

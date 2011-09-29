@@ -15,16 +15,7 @@
  */
 package com.google.jstestdriver;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
@@ -32,6 +23,13 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.jstestdriver.JsonCommand.CommandType;
 import com.google.jstestdriver.model.JstdTestCase;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -62,11 +60,13 @@ public class JsTestDriverClientImpl implements JsTestDriverClient {
     this.uploader = uploader;
   }
 
+  @Override
   public Collection<BrowserInfo> listBrowsers() {
     return gson.fromJson(server.fetch(baseUrl + "/cmd?listBrowsers"),
         new TypeToken<Collection<BrowserInfo>>() {}.getType());
   }
 
+  @Override
   public String getNextBrowserId() {
     return server.fetch(baseUrl + "/cmd?nextBrowserId");
   }
@@ -85,6 +85,7 @@ public class JsTestDriverClientImpl implements JsTestDriverClient {
     task.run(testCase);
   }
 
+  @Override
   public void eval(String browserId, ResponseStream responseStream, String cmd, JstdTestCase testCase) {
     List<String> parameters = new LinkedList<String>();
 
@@ -94,17 +95,20 @@ public class JsTestDriverClientImpl implements JsTestDriverClient {
     sendCommand(browserId, responseStream, gson.toJson(jsonCmd), false, testCase);
   }
 
+  @Override
   public void runAllTests(String browserId, ResponseStream responseStream, boolean captureConsole,
       JstdTestCase testCase) {
     runTests(browserId, responseStream, Lists.newArrayList("all"), captureConsole, testCase);
   }
 
+  @Override
   public void reset(String browserId, ResponseStream responseStream, JstdTestCase testCase) {
     JsonCommand cmd = new JsonCommand(CommandType.RESET, Collections.<String>emptyList());
 
     sendCommand(browserId, responseStream, gson.toJson(cmd), false, testCase);
   }
 
+  @Override
   public void runTests(String browserId, ResponseStream responseStream, List<String> tests,
       boolean captureConsole, JstdTestCase testCase) {
     List<String> parameters = new LinkedList<String>();
@@ -118,12 +122,14 @@ public class JsTestDriverClientImpl implements JsTestDriverClient {
     sendCommand(browserId, responseStream, gson.toJson(cmd), true, testCase);
   }
 
+  @Override
   public void dryRun(String browserId, ResponseStream responseStream, JstdTestCase testCase) {
     JsonCommand cmd = new JsonCommand(CommandType.DRYRUN, Collections.<String>emptyList());
 
     sendCommand(browserId, responseStream, gson.toJson(cmd), true, testCase);
   }
 
+  @Override
   public void dryRunFor(String browserId, ResponseStream responseStream, List<String> expressions,
       JstdTestCase testCase) {
     List<String> parameters = new LinkedList<String>();
@@ -134,9 +140,8 @@ public class JsTestDriverClientImpl implements JsTestDriverClient {
     sendCommand(browserId, responseStream, gson.toJson(cmd), true, testCase);
   }
 
+  @Override
   public void uploadFiles(String browserId, JstdTestCase testCase) {
-    Set<FileInfo> fileSet = Sets.newLinkedHashSet(testCase.getDependencies());
-    fileSet.addAll(testCase.getTests());
-    uploader.uploadFileSet(browserId, fileSet, new BrowserPanicResponseStream());
+    uploader.uploadFileSet(browserId, Lists.<JstdTestCase>newArrayList(testCase), new BrowserPanicResponseStream());
   }
 }

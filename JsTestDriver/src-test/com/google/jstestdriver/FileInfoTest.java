@@ -33,4 +33,17 @@ public class FileInfoTest extends TestCase {
     assertTrue(httpsFile.isWebAddress());
     assertFalse(nonWebFile.isWebAddress());
   }
+  
+  public void testShouldReplaceWith() throws Exception {
+    FileInfo oldFile = new FileInfo("a/b/c/file.js", 0, -1, false, false, null, "a/b/c/file.js");
+    FileInfo newFile = new FileInfo("a/b/c/file.js", 10, -1, false, false, null, "a/b/c/file.js");
+    
+    assertTrue("A different timestamp means replace", oldFile.shouldReplaceWith(newFile));
+    assertFalse("Same timestamp and length means noreplace", oldFile.shouldReplaceWith(oldFile));
+    
+    FileInfo longer = new FileInfo("a/b/c/file.js", 0, 10, false, false, null, "a/b/c/file.js");
+    FileInfo shorter = new FileInfo("a/b/c/file.js", 0, 3, false, false, null, "a/b/c/file.js");
+    
+    assertTrue("A different length means replace", longer.shouldReplaceWith(shorter));
+  }
 }

@@ -46,6 +46,7 @@ public class JsTestDriverClientTest extends TestCase {
       this.stream = stream;
     }
 
+    @Override
     public ResponseStream getEvalActionResponseStream() {
       return stream;
     }
@@ -58,14 +59,17 @@ public class JsTestDriverClientTest extends TestCase {
       return stream;
     }
 
+    @Override
     public ResponseStream getResetActionResponseStream() {
       return stream;
     }
 
+    @Override
     public ResponseStream getDryRunActionResponseStream() {
       return stream;
     }
 
+    @Override
     public ResponseStream getRunTestsActionResponseStream(String testId) {
       return stream;
     }
@@ -75,9 +79,11 @@ public class JsTestDriverClientTest extends TestCase {
 
     private Response response;
 
+    @Override
     public void finish() {
     }
 
+    @Override
     public void stream(Response response) {
       this.response = response;
     }
@@ -148,6 +154,7 @@ public class JsTestDriverClientTest extends TestCase {
     final NullStopWatch stopWatch = new NullStopWatch();
     CommandTaskFactory commandTaskFactory =
         new CommandTaskFactory(new DefaultFileFilter(), null, new Provider<HeartBeatManager>() {
+          @Override
           public HeartBeatManager get() {
             return new HeartBeatManagerStub();
           }
@@ -179,14 +186,17 @@ public class JsTestDriverClientTest extends TestCase {
   public void testRunAllTest() throws Exception {
     MockServer server = new MockServer();
     String id = "1";
+    JstdTestCase testCase =
+        new JstdTestCase(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(),
+            java.util.Collections.<FileInfo>emptyList(), null);
 
     server.expect("http://localhost/heartbeat?id=" + id, "OK");
     server.expect(
-        "http://localhost/fileSet?POST?{id=" + id + ", data=[], action=browserFileCheck}",
+        "http://localhost/fileSet?POST?{id=" + id + ", data=" + gson.toJson(testCase) + ", action=browserFileCheck}",
         gson.toJson(new BrowserFileSet()));
 
     server.expect("http://localhost/fileSet?POST?{data=[], action=serverFileCheck}", "[]");
-    
+
     BrowserInfo browserInfo = new BrowserInfo();
     browserInfo.setId(Long.parseLong(id));
     browserInfo.setUploadSize(10);
@@ -200,6 +210,7 @@ public class JsTestDriverClientTest extends TestCase {
     final NullStopWatch stopWatch = new NullStopWatch();
     CommandTaskFactory commandTaskFactory =
         new CommandTaskFactory(new DefaultFileFilter(), new MockFileLoader(), new Provider<HeartBeatManager>() {
+          @Override
           public HeartBeatManager get() {
             return new HeartBeatManagerStub();
           }
@@ -209,17 +220,18 @@ public class JsTestDriverClientTest extends TestCase {
     FakeResponseStream stream = new FakeResponseStream();
 
     client.runAllTests("1", stream, false,
-        new JstdTestCase(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), java.util.Collections.<FileInfo> emptyList(), null));
+        testCase);
 
     assertEquals("PASSED", stream.getResponse().getResponse());
   }
 
   public void testRunOneTest() throws Exception {
+    JstdTestCase testCase = new JstdTestCase(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), java.util.Collections.<FileInfo> emptyList(), null);
     String id = "1";
     MockServer server = new MockServer();
 
     server.expect("http://localhost/heartbeat?id=1", "OK");
-    server.expect("http://localhost/fileSet?POST?{id=1, data=[], action=browserFileCheck}",
+    server.expect("http://localhost/fileSet?POST?{id=1, data=" + gson.toJson(testCase) + ", action=browserFileCheck}",
         gson.toJson(new BrowserFileSet()));
     server.expect("http://localhost/fileSet?POST?{data=[], action=serverFileCheck}", "[]");
     server.expect(
@@ -239,6 +251,7 @@ public class JsTestDriverClientTest extends TestCase {
         new CommandTaskFactory(filter,
             new MockFileLoader(),
             new Provider<HeartBeatManager>() {
+          @Override
           public HeartBeatManager get() {
             return new HeartBeatManagerStub();
           }
@@ -255,7 +268,7 @@ public class JsTestDriverClientTest extends TestCase {
     tests.add("testCase.testFoo");
     tests.add("testCase.testBar");
     client.runTests("1", stream, tests, false,
-        new JstdTestCase(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), java.util.Collections.<FileInfo> emptyList(), null));
+        testCase);
 
     assertEquals("PASSED", stream.getResponse().getResponse());
   }

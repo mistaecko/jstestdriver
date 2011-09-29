@@ -45,7 +45,7 @@ public class ActionSequenceBuilderTest extends TestCase {
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
             newConfigureGatewayActionFactory(),
-            null);
+            null, null);
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ConfigureGatewayAction.class);
@@ -78,7 +78,7 @@ public class ActionSequenceBuilderTest extends TestCase {
         new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
         null,
         newConfigureGatewayActionFactory(),
-            null);
+            null, null);
 
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
@@ -106,7 +106,7 @@ public class ActionSequenceBuilderTest extends TestCase {
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
             newConfigureGatewayActionFactory(),
-            null);
+            null, null);
     
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();
     expectedActions.add(ServerStartupAction.class);
@@ -137,7 +137,7 @@ public class ActionSequenceBuilderTest extends TestCase {
             new CapturedBrowsers(new BrowserIdStrategy(new MockTime(0))),
             null,
             newConfigureGatewayActionFactory(),
-            null);
+            null, null);
 
     List<Action> actions = builder.addTests(tests).withLocalServerPort(999).build();
     List<Class<? extends Action>> expectedActions = new ArrayList<Class<? extends Action>>();

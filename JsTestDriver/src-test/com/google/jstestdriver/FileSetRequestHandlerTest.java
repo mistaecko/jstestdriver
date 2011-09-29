@@ -15,41 +15,28 @@
  */
 package com.google.jstestdriver;
 
-import java.util.Map;
-
-import junit.framework.TestCase;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.jstestdriver.SlaveBrowser.BrowserState;
 import com.google.jstestdriver.browser.BrowserFileSet;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
+import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.runner.RunnerType;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 import com.google.jstestdriver.server.handlers.CaptureHandler;
 import com.google.jstestdriver.servlet.fileset.BrowserFileCheck;
-import com.google.jstestdriver.servlet.fileset.ServerFileCheck;
-import com.google.jstestdriver.servlet.fileset.ServerFileUpload;
+import com.google.jstestdriver.servlet.fileset.TestCaseUpload;
+
+import junit.framework.TestCase;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
 public class FileSetRequestHandlerTest extends TestCase {
-  public void testServerCheckFileAction() throws Exception {
-    final String fileOne = "one.js";
-    final String fileTwo = "two.js";
-    final Map<String, FileInfo> fileMap = Maps.newHashMap();
-    fileMap.put(fileOne, createFile(fileOne, 1));
-    fileMap.put(fileTwo, createFile(fileTwo, 1));
-
-    final ServerFileCheck serverFileCheck =
-        new ServerFileCheck(new FilesCache(fileMap), new FileSetCacheStrategy());
-
-    assertEquals(
-        Sets.newHashSet(createFile(fileOne, 3)),
-        serverFileCheck.handle(null,
-            Lists.newArrayList(createFile(fileOne, 3), createFile(fileTwo, 1))));
-  }
 
   FileInfo createFile(String path, long timestamp) {
     return new FileInfo(path, timestamp, -1, false, false, null, path);
@@ -75,27 +62,32 @@ public class FileSetRequestHandlerTest extends TestCase {
     browser.addFiles(Lists.newArrayList(createFile(fileOne, 1), createFile(fileTwo, 1),
         createFile(fileThree, 1)), new LoadedFiles());
     browsers.addSlave(browser);
-    final BrowserFileCheck browserFileCheck = new BrowserFileCheck(new FileSetCacheStrategy());
+    Gson gson = new Gson();
+    final BrowserFileCheck browserFileCheck = new BrowserFileCheck(gson);
+
+    JstdTestCase testCaseToRun =
+        new JstdTestCase(Lists.newArrayList(createFile(fileOne, 3), createFile(fileTwo, 1)),
+            Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), "one");
 
     assertEquals(
         new BrowserFileSet(Lists.newArrayList(createFile(fileOne, 3)),
-            Lists.newArrayList(createFile(fileThree, 3)), false), browserFileCheck.handle(browser,
-            Lists.newArrayList(createFile(fileOne, 3), createFile(fileTwo, 1))));
+            Lists.newArrayList(createFile(fileThree, 3)), false),
+            browserFileCheck.handle(browser, gson.toJson(testCaseToRun)));
   }
 
   public void testUploadFilesToServer() throws Exception {
     final String fileOne = "one.js";
     final String fileTwo = "two.js";
-    final Map<String, FileInfo> expected = Maps.newHashMap();
-    final Map<String, FileInfo> actual = Maps.newHashMap();
-    expected.put(fileOne, createFile(fileOne, 1));
-    expected.put(fileTwo, createFile(fileTwo, 1));
 
-    final ServerFileUpload serverFileUpload = new ServerFileUpload(new FilesCache(actual));
+    Gson gson = new Gson();
+    JstdTestCaseStore store = new JstdTestCaseStore();
+    final TestCaseUpload serverFileUpload = new TestCaseUpload(store, gson);
 
-    serverFileUpload.handle(null,
-        Lists.newArrayList(createFile(fileOne, 3), createFile(fileTwo, 1)));
+    JstdTestCase jstdTestCase = new JstdTestCase(Lists.newArrayList(createFile(fileOne, 3), createFile(fileTwo, 1)),
+        Collections.<FileInfo>emptyList(),
+        Collections.<FileInfo>emptyList(), "one");
+    serverFileUpload.handle(null, gson.toJson(Lists.<JstdTestCase>newArrayList(jstdTestCase)));
 
-    assertEquals(expected, actual);
+    assertEquals(jstdTestCase, store.getCase(jstdTestCase.getId()));
   }
 }

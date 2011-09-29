@@ -18,6 +18,7 @@ package com.google.jstestdriver.server.handlers;
 import com.google.inject.Inject;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +39,16 @@ class TestResourceHandler implements RequestHandler {
 
   private final HttpServletRequest request;
   private final HttpServletResponse response;
-  private final FilesCache filesCache;
+  private final JstdTestCaseStore store;
 
   @Inject
   public TestResourceHandler(
       HttpServletRequest request,
       HttpServletResponse response,
-      FilesCache filesCache) {
+      JstdTestCaseStore store) {
     this.request = request;
     this.response = response;
-    this.filesCache = filesCache;
+    this.store = store;
   }
 
   @Override
@@ -60,7 +61,7 @@ class TestResourceHandler implements RequestHandler {
 
   public void service(String fileName, PrintWriter writer) throws IOException {
     try {
-      String fileContent = filesCache.getFileContent(fileName);
+      String fileContent = store.getFileContent(fileName);
       String mimeType = parseMimeType(fileName);
       if (mimeType != null) {
         response.setContentType(mimeType);

@@ -25,6 +25,7 @@ import java.util.List;
  * @author Cory Smith (corbinrsmith@gmail.com)
  */
 public class DefaultFileFilter implements JsTestDriverFileFilter {
+  @Override
   public List<FileInfo> resolveFilesDeps(FileInfo file, List<FileInfo> fileSet) {
     int index = fileSet.indexOf(file);
     if (index == -1) {

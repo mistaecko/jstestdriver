@@ -21,6 +21,7 @@ import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.NullPathPrefix;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 
 import junit.framework.TestCase;
 
@@ -29,8 +30,7 @@ import junit.framework.TestCase;
  */
 public class BrowserControlledRunnerPageTest extends TestCase {
   public void testRenderWithPrefix() throws Exception {
-    new PrefixTester().testPrefixes(new BrowserControlledRunnerPage(new FilesCache(
-      Collections.<String, FileInfo>emptyMap()),
+    new PrefixTester().testPrefixes(new BrowserControlledRunnerPage(new JstdTestCaseStore(),
       new NullPathPrefix(),
       Collections.<FileInfoScheme>emptySet()));
   }

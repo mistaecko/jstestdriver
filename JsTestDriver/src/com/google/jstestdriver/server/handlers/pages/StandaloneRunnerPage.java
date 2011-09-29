@@ -15,10 +15,14 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import java.io.IOException;
-
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import com.google.jstestdriver.model.JstdTestCase;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 import com.google.jstestdriver.util.HtmlWriter;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Runner page 
@@ -27,12 +31,15 @@ import com.google.jstestdriver.util.HtmlWriter;
  */
 public class StandaloneRunnerPage implements Page {
   private final TestFileUtil testFileUtil;
+  private final JstdTestCaseStore store;
 
   @Inject
-  StandaloneRunnerPage(TestFileUtil testFileUtil) {
+  StandaloneRunnerPage(TestFileUtil testFileUtil, JstdTestCaseStore store) {
     this.testFileUtil = testFileUtil;
+    this.store = store;
   }
   
+  @Override
   public void render(HtmlWriter writer, SlavePageRequest request) throws IOException {
     writer.startHead()
         .writeTitle("Console Runner")
@@ -45,8 +52,15 @@ public class StandaloneRunnerPage implements Page {
             "jstestdriver.console = new jstestdriver.Console();" +
             "jstestdriver.runner = jstestdriver.config.createRunner(\n"+
             "  jstestdriver.config.createStandAloneExecutor);");
-
-    testFileUtil.writeTestFiles(writer);
+    List<JstdTestCase> casesToWrite = Lists.newArrayList();
+    
+    if (request.getParameter(SlavePageRequest.TESTCASE_ID) != null) {
+      testFileUtil.writeTestFiles(writer, request.getParameter(SlavePageRequest.TESTCASE_ID));
+    } else {
+      for (JstdTestCase testCase : store.getCases()) {
+        testFileUtil.writeTestFiles(writer, testCase.getId());
+      }
+    }
 
     writer.writeScript("jstestdriver.runner.listen(" +
         "jstestdriver.manualResourceTracker.getResults());");

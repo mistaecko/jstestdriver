@@ -4,6 +4,7 @@ package com.google.jstestdriver.server;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.inject.Singleton;
 import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.model.JstdTestCase;
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author corysmith@google.com (Cory Smith)
  *
  */
+@Singleton
 public class JstdTestCaseStore {
   private static final Logger logger = LoggerFactory.getLogger(JstdTestCaseStore.class);
   private final ConcurrentMap<String, JstdTestCase> cases =
@@ -85,6 +87,9 @@ public class JstdTestCaseStore {
    * Retrieve a test case from the store.
    */
   public JstdTestCase getCase(String testCaseId) {
+    if (testCaseId == null) {
+      return null;
+    }
     return cases.get(testCaseId);
   }
 

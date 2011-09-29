@@ -15,28 +15,30 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import java.io.StringWriter;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import junit.framework.TestCase;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.jstestdriver.FileInfo;
-import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.HttpFileInfoScheme;
 import com.google.jstestdriver.hooks.FileInfoScheme;
+import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.model.NullPathPrefix;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 import com.google.jstestdriver.util.HtmlWriter;
+
+import junit.framework.TestCase;
+
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Cory Smith (corbinrsmith@gmail.com) 
  */
 public class TestFileUtilTest extends TestCase {
+
+  private static final String TESTCASE_ID = "foo";
 
   public void testWriteFileInfos() throws Exception {
     Set<FileInfoScheme> defaultSchemes = Sets.<FileInfoScheme>newHashSet(new HttpFileInfoScheme());
@@ -57,7 +59,7 @@ public class TestFileUtilTest extends TestCase {
         paths.add(path);
         return this;
       }
-    });
+    }, TESTCASE_ID);
     assertEquals(Lists.newArrayList("/test/foo.js","/test/bar.js", "http://somehost/bar.js"), paths);
   }
 
@@ -93,16 +95,15 @@ public class TestFileUtilTest extends TestCase {
         paths.add(path);
         return this;
       }
-    });
+    }, TESTCASE_ID);
     assertEquals(Lists.newArrayList("/test/foo.js","/test/bar.js"), paths);
   }
 
-  private FilesCache createFileCache(FileInfo... files) {
-    Map<String, FileInfo> fileMap = new LinkedHashMap<String, FileInfo>();
-    for (FileInfo fileInfo : files) {
-      fileMap.put(fileInfo.getDisplayPath(), fileInfo);
-    }
-    return new FilesCache(fileMap);
+  private JstdTestCaseStore createFileCache(FileInfo... files) {
+    JstdTestCaseStore store = new JstdTestCaseStore();
+    store.addCase(new JstdTestCase(Lists.newArrayList(files), Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), TESTCASE_ID));
+    
+    return store;
   }
   public void testBreakOnUnloadableWriteFileInfos() throws Exception {
     

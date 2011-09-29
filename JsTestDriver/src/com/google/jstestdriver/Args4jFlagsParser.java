@@ -16,9 +16,7 @@
 
 package com.google.jstestdriver;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.jstestdriver.config.InvalidFlagException;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -27,7 +25,9 @@ import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 
-import com.google.jstestdriver.config.InvalidFlagException;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parsers the Flags from args.
@@ -86,6 +86,7 @@ public class Args4jFlagsParser implements FlagsParser {
   }
 
 
+  @Override
   public Flags parseArgument(String[] strings) {
     FlagsImpl flags = new FlagsImpl();
     CmdLineParser.registerHandler(List.class, StringListOptionHandler.class);

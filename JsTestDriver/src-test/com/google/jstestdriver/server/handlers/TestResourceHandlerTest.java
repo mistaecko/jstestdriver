@@ -15,19 +15,20 @@
  */
 package com.google.jstestdriver.server.handlers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
+import com.google.common.collect.Lists;
+import com.google.jstestdriver.FileInfo;
+import com.google.jstestdriver.model.JstdTestCase;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 
-import com.google.jstestdriver.FileInfo;
-import com.google.jstestdriver.FilesCache;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.util.Collections;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -42,8 +43,7 @@ public class TestResourceHandlerTest extends TestCase {
     response.sendError(404);
     EasyMock.expectLastCall().anyTimes();
     EasyMock.replay(response);
-    TestResourceHandler handler =
-        new TestResourceHandler(null, response, new FilesCache(new HashMap<String, FileInfo>()));
+    TestResourceHandler handler = new TestResourceHandler(null, response, new JstdTestCaseStore());
 
     handler.service("nothing", writer);
   }
@@ -53,13 +53,17 @@ public class TestResourceHandlerTest extends TestCase {
     response.setContentType(StaticResourceHandler.MIME_TYPE_MAP.get("js"));
     EasyMock.expectLastCall().anyTimes();
     EasyMock.replay(response);
-    Map<String, FileInfo> files = new HashMap<String, FileInfo>();
 
-    files.put("dummy.js", new FileInfo("dummy.js", -1, -1, false, false, "data", "dummy.js"));
-    files.put("dummytoo.js", new FileInfo("dummytoo.js", 20, -1, false, false, "more data",
-        "dummytoo.js"));
-    FilesCache filesCache = new FilesCache(files);
-    TestResourceHandler handler = new TestResourceHandler(null, response, filesCache);
+
+    JstdTestCaseStore store = new JstdTestCaseStore();
+    store.addCase(new JstdTestCase(
+        Lists.newArrayList(
+            new FileInfo("dummy.js", -1, -1, false, false, "data", "dummy.js"),
+            new FileInfo("dummytoo.js", 20, -1, false, false, "more data", "dummytoo.js")),
+        Collections.<FileInfo>emptyList(),
+        Collections.<FileInfo>emptyList(),
+        "id"));
+    TestResourceHandler handler = new TestResourceHandler(null, response, store);
 
     handler.service("dummy.js", writer);
     assertEquals("data", out.toString());

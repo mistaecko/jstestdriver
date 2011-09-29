@@ -15,19 +15,20 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import java.util.Set;
-
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.FileSource;
-import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
+import com.google.jstestdriver.model.JstdTestCase;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 import com.google.jstestdriver.util.HtmlWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 /**
  * A utility that write The contents of the FilesCache into an HtmlWriter.
@@ -38,17 +39,17 @@ import org.slf4j.LoggerFactory;
 public class TestFileUtil {
   private static final Logger logger = LoggerFactory.getLogger(TestFileUtil.class);
   private final HandlerPathPrefix prefix;
-  private final FilesCache cache;
   private final Set<FileInfoScheme> schemes;
   private final Gson gson;
+  private final JstdTestCaseStore store;
 
   /**
    * Creates a new TestFileUtil from the dependencies.
    */
   @Inject
-   TestFileUtil(FilesCache cache, HandlerPathPrefix prefix, Set<FileInfoScheme> schemes,
+   TestFileUtil(JstdTestCaseStore store, HandlerPathPrefix prefix, Set<FileInfoScheme> schemes,
       Gson gson) {
-    this.cache = cache;
+    this.store = store;
     this.prefix = prefix;
     this.schemes = schemes;
     this.gson = gson;
@@ -59,8 +60,14 @@ public class TestFileUtil {
    * FileInfo that cannot be handled using a &lt;link&gt; or a &lt;script&gt;.
    * @param writer The output writer.
    */
-  public void writeTestFiles(HtmlWriter writer) {
-    for (FileInfo file : cache.getAllFileInfos()) {
+  public void writeTestFiles(HtmlWriter writer, String testCaseId) {
+    JstdTestCase testCase = store.getCase(testCaseId);
+
+    if (testCase == null) { // no optimization without testcase id
+      return;
+    }
+
+    for (FileInfo file : testCase) {
       if (file.isServeOnly()) {
         continue;
       }

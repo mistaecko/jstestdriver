@@ -43,6 +43,7 @@ public class SlavePageRequest {
   public static final String TIMEOUT = "timeout";
   public static final String UPLOAD_SIZE = "upload_size";
   public static final String LOAD_TYPE = "load_type";
+  public static final String TESTCASE_ID = "testcase_id";
   public static final String REFRESH = "refresh";
 
   private static final Logger logger =

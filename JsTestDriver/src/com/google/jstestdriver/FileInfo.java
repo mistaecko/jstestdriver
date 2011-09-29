@@ -169,7 +169,7 @@ public class FileInfo implements Cloneable {
   @Override
   public String toString() {
     if (logger.isDebugEnabled() || logger.isTraceEnabled()) {
-      return "FileInfo [filePath=" + filePath + ", length=" + length + ", patches=" + patches
+      return "\n\tFileInfo [filePath=" + filePath + ", length=" + length + ", patches=" + patches
           + ", serveOnly=" + serveOnly + ", timestamp=" + timestamp + "]";
     }
     return "\n\tFileInfo[" + this.getDisplayPath() + "]";

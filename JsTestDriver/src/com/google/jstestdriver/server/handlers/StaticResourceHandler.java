@@ -15,16 +15,16 @@
  */
 package com.google.jstestdriver.server.handlers;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.jstestdriver.SlaveResourceService;
+import com.google.jstestdriver.requesthandlers.RequestHandler;
+
 import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.jstestdriver.SlaveResourceService;
-import com.google.jstestdriver.requesthandlers.RequestHandler;
 
 /**
  * Serves static resources.

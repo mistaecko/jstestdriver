@@ -16,6 +16,7 @@
 package com.google.jstestdriver.server.handlers.pages;
 
 import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.LOAD_TYPE;
+import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.TESTCASE_ID;
 
 import com.google.inject.Inject;
 import com.google.jstestdriver.util.HtmlWriter;
@@ -54,7 +55,7 @@ public class RunnerPage implements Page {
           "        jstestdriver.setTimeout));");
 
     if (!"load".equals(request.getParameter(LOAD_TYPE))) {
-      testFileUtil.writeTestFiles(writer);
+      testFileUtil.writeTestFiles(writer, request.getParameter(TESTCASE_ID));
     }
 
     writer.writeScript("jstestdriver.jQuery(window).load(function(){jstestdriver.runner.listen(" +

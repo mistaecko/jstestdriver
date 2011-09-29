@@ -15,15 +15,6 @@
  */
 package com.google.jstestdriver;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Iterator;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -31,6 +22,15 @@ import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.model.RunData;
 import com.google.jstestdriver.model.RunDataFactory;
 import com.google.jstestdriver.util.StopWatch;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)

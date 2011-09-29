@@ -15,6 +15,14 @@
  */
 package com.google.jstestdriver;
 
+import com.google.common.collect.Lists;
+import com.google.jstestdriver.hooks.FileParsePostProcessor;
+import com.google.jstestdriver.util.DisplayPathSanitizer;
+
+import org.apache.oro.io.GlobFilenameFilter;
+import org.apache.oro.text.GlobCompiler;
+import org.jvyaml.YAML;
+
 import java.io.File;
 import java.io.Reader;
 import java.util.Arrays;
@@ -24,14 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.oro.io.GlobFilenameFilter;
-import org.apache.oro.text.GlobCompiler;
-import org.jvyaml.YAML;
-
-import com.google.common.collect.Lists;
-import com.google.jstestdriver.hooks.FileParsePostProcessor;
-import com.google.jstestdriver.util.DisplayPathSanitizer;
 
 /**
  * TODO: needs to give more feedback when something goes wrong...

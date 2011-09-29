@@ -130,7 +130,7 @@ class BrowserQueryResponseHandler implements RequestHandler {
     Command command = null;
     if (isResponseValid(response)) {
       Response res = gson.fromJson(response, Response.class);
-      logger.debug("response type: " +  res.getResponseType());
+      logger.trace("response type: " +  res.getResponseType());
       // TODO (corysmith): Replace this with polymorphism,
       // using the response type to create disposable actions.
       switch (res.getResponseType()) {

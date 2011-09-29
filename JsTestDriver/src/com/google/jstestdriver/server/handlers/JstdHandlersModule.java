@@ -24,20 +24,9 @@ import static com.google.jstestdriver.server.handlers.pages.PageType.HEARTBEAT;
 import static com.google.jstestdriver.server.handlers.pages.PageType.RUNNER;
 import static com.google.jstestdriver.server.handlers.pages.PageType.STANDALONE_RUNNER;
 import static com.google.jstestdriver.server.handlers.pages.PageType.VISUAL_STANDALONE_RUNNER;
-import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.UPLOAD_SIZE;
 import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.LOAD_TYPE;
 import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.REFRESH;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.UPLOAD_SIZE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -50,7 +39,6 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.servlet.RequestScoped;
 import com.google.jstestdriver.CapturedBrowsers;
 import com.google.jstestdriver.FileInfo;
-import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.ForwardingServlet;
 import com.google.jstestdriver.SlaveBrowser;
 import com.google.jstestdriver.SlaveResourceService;
@@ -66,6 +54,7 @@ import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
 import com.google.jstestdriver.requesthandlers.RequestHandler;
 import com.google.jstestdriver.requesthandlers.RequestHandlersModule;
+import com.google.jstestdriver.server.JstdTestCaseStore;
 import com.google.jstestdriver.server.gateway.SimpleServletConfig;
 import com.google.jstestdriver.server.handlers.pages.BrowserControlledRunnerPage;
 import com.google.jstestdriver.server.handlers.pages.ConsolePage;
@@ -76,10 +65,21 @@ import com.google.jstestdriver.server.handlers.pages.RunnerPage;
 import com.google.jstestdriver.server.handlers.pages.SlavePageRequest;
 import com.google.jstestdriver.server.handlers.pages.StandaloneRunnerPage;
 import com.google.jstestdriver.servlet.fileset.BrowserFileCheck;
+import com.google.jstestdriver.servlet.fileset.DeltaUpload;
 import com.google.jstestdriver.servlet.fileset.FileSetRequestHandler;
-import com.google.jstestdriver.servlet.fileset.ServerFileCheck;
-import com.google.jstestdriver.servlet.fileset.ServerFileUpload;
+import com.google.jstestdriver.servlet.fileset.TestCaseUpload;
 import com.google.jstestdriver.util.ParameterParser;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Defines {@link RequestHandler} bindings for the JSTD server.
@@ -99,7 +99,7 @@ public class JstdHandlersModule extends RequestHandlersModule {
   private static final String JSTD = "jstd";
   
   private final CapturedBrowsers capturedBrowsers;
-  private final FilesCache filesCache;
+  private final JstdTestCaseStore testCaseStore;
   private final long browserTimeout;
   private final HandlerPathPrefix handlerPrefix;
 
@@ -113,13 +113,13 @@ public class JstdHandlersModule extends RequestHandlersModule {
    */
   public JstdHandlersModule(
       CapturedBrowsers capturedBrowsers,
-      FilesCache filesCache,
+      JstdTestCaseStore testCaseStore,
       long browserTimeout,
       HandlerPathPrefix handlerPrefix,
       Set<FileInfoScheme> schemes) {
     super();
     this.capturedBrowsers = capturedBrowsers;
-    this.filesCache = filesCache;
+    this.testCaseStore = testCaseStore;
     this.browserTimeout = browserTimeout;
     this.handlerPrefix = handlerPrefix;
     this.schemes = schemes;
@@ -168,7 +168,7 @@ public class JstdHandlersModule extends RequestHandlersModule {
 
     // Miscellaneous bindings
     bind(CapturedBrowsers.class).toInstance(capturedBrowsers);
-    bind(FilesCache.class).toInstance(filesCache);
+    bind(JstdTestCaseStore.class).toInstance(testCaseStore);
     bind(new Key<ConcurrentMap<SlaveBrowser, List<String>>>() {})
         .toInstance(new ConcurrentHashMap<SlaveBrowser, List<String>>());
     bind(new Key<ConcurrentMap<SlaveBrowser, Thread>>() {})
@@ -214,8 +214,8 @@ public class JstdHandlersModule extends RequestHandlersModule {
   }
 
   @Provides @Singleton List<FileSetRequestHandler<?>> provideFileSetRequestHandlers(
-      BrowserFileCheck browserFileCheck, ServerFileCheck serverFileCheck, ServerFileUpload serverFileUpload) {
-    return ImmutableList.of(browserFileCheck, serverFileCheck, serverFileUpload);
+      BrowserFileCheck browserFileCheck, TestCaseUpload serverFileUpload, DeltaUpload deltaUpload) {
+    return ImmutableList.of(browserFileCheck, serverFileUpload, deltaUpload);
   }
 
   @Provides @Singleton
