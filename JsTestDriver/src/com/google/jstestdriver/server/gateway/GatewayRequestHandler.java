@@ -62,15 +62,21 @@ public class GatewayRequestHandler implements RequestHandler {
     addRequestHeaders(method, request);
     method.setQueryString(request.getQueryString());
     spoofHostHeader(method);
-    final int statusCode = client.executeMethod(method);
-    response.setStatus(statusCode);
-    addResponseHeaders(method, response);
-    if (isRedirect(statusCode)) {
-      spoofLocationHeader(request, (Response) response);
+    try {
+      final int statusCode = client.executeMethod(method);
+      response.setStatus(statusCode);
+      addResponseHeaders(method, response);
+      if (isRedirect(statusCode)) {
+        spoofLocationHeader(request, (Response) response);
+      }
+      // TODO(rdionne): Substitute the JsTD server address for the destination address in any redirects.
+      Streams.copy(method.getResponseBodyAsStream(), response.getOutputStream());
+    } catch (IOException e) {
+      response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+      e.printStackTrace(response.getWriter());
+    } finally {
+      method.releaseConnection();
     }
-    // TODO(rdionne): Substitute the JsTD server address for the destination address in any redirects.
-    Streams.copy(method.getResponseBodyAsStream(), response.getOutputStream());
-    method.releaseConnection();
   }
 
   private HttpMethodBase getMethod(final HttpServletRequest request) throws IOException {
