@@ -15,6 +15,17 @@
  */
 package com.google.jstestdriver;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+
+import org.apache.oro.io.GlobFilenameFilter;
+import org.apache.oro.text.GlobCompiler;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -23,16 +34,6 @@ import com.google.jstestdriver.config.UnreadableFile;
 import com.google.jstestdriver.config.UnreadableFilesException;
 import com.google.jstestdriver.hooks.FileParsePostProcessor;
 import com.google.jstestdriver.util.DisplayPathSanitizer;
-
-import org.apache.oro.io.GlobFilenameFilter;
-import org.apache.oro.text.GlobCompiler;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Handles the resolution of glob paths (*.js) and relative paths.
@@ -139,7 +140,7 @@ public class PathResolver {
    * Java absolute paths  
    */
   private String resolveRelativePathReferences(String path) {
-    String[] elements = path.split(File.separator);
+    String[] elements = path.split(Matcher.quoteReplacement("\\"));
     List<String> resolved = Lists.newArrayListWithExpectedSize(elements.length);
     for (String element : elements) {
       if ("..".equals(element)) {
