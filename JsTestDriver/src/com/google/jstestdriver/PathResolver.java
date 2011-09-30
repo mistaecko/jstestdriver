@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.oro.io.GlobFilenameFilter;
 import org.apache.oro.text.GlobCompiler;
@@ -46,7 +46,8 @@ public class PathResolver {
   private DisplayPathSanitizer sanitizer;
 
   @Inject
-  public PathResolver(@Named("basePath") File basePath, Set<FileParsePostProcessor> processors, DisplayPathSanitizer sanitizer) {
+  public PathResolver(@Named("basePath") File basePath, Set<FileParsePostProcessor> processors,
+      DisplayPathSanitizer sanitizer) {
     this.basePath = basePath;
     this.processors = processors;
     this.sanitizer = sanitizer;
@@ -140,7 +141,8 @@ public class PathResolver {
    * Java absolute paths  
    */
   private String resolveRelativePathReferences(String path) {
-    String[] elements = path.split(Matcher.quoteReplacement("\\"));
+    Pattern pattern = Pattern.compile(Pattern.quote(File.separator));
+    String[] elements = pattern.split(path);
     List<String> resolved = Lists.newArrayListWithExpectedSize(elements.length);
     for (String element : elements) {
       if ("..".equals(element)) {

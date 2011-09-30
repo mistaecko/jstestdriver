@@ -36,6 +36,5 @@ public class PathResolverTest extends TestCase {
             new DisplayPathSanitizer(basePath));
     
     File resolvePath = pathResolver.resolvePath("\\foo\\bar");
-    System.out.println(resolvePath.getPath());
   }
 }
