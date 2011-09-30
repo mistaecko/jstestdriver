@@ -177,8 +177,8 @@ public class JstdTestCase implements Iterable<FileInfo> {
 
   @Override
   public String toString() {
-    return "JstdTestCase [dependencies=" + (logger.isDebugEnabled() || logger.isTraceEnabled() ? dependencies : "<elided>") + ", plugins=" + plugins + ", tests="
-        + tests + "]";
+    return "JstdTestCase ([dependencies=" + (logger.isDebugEnabled() || logger.isTraceEnabled() ? dependencies : "<elided>") + ", plugins=" + plugins + ", tests="
+        + tests + ",id=" + id + "]" ;
   }
 
   /**

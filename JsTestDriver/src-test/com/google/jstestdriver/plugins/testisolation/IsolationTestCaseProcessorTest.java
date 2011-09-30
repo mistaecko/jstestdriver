@@ -43,9 +43,9 @@ public class IsolationTestCaseProcessorTest extends TestCase {
 
   public void testProcess() {
     JstdTestCase testCaseWithTwoTests =
-        new JstdTestCase(DEPS_1, Lists.newArrayList(TEST_1, TEST_2), PLUGINS_1, null);
+        new JstdTestCase(DEPS_1, Lists.newArrayList(TEST_1, TEST_2), PLUGINS_1, "");
     JstdTestCase testCaseWithOneTest =
-        new JstdTestCase(DEPS_2, Lists.newArrayList(TEST_3), PLUGINS_2, null);
+        new JstdTestCase(DEPS_2, Lists.newArrayList(TEST_3), PLUGINS_2, "");
     
     List<JstdTestCase> processedTests =
         processor.process(Lists.newArrayList(testCaseWithTwoTests, testCaseWithOneTest).iterator());
@@ -53,11 +53,11 @@ public class IsolationTestCaseProcessorTest extends TestCase {
     // Each test file should have been moved into its own JstdTestCase    
     assertEquals(3, processedTests.size());
     assertEquals(
-        new JstdTestCase(DEPS_1, Lists.newArrayList(TEST_1), PLUGINS_1, null), processedTests.get(0));
+        new JstdTestCase(DEPS_1, Lists.newArrayList(TEST_1), PLUGINS_1, ""), processedTests.get(0));
     assertEquals(
-        new JstdTestCase(DEPS_1, Lists.newArrayList(TEST_2), PLUGINS_1, null), processedTests.get(1)); 
+        new JstdTestCase(DEPS_1, Lists.newArrayList(TEST_2), PLUGINS_1, ""), processedTests.get(1)); 
     assertEquals(
-        new JstdTestCase(DEPS_2, Lists.newArrayList(TEST_3), PLUGINS_2, null), processedTests.get(2)); 
+        new JstdTestCase(DEPS_2, Lists.newArrayList(TEST_3), PLUGINS_2, ""), processedTests.get(2)); 
   }
   
   private static FileInfo getFileInfo(String name) {
