@@ -1,6 +1,7 @@
 // Copyright 2011 Google, Inc. All Rights Reserved.
 package com.google.jstestdriver.server.gateway;
 
+import com.google.common.collect.Iterators;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
@@ -36,8 +37,12 @@ public class GatewayRequestHandler implements RequestHandler {
 
   private static final String HOST = "Host";
   private static final String LOCATION = "Location";
+  private static final String PRAGMA = "Pragma";
   private static final String REQUEST_URI_DOES_NOT_START_WITH_PREFIX =
       "Request URI '%s' does not start with prefix '%s'.";
+  private static final String X_SUPPRESS_STATUS_CODE = "X-Suppress-Status-Code";
+  private static final String X_SUPPRESSED_STATUS_CODE = "X-Suppressed-Status-Code";
+  private static final String X_SUPPRESSED_REASON_PHRASE = "X-Suppressed-Reason-Phrase";
 
   private final HttpClient client;
   private final HttpServletRequest request;
@@ -69,6 +74,11 @@ public class GatewayRequestHandler implements RequestHandler {
       if (isRedirect(statusCode)) {
         spoofLocationHeader(request, (Response) response);
       }
+      if (isStatusCodeSuppressed(request)) {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.addIntHeader(X_SUPPRESSED_STATUS_CODE, statusCode);
+        response.addHeader(X_SUPPRESSED_REASON_PHRASE, method.getStatusText());
+      }
       // TODO(rdionne): Substitute the JsTD server address for the destination address in any redirects.
       Streams.copy(method.getResponseBodyAsStream(), response.getOutputStream());
     } catch (IOException e) {
@@ -77,6 +87,11 @@ public class GatewayRequestHandler implements RequestHandler {
     } finally {
       method.releaseConnection();
     }
+  }
+
+  private boolean isStatusCodeSuppressed(final HttpServletRequest request) {
+    return Iterators.contains(
+        Iterators.forEnumeration(request.getHeaders(PRAGMA)), X_SUPPRESS_STATUS_CODE);
   }
 
   private HttpMethodBase getMethod(final HttpServletRequest request) throws IOException {

@@ -62,6 +62,8 @@ public class GatewayServletTest extends TestCase {
     Capture<HttpMethodBase> methodCapture = new Capture<HttpMethodBase>();
     expect(client.executeMethod(EasyMock.capture(methodCapture))).andStubReturn(200);
     /* expect */ response.setStatus(200);
+    expect(request.getHeaders("Pragma")).andStubReturn(
+        Iterators.asEnumeration(Iterators.emptyIterator()));
     final ByteArrayOutputStream output = new ByteArrayOutputStream();
     ServletOutputStream out = new ServletOutputStream() {
       @Override
@@ -100,6 +102,8 @@ public class GatewayServletTest extends TestCase {
     Capture<HttpMethodBase> methodCapture = new Capture<HttpMethodBase>();
     expect(client.executeMethod(EasyMock.capture(methodCapture))).andStubReturn(200);
     /* expect */ response.setStatus(200);
+    expect(request.getHeaders("Pragma")).andStubReturn(
+        Iterators.asEnumeration(Iterators.emptyIterator()));
     final ByteArrayOutputStream output = new ByteArrayOutputStream();
     ServletOutputStream out = new ServletOutputStream() {
       @Override
