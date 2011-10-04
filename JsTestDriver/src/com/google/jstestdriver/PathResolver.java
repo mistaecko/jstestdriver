@@ -57,8 +57,10 @@ public class PathResolver {
    * Creates a full resolved path to a resource without following the sym links.
    */
   public File resolvePath(String filePath) {
-    File absolute = !filePath.startsWith(File.separator) && basePath != null ?
-        new File(basePath, filePath) : new File(filePath);
+      File absolute = new File(filePath);
+      if(!absolute.isAbsolute())
+        absolute = new File(basePath, filePath);
+
     return new File(resolveRelativePathReferences(absolute.getAbsolutePath()));
   }
 

@@ -98,9 +98,9 @@ public class PathResolverTest extends TestCase {
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
     assertEquals(3, files.size());
-    assertTrue(listFiles.get(0).getFilePath().endsWith("code/code.js"));
-    assertTrue(listFiles.get(1).getFilePath().endsWith("test/test.js"));
-    assertTrue(listFiles.get(2).getFilePath().endsWith("test/test3.js"));
+    assertTrue(listFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/code.js"));
+    assertTrue(listFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("test/test.js"));
+    assertTrue(listFiles.get(2).getFilePath().replace(File.separatorChar, '/').endsWith("test/test3.js"));
   }
   public void testParseConfigFileAndHaveListOfFilesRelative() throws Exception {
     File codeDir = createTmpSubDir("code");
@@ -133,9 +133,9 @@ public class PathResolverTest extends TestCase {
     assertFalse(listFiles.get(0).getDisplayPath().contains(".."));
     assertFalse(listFiles.get(1).getDisplayPath().contains(".."));
     assertFalse(listFiles.get(2).getDisplayPath().contains(".."));
-    assertTrue(listFiles.get(0).getFilePath().endsWith("code/code.js"));
-    assertTrue(listFiles.get(1).getFilePath().endsWith("test/test.js"));
-    assertTrue(listFiles.get(2).getFilePath().endsWith("test/test3.js"));
+    assertTrue(listFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/code.js"));
+    assertTrue(listFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("test/test.js"));
+    assertTrue(listFiles.get(2).getFilePath().replace(File.separatorChar, '/').endsWith("test/test3.js"));
   }
 
   public void testParseConfigFileAndHaveListOfFilesWithTests() throws Exception {
@@ -165,7 +165,7 @@ public class PathResolverTest extends TestCase {
     List<FileInfo> listFiles = Lists.newArrayList(files);
     
     assertEquals(1, files.size());
-    assertTrue(listFiles.get(0).getFilePath().endsWith("code/code.js"));
+    assertTrue(listFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/code.js"));
     
     List<FileInfo> tests = config.getTests();
     assertEquals(new File(tmpDir, "test/test.js").getAbsolutePath(), tests.get(0).getFilePath());
@@ -199,7 +199,7 @@ public class PathResolverTest extends TestCase {
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
     assertEquals(1, files.size());
-    assertTrue(listFiles.get(0).getFilePath().endsWith("code/code.js"));
+    assertTrue(listFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/code.js"));
     assertTrue(listFiles.get(0).isServeOnly());
   }
 
@@ -218,8 +218,8 @@ public class PathResolverTest extends TestCase {
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
     assertEquals(2, files.size());
-    assertTrue(listFiles.get(0).getFilePath().endsWith("code/code.js"));
-    assertTrue(listFiles.get(1).getFilePath().endsWith("code/code2.js"));
+    assertTrue(listFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/code.js"));
+    assertTrue(listFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("code/code2.js"));
   }
 
   public void testParseConfigFileAndHaveListOfFilesWithPatches()
@@ -245,10 +245,10 @@ public class PathResolverTest extends TestCase {
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
     assertEquals(3, files.size());
-    assertTrue(listFiles.get(0).getFilePath().endsWith("code/code.js"));
-    assertTrue(listFiles.get(1).getFilePath().endsWith("test/test.js"));
-    assertTrue(listFiles.get(2).getFilePath().endsWith("test/test3.js"));
-    assertTrue(listFiles.get(0).getPatches().get(0).getFilePath().endsWith(
+    assertTrue(listFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/code.js"));
+    assertTrue(listFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("test/test.js"));
+    assertTrue(listFiles.get(2).getFilePath().replace(File.separatorChar, '/').endsWith("test/test3.js"));
+    assertTrue(listFiles.get(0).getPatches().get(0).getFilePath().replace(File.separatorChar, '/').endsWith(
       "code/patch.js"));
   }
 
@@ -392,10 +392,10 @@ public class PathResolverTest extends TestCase {
     List<FileInfo> serveFiles = new ArrayList<FileInfo>(serveFilesSet);
 
     assertEquals(4, serveFilesSet.size());
-    assertTrue(serveFiles.get(0).getFilePath().endsWith("code/code.js"));
-    assertTrue(serveFiles.get(1).getFilePath().endsWith("test/test.js"));
-    assertTrue(serveFiles.get(2).getFilePath().endsWith("test/test3.js"));
-    assertTrue(serveFiles.get(3).getFilePath().endsWith("serve/serve1.js"));
+    assertTrue(serveFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/code.js"));
+    assertTrue(serveFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("test/test.js"));
+    assertTrue(serveFiles.get(2).getFilePath().replace(File.separatorChar, '/').endsWith("test/test3.js"));
+    assertTrue(serveFiles.get(3).getFilePath().replace(File.separatorChar, '/').endsWith("serve/serve1.js"));
     assertTrue(serveFiles.get(3).isServeOnly());
   }
 
@@ -438,5 +438,68 @@ public class PathResolverTest extends TestCase {
       fail("Exception not caught");
     } catch (IllegalArgumentException e) {
     }
+  }
+
+  public void testResolveFullQualifiedPath() throws Exception {
+    File baseDir = createTmpSubDir("base");
+    // test dir and file reside outside the base directory
+    File absoluteDir = createTmpSubDir("absolute");
+    File absoluteFile = new File(absoluteDir, "file.js");
+
+    PathResolver pathResolver = new PathResolver(baseDir,
+        Collections.<FileParsePostProcessor>emptySet(),
+        new DisplayPathSanitizer(baseDir));
+
+    File result1 = pathResolver.resolvePath(absoluteFile.getAbsolutePath());
+    assertEquals(absoluteFile, result1);
+  }
+
+  public void testResolveFullQualifiedPathWithParentRef() throws Exception {
+    File baseDir = createTmpSubDir("base");
+    File dir = createTmpSubDir("absolute");
+    File subDir = new File(dir, "sub");
+    subDir.mkdir();
+    subDir.deleteOnExit();
+    
+    File otherDir = createTmpSubDir("other");
+
+    PathResolver pathResolver = new PathResolver(baseDir,
+        Collections.<FileParsePostProcessor>emptySet(),
+        new DisplayPathSanitizer(baseDir));
+
+    {
+      File file = new File(dir, "../file.js");
+      File result = pathResolver.resolvePath(file.getAbsolutePath());
+      assertEquals(new File(tmpDir, "file.js"), result);
+    }
+    {
+      File file = new File(subDir, "../../other/file.js");
+      File result = pathResolver.resolvePath(file.getAbsolutePath());
+      assertEquals(new File(otherDir, "file.js"), result);
+    }
+
+  }
+
+  public void testResolvePathFragement() {
+    File baseDir = createTmpSubDir("base");
+
+    PathResolver pathResolver = new PathResolver(baseDir,
+        Collections.<FileParsePostProcessor>emptySet(),
+        new DisplayPathSanitizer(baseDir));
+
+    File result1 = pathResolver.resolvePath("file.js");
+    assertEquals(new File(baseDir, "file.js").getAbsolutePath(), result1.getAbsolutePath());
+  }
+
+  public void testResolvePathFragementWithParentRef() {
+    File baseDir = tmpDir;
+    File dir = createTmpSubDir("dir");
+
+    PathResolver pathResolver = new PathResolver(baseDir,
+        Collections.<FileParsePostProcessor>emptySet(),
+        new DisplayPathSanitizer(baseDir));
+
+    File result = pathResolver.resolvePath("other/nowhere/../../dir/file.js");
+    assertEquals(new File(dir, "file.js"), result);
   }
 }
