@@ -121,6 +121,28 @@ public class FileUploader {
   public List<FileInfo> determineBrowserFileSet(String browserId, JstdTestCase testCase,
       ResponseStream stream) {
 
+    BrowserFileSet browserFileSet = getBrowserFileSet(browserId, testCase);
+
+    stopWatch.start("resolving browser upload %s", browserId);
+    try {
+      logger.debug("Updating files {}", browserFileSet.getFilesToUpload());
+      // need a linked hashset here to avoid adding a file more than once.
+      final Set<FileInfo> finalFilesToUpload = new LinkedHashSet<FileInfo>();
+      // reset if there are extra files in the browser
+      while (browserFileSet.shouldReset() || !browserFileSet.getExtraFiles().isEmpty()) {
+        reset(browserId, stream, testCase);
+        browserFileSet = getBrowserFileSet(browserId, testCase);
+      }
+      for (FileInfo file : browserFileSet.getFilesToUpload()) {
+        finalFilesToUpload.addAll(determineInBrowserDependencies(file, testCase.getServable()));
+      }
+      return Lists.newArrayList(finalFilesToUpload);
+    } finally {
+      stopWatch.stop("resolving browser upload %s", browserId);
+    }
+  }
+
+  private BrowserFileSet getBrowserFileSet(String browserId, JstdTestCase testCase) {
     stopWatch.start("get upload set %s", browserId);
     Map<String, String> fileSetParams = new LinkedHashMap<String, String>();
 
@@ -129,36 +151,14 @@ public class FileUploader {
     fileSetParams.put("action", BrowserFileCheck.ACTION);
     //logger.info("FileParams: {}", fileSetParams);
     String postResult = server.post(baseUrl + "/fileSet", fileSetParams);
-    stopWatch.stop("get upload set %s", browserId);
-
-    if (postResult.length() > 0) {
-      stopWatch.start("resolving browser upload %s", browserId);
-      try {
-        BrowserFileSet browserFileSet = gson.fromJson(postResult, BrowserFileSet.class);
-        logger.debug("Updating files {}", browserFileSet.getFilesToUpload());
-        // need a linked hashset here to avoid adding a file more than once.
-        final Set<FileInfo> finalFilesToUpload = new LinkedHashSet<FileInfo>();
-        // reset if there are extra files in the browser
-        if (browserFileSet.shouldReset() || !browserFileSet.getExtraFiles().isEmpty()) {
-          reset(browserId, stream, testCase);
-          // since the browser has been reset, reload all files.
-          finalFilesToUpload.addAll(testCase.getServable());
-        } else {
-          for (FileInfo file : browserFileSet.getFilesToUpload()) {
-            finalFilesToUpload.addAll(determineInBrowserDependencies(file, testCase.getServable()));
-          }
-        }
-        return Lists.newArrayList(finalFilesToUpload);
-      } finally {
-        stopWatch.stop("resolving browser upload %s", browserId);
-      }
-    } else {
-      logger.debug("No files to update on server.");
+    if (postResult.length() < 0) {
+      return new BrowserFileSet(Collections.<FileInfo>emptyList(), Collections.<FileInfo>emptyList(), false);
     }
-    return Collections.<FileInfo>emptyList();
+    BrowserFileSet browserFileSet = gson.fromJson(postResult, BrowserFileSet.class);
+    stopWatch.stop("get upload set %s", browserId);
+    return browserFileSet;
   }
 
-  
 
   /** Uploads files to the browser. */
   public void uploadToTheBrowser(String browserId, ResponseStream stream,
