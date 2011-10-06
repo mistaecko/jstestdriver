@@ -21,6 +21,9 @@ import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.TES
 import com.google.inject.Inject;
 import com.google.jstestdriver.util.HtmlWriter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 
 /**
@@ -54,6 +57,7 @@ public class RunnerPage implements Page {
           "        jstestdriver.now,\n" +
           "        jstestdriver.setTimeout));");
 
+    
     if (!"load".equals(request.getParameter(LOAD_TYPE))) {
       testFileUtil.writeTestFiles(writer, request.getParameter(TESTCASE_ID));
     }

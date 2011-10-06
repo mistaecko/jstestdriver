@@ -41,32 +41,35 @@ public class BrowserFileCheck implements FileSetRequestHandler<BrowserFileSet> {
     final List<FileInfo> filesToUpdate = Lists.newLinkedList();
     final List<FileInfo> extraFiles = Lists.newLinkedList();
     boolean reset = false;
-    // reload all files if Safari, Opera, or Konqueror, because they don't overwrite properly.
-    // TODO(corysmith): Replace this with polymorphic browser classes.
-    if (browser.getBrowserInfo().getName().contains("Safari")
-        || browser.getBrowserInfo().getName().contains("Opera")
-        || browser.getBrowserInfo().getName().contains("Konqueror")) {
-      logger.debug("Resetting browser fileset to ensure proper overwriting.");
+    logger.debug("Determing files to update {}, {}", testCase.toFileSet(), browser.getFileSet());
+    for (FileInfo newFile : testCase.getServable()) {
+      if (browser.getFileSet().contains(newFile)) {
+        for (FileInfo oldFile : browser.getFileSet()) {
+          if (oldFile.shouldReplaceWith(newFile)) {
+            filesToUpdate.add(newFile);
+          }
+        }
+      } else {
+        filesToUpdate.add(newFile);
+      }
+    }
+    extraFiles.addAll(browser.getFileSet());
+    extraFiles.removeAll(testCase.toFileSet());
+
+    if (!(filesToUpdate.isEmpty() && extraFiles.isEmpty())
+        && (browser.getBrowserInfo().getName().contains("Safari")
+            || browser.getBrowserInfo().getName().contains("Opera")
+            || browser.getBrowserInfo().getName().contains("Konqueror"))) {
+      // reload all files if Safari, Opera, or Konqueror, because they don't
+      // overwrite properly.
+      // TODO(corysmith): Replace this with polymorphic browser classes.
+      logger.info("Resetting browser fileset to ensure proper overwriting. {} {}", filesToUpdate.isEmpty(), extraFiles);
       filesToUpdate.addAll(testCase.toFileSet());
       // TODO(corysmith): Change the browser to handle it's own resets.
       browser.resetFileSet();
       reset = true;
-    } else {
-      logger.debug("Determing files to update {}, {}", testCase.toFileSet(), browser.getFileSet());
-      for (FileInfo newFile : testCase.getServable()) {
-        if (browser.getFileSet().contains(newFile)) {
-          for (FileInfo oldFile : browser.getFileSet()) {
-            if (oldFile.shouldReplaceWith(newFile)) {
-              filesToUpdate.add(newFile);
-            }
-          }
-        } else {
-          filesToUpdate.add(newFile);
-        }
-      }
-      extraFiles.addAll(browser.getFileSet());
-      extraFiles.removeAll(testCase.toFileSet());
     }
+
     return new BrowserFileSet(filesToUpdate, extraFiles, reset);
   }
   

@@ -129,9 +129,10 @@ public class FileUploader {
       // need a linked hashset here to avoid adding a file more than once.
       final Set<FileInfo> finalFilesToUpload = new LinkedHashSet<FileInfo>();
       // reset if there are extra files in the browser
-      while (browserFileSet.shouldReset() || !browserFileSet.getExtraFiles().isEmpty()) {
+      if (browserFileSet.shouldReset() || !browserFileSet.getExtraFiles().isEmpty()) {
         reset(browserId, stream, testCase);
         browserFileSet = getBrowserFileSet(browserId, testCase);
+        logger.info("second fileset {}", browserFileSet);
       }
       for (FileInfo file : browserFileSet.getFilesToUpload()) {
         finalFilesToUpload.addAll(determineInBrowserDependencies(file, testCase.getServable()));
@@ -165,7 +166,7 @@ public class FileUploader {
       List<FileInfo> loadedFiles, int chunkSize) {
     List<FileSource> filesSrc = Lists.newLinkedList(filterFilesToLoad(loadedFiles));
     int numberOfFilesToLoad = filesSrc.size();
-    logger.debug("Files toupload {}",
+    logger.info("Files toupload {}",
         Lists.transform(Lists.newArrayList(loadedFiles), new Function<FileInfo, String>() {
           @Override
           public String apply(FileInfo in) {
@@ -226,14 +227,15 @@ public class FileUploader {
   private void reset(String browserId, ResponseStream stream, JstdTestCase testCase) {
     stopWatch.start("reset %s", browserId);
     JsonCommand cmd = new JsonCommand(CommandType.RESET,
-        Lists.newArrayList("load", testCase.getId()));
+        Lists.newArrayList("preload", testCase.getId()));
     Map<String, String> resetParams = new LinkedHashMap<String, String>();
 
+    logger.debug("reset browser {}  testcase {}", browserId, testCase.getId());
     resetParams.put("id", browserId);
     resetParams.put("data", gson.toJson(cmd));
     server.post(baseUrl + "/cmd", resetParams);
 
-    logger.debug("Starting File Upload Refresh for {}", browserId);
+    logger.trace("starting reset for {}", browserId);
     Response response;
     StreamMessage message;
     do {
@@ -242,7 +244,7 @@ public class FileUploader {
       response = message.getResponse();
       stream.stream(response);
     } while(!(ResponseType.RESET_RESULT.equals(response.getResponseType()) && message.isLast()));
-    logger.info("Finished File Upload Refresh for {}", browserId);
+    logger.trace("finished reset for {}", browserId);
     stopWatch.stop("reset %s", browserId);
   }
 

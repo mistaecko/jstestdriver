@@ -216,6 +216,7 @@ class BrowserQueryResponseHandler implements RequestHandler {
   private void handleFileLoadResult(SlaveBrowser browser, Response res) {
     LoadedFiles loadedFiles = gson.fromJson(res.getResponse(), res.getGsonType());
     Collection<FileResult> allLoadedFiles = loadedFiles.getLoadedFiles();
+    logger.info("loaded {} files", allLoadedFiles.size());
     if (!allLoadedFiles.isEmpty()) {
       LinkedHashSet<FileInfo> fileInfos = new LinkedHashSet<FileInfo>();
       Collection<FileSource> errorFiles = new LinkedHashSet<FileSource>();
@@ -231,7 +232,7 @@ class BrowserQueryResponseHandler implements RequestHandler {
       }
       browser.addFiles(fileInfos, loadedFiles);
       if (errorFiles.size() > 0) {
-        logger.debug("clearing fileset on browser errors:" + errorFiles);
+        logger.info("clearing fileset on browser errors:" + errorFiles);
         browser.resetFileSet();
       }
     }

@@ -45,9 +45,10 @@ jstestdriver.ResetCommand = function(location, signal, now) {
  * @param {string} loadType method of loading: "load" or "preload", default: "preload"
  * @param {string} testCaseId id of the test case to be run.
  */
-jstestdriver.ResetCommand.prototype.reset = function(loadType, testCaseId) {
+jstestdriver.ResetCommand.prototype.reset = function(args) {
   this.signal_.set(true);
-  loadType = loadType ? loadType : 'preload';
+  var loadType = args[0] ? args[0] : 'preload';
+  var testCaseId = args[1];
   if (!testCaseId) {
     loadType = 'load'
   }
@@ -57,8 +58,10 @@ jstestdriver.ResetCommand.prototype.reset = function(loadType, testCaseId) {
                this.location_.host +
                this.location_.pathname +
                '/refresh/' + now +
-               '/load_type/' + loadType +
-               '/testcase_id/' + testCaseId;
+               '/load_type/' + loadType;
+  if (testCaseId) {
+    newUrl += '/testcase_id/' + testCaseId;
+  }
   jstestdriver.log('Replacing ' + newUrl);
   this.location_.replace(newUrl);
 };

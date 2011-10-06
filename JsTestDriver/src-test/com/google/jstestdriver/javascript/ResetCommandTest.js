@@ -90,6 +90,6 @@ ResetCommandTest.prototype.testResetLoadType = function() {
     return now;
   });
   
-  command.reset("load");
+  command.reset(["load"]);
   assertEquals("http://host/path/name/refresh/" + now + "/load_type/load", locationMock.newUrl)
 };

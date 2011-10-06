@@ -41,6 +41,7 @@ import com.google.jstestdriver.model.ConcretePathPrefix;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.model.NullPathPrefix;
 import com.google.jstestdriver.output.TestResultListener;
+import com.google.jstestdriver.plugins.testisolation.TestIsolationInitializer;
 import com.google.jstestdriver.runner.RunnerMode;
 import com.google.jstestdriver.util.NullStopWatch;
 import com.google.jstestdriver.util.RetryException;
@@ -137,6 +138,7 @@ public class JsTestDriver {
       builder.setConfigurationSource(cmdLineFlags.getConfigurationSource());
       builder.addPluginModules(pluginModules);
       builder.withPluginInitializer(TestResultPrintingInitializer.class);
+      builder.withPluginInitializer(TestIsolationInitializer.class);
       builder.setRunnerMode(cmdLineFlags.getRunnerMode());
       builder.setFlags(cmdLineFlags.getUnusedFlagsAsArgs());
       JsTestDriver jstd = builder.build();

@@ -72,6 +72,7 @@ public class TestFileUtil {
     }
 
     for (JstdTestCase testCase : testCases) {
+      logger.info("preloading {}", testCase.getId());
       for (FileInfo file : testCase) {
         if (file.isServeOnly()) {
           continue;
