@@ -97,7 +97,7 @@ public class JettyModule extends AbstractModule {
     Context context = new Context(server, "/", Context.SESSIONS);
     context.setMaxFormContentSize(maxFormContentSize);
 
-    context.addFilter(GzipFilter.class, handlerPrefix.prefixPath("/test/*"), Handler.DEFAULT);
+    context.addFilter(GzipFilter.class, handlerPrefix.prefixPath("/test/*"), Handler.ALL);
     // TODO(rdionne): Fix HttpServletRequest#getPathInfo() provided by RequestHandlerServlet.
     context.addServlet(servletHolder, handlerPrefix.prefixPath("/"));
     context.addServlet(servletHolder, handlerPrefix.prefixPath("/cache"));

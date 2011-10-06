@@ -20,6 +20,7 @@ import com.google.jstestdriver.browser.BrowserRunner;
 import com.google.jstestdriver.browser.CommandLineBrowserRunner;
 import com.google.jstestdriver.config.ConfigurationSource;
 import com.google.jstestdriver.config.DefaultConfigurationSource;
+import com.google.jstestdriver.config.ExecutionType;
 import com.google.jstestdriver.config.UserConfigurationSource;
 import com.google.jstestdriver.model.ConcretePathPrefix;
 import com.google.jstestdriver.model.HandlerPathPrefix;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 /**
  * FlagsParser for the JsTestDriver.
@@ -71,6 +73,7 @@ public class FlagsImpl implements Flags {
     this.port = port;
   }
 
+  @Override
   public Integer getPort() {
     return port;
   }
@@ -80,6 +83,7 @@ public class FlagsImpl implements Flags {
     this.sslPort = sslPort;
   }
 
+  @Override
   public Integer getSslPort() {
     return sslPort;
   }
@@ -89,6 +93,7 @@ public class FlagsImpl implements Flags {
     this.server = server;
   }
 
+  @Override
   public String getServer() {
     return server;
   }
@@ -103,6 +108,7 @@ public class FlagsImpl implements Flags {
     return captureAddress;
   }
 
+  @Override
   public List<String> getArguments() {
     return arguments;
   }
@@ -113,6 +119,7 @@ public class FlagsImpl implements Flags {
     this.testOutput = testOutput;
   }
 
+  @Override
   public String getTestOutput() {
     return testOutput;
   }
@@ -131,6 +138,7 @@ public class FlagsImpl implements Flags {
     }
   }
 
+  @Override
   public Set<BrowserRunner> getBrowser() {
     return browser;
   }
@@ -140,6 +148,7 @@ public class FlagsImpl implements Flags {
     this.reset = reset;
   }
 
+  @Override
   public boolean getReset() {
     return reset;
   }
@@ -149,6 +158,7 @@ public class FlagsImpl implements Flags {
     this.config = new UserConfigurationSource(new File(config).getAbsoluteFile());
   }
 
+  @Override
   public ConfigurationSource getConfig() {
     return config;
   }
@@ -159,6 +169,7 @@ public class FlagsImpl implements Flags {
     this.tests = tests;
   }
 
+  @Override
   public List<String> getTests() {
     return tests;
   }
@@ -168,6 +179,7 @@ public class FlagsImpl implements Flags {
     this.displayHelp = displayHelp;
   }
   
+  @Override
   public boolean getDisplayHelp() {
     return displayHelp;
   }
@@ -177,6 +189,7 @@ public class FlagsImpl implements Flags {
     this.verbose = verbose;
   }
 
+  @Override
   public boolean getVerbose() {
     return verbose;
   }
@@ -186,6 +199,7 @@ public class FlagsImpl implements Flags {
     this.captureConsole = captureConsole;
   }
 
+  @Override
   public boolean getCaptureConsole() {
     return captureConsole;
   }
@@ -195,6 +209,7 @@ public class FlagsImpl implements Flags {
     this.preloadFiles = preloadFiles;
   }
 
+  @Override
   public boolean getPreloadFiles() {
     return preloadFiles;
   }
@@ -205,6 +220,7 @@ public class FlagsImpl implements Flags {
     this.dryRunFor = dryRunFor;
   }
 
+  @Override
   public List<String> getDryRunFor() {
     return dryRunFor;
   }
@@ -218,6 +234,7 @@ public class FlagsImpl implements Flags {
     this.browserTimeout = browserTimeout;
   }
 
+  @Override
   public long getBrowserTimeout() {
     return browserTimeout;
   }
@@ -228,6 +245,7 @@ public class FlagsImpl implements Flags {
     this.requiredBrowsers = Sets.newHashSet(requiredBrowsers);
   }
   
+  @Override
   public Set<String> getRequiredBrowsers() {
     return requiredBrowsers;
   }
@@ -239,9 +257,12 @@ public class FlagsImpl implements Flags {
         serverHandlerPrefix.substring(1) : serverHandlerPrefix);
   }
 
+  @Override
   public HandlerPathPrefix getServerHandlerPrefix() {
     return serverHandlerPrefix;
   }
+  
+  
 
   @Override
   public String toString() {
@@ -252,5 +273,10 @@ public class FlagsImpl implements Flags {
         + captureConsole + ",\n preloadFiles=" + preloadFiles + ",\n dryRunFor=" + dryRunFor
         + ",\n arguments=" + arguments + ",\n runnerMode=" + runnerMode + ",\n requiredBrowsers="
         + requiredBrowsers + ",\n serverHandlerPrefix=" + serverHandlerPrefix +  "]";
+  }
+
+  @Override
+  public ExecutionType getExecutionType() {
+    return ExecutionType.INTERACTIVE;
   }
 }

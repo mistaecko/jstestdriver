@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import com.google.jstestdriver.browser.BrowserCaptureEvent;
 import com.google.jstestdriver.browser.BrowserReaper;
+import com.google.jstestdriver.config.ExecutionType;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.HandlerPathPrefix;
@@ -66,6 +67,8 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
 
   private final Set<FileInfoScheme> schemes;
 
+  private final ExecutionType executionType;
+
   @Inject
   public JsTestDriverServerImpl(@Assisted("port") int port,
                                 @Assisted("sslPort") int sslPort,
@@ -74,7 +77,8 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
                                 @Named("browserTimeout") long browserTimeout,
                                 @Named("serverHandlerPrefix") HandlerPathPrefix handlerPrefix,
                                 Set<ServerListener> listeners,
-                                Set<FileInfoScheme> schemes) {
+                                Set<FileInfoScheme> schemes,
+                                @Named("executionType") ExecutionType executionType) {
     this.port = port;
     this.sslPort = sslPort;
     this.capturedBrowsers = capturedBrowsers;
@@ -83,6 +87,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
     this.handlerPrefix = handlerPrefix;
     this.listeners = listeners;
     this.schemes = schemes;
+    this.executionType = executionType;
     initServer();
   }
 
@@ -99,7 +104,8 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
                                  testCaseStore,
                                  browserTimeout,
                                  handlerPrefix,
-                                 schemes)).getInstance(Server.class);
+                                 schemes,
+                                 executionType)).getInstance(Server.class);
       server.addLifeCycleListener(new JettyLifeCycleLogger());
     }
   }
@@ -114,7 +120,7 @@ public class JsTestDriverServerImpl implements JsTestDriverServer, Observer {
       timer.schedule(new BrowserReaper(capturedBrowsers), browserTimeout * 2, browserTimeout * 2);
 
       server.start();
-      logger.info("Started the JsTD server on {}", port);
+      logger.info("Started the JsTD server on {} with execution type {}", port, executionType);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

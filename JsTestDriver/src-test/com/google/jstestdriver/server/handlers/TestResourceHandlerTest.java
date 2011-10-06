@@ -17,15 +17,19 @@ package com.google.jstestdriver.server.handlers;
 
 import com.google.common.collect.Lists;
 import com.google.jstestdriver.FileInfo;
+import com.google.jstestdriver.config.ExecutionType;
 import com.google.jstestdriver.model.JstdTestCase;
 import com.google.jstestdriver.server.JstdTestCaseStore;
 
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatterBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.util.Collections;
 
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +47,8 @@ public class TestResourceHandlerTest extends TestCase {
     response.sendError(404);
     EasyMock.expectLastCall().anyTimes();
     EasyMock.replay(response);
-    TestResourceHandler handler = new TestResourceHandler(null, response, new JstdTestCaseStore());
+    TestResourceHandler handler =
+        new TestResourceHandler(null, response, new JstdTestCaseStore(), ExecutionType.INTERACTIVE);
 
     handler.service("nothing", writer);
   }
@@ -62,8 +67,9 @@ public class TestResourceHandlerTest extends TestCase {
             new FileInfo("dummytoo.js", 20, -1, false, false, "more data", "dummytoo.js")),
         Collections.<FileInfo>emptyList(),
         Collections.<FileInfo>emptyList(),
-        "id"));
-    TestResourceHandler handler = new TestResourceHandler(null, response, store);
+            "id"));
+    TestResourceHandler handler =
+        new TestResourceHandler(null, response, store, ExecutionType.INTERACTIVE);
 
     handler.service("dummy.js", writer);
     assertEquals("data", out.toString());

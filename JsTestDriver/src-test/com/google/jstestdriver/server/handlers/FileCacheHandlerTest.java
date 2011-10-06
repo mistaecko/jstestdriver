@@ -27,7 +27,7 @@ public class FileCacheHandlerTest extends junit.framework.TestCase {
 
   private final Gson gson = new Gson();
 
-  public void testFileCache() throws IOException, ServletException {
+  public void testFileCache() throws Exception {
     HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
     HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
     FileCacheHandler handler = new FileCacheHandler(

@@ -50,6 +50,7 @@ import com.google.jstestdriver.TimeImpl;
 import com.google.jstestdriver.annotations.BaseResourceLocation;
 import com.google.jstestdriver.annotations.BrowserTimeout;
 import com.google.jstestdriver.annotations.Port;
+import com.google.jstestdriver.config.ExecutionType;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 import com.google.jstestdriver.requesthandlers.HttpMethod;
@@ -70,6 +71,8 @@ import com.google.jstestdriver.servlet.fileset.DeltaUpload;
 import com.google.jstestdriver.servlet.fileset.FileSetRequestHandler;
 import com.google.jstestdriver.servlet.fileset.TestCaseUpload;
 import com.google.jstestdriver.util.ParameterParser;
+
+import org.mortbay.jetty.servlet.DefaultServlet;
 
 import java.util.HashSet;
 import java.util.List;
@@ -106,6 +109,8 @@ public class JstdHandlersModule extends RequestHandlersModule {
 
   private final Set<FileInfoScheme> schemes;
 
+  private final ExecutionType executionType;
+
   /**
    * TODO(rdionne): Refactor so we don't depend upon manually instantiated
    * classes from other object graphs. 
@@ -117,13 +122,15 @@ public class JstdHandlersModule extends RequestHandlersModule {
       JstdTestCaseStore testCaseStore,
       long browserTimeout,
       HandlerPathPrefix handlerPrefix,
-      Set<FileInfoScheme> schemes) {
+      Set<FileInfoScheme> schemes,
+      ExecutionType executionType) {
     super();
     this.capturedBrowsers = capturedBrowsers;
     this.testCaseStore = testCaseStore;
     this.browserTimeout = browserTimeout;
     this.handlerPrefix = handlerPrefix;
     this.schemes = schemes;
+    this.executionType = executionType;
   }
   
   @Override
@@ -155,7 +162,13 @@ public class JstdHandlersModule extends RequestHandlersModule {
     serve(POST, handlerPrefix.prefixPath("/query/*"), BrowserQueryResponseHandler.class);
     serve( GET, handlerPrefix.prefixPath("/runner/*"), StandaloneRunnerHandler.class);
     serve( GET, handlerPrefix.prefixPath("/slave/*"), SlaveResourceHandler.class);
-    serve( GET, handlerPrefix.prefixPath("/test/*"), TestResourceHandler.class);
+    
+    if (executionType == ExecutionType.STANDALONE) {
+      serve( GET, handlerPrefix.prefixPath("/test/*"), CachingTestResourceHandler.class);
+    } else {
+      serve( GET, handlerPrefix.prefixPath("/test/*"), NonCachingTestResourceHandler.class);
+    }
+    
     serve( GET, handlerPrefix.prefixPath("/quit"), QuitHandler.class);
     serve( GET, handlerPrefix.prefixPath("/quit/*"), QuitHandler.class);
     serve( GET, handlerPrefix.prefixPath("/static/*"), StaticResourceHandler.class);
@@ -179,6 +192,8 @@ public class JstdHandlersModule extends RequestHandlersModule {
     bind(HandlerPathPrefix.class).toInstance(handlerPrefix);
     bind(Time.class).to(TimeImpl.class);
     bind(new TypeLiteral<Set<FileInfoScheme>>(){}).toInstance(schemes);
+    
+    bind(ExecutionType.class).toInstance(executionType);
 
     MapBinder<PageType, Page> pageBinder = newMapBinder(binder(), PageType.class, Page.class);
     pageBinder.addBinding(CONSOLE).to(ConsolePage.class).in(RequestScoped.class);

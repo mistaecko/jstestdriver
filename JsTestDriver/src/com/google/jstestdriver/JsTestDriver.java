@@ -138,7 +138,6 @@ public class JsTestDriver {
       builder.setConfigurationSource(cmdLineFlags.getConfigurationSource());
       builder.addPluginModules(pluginModules);
       builder.withPluginInitializer(TestResultPrintingInitializer.class);
-      builder.withPluginInitializer(TestIsolationInitializer.class);
       builder.setRunnerMode(cmdLineFlags.getRunnerMode());
       builder.setFlags(cmdLineFlags.getUnusedFlagsAsArgs());
       JsTestDriver jstd = builder.build();

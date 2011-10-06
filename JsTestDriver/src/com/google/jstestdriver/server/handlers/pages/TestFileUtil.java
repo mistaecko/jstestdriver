@@ -15,7 +15,6 @@
  */
 package com.google.jstestdriver.server.handlers.pages;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.jstestdriver.FileInfo;
@@ -29,7 +28,6 @@ import com.google.jstestdriver.util.HtmlWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -63,39 +61,42 @@ public class TestFileUtil {
    * @param writer The output writer.
    */
   public void writeTestFiles(HtmlWriter writer, String testCaseId) {
-    Collection<JstdTestCase> testCases;
+    JstdTestCase testCase;
 
     if (store.getCase(testCaseId) == null) { // no optimization without testcase id
-      testCases = store.getCases();
+      if (store.getCases().size() == 1) {
+        testCase = store.getCases().iterator().next();
+      } else {
+        // no point in writing out random test cases, just quit.
+        return;
+      }
     } else {
-      testCases = Lists.<JstdTestCase>newArrayList(store.getCase(testCaseId));
+      testCase = store.getCase(testCaseId);
     }
 
-    for (JstdTestCase testCase : testCases) {
-      logger.info("preloading {}", testCase.getId());
-      for (FileInfo file : testCase) {
-        if (file.isServeOnly()) {
-          continue;
-        }
-        // TODO(corysmith): This is a problematic optimization.
-        // If a client connects with unknown schemes and causes a reset, this will mess up miserably.
-        // Must fix.
-        FileSource fileSource = file.toFileSource(prefix, schemes);
-        if (!(fileSource.getFileSrc().startsWith("http") || fileSource.getFileSrc().startsWith("/test"))) {
-          // better safe than sorry.
-          break;
-        }
-        logger.debug("Writing " + fileSource.getFileSrc());
-        writer.writeScript(String.format(
-            "jstestdriver.manualResourceTracker.startResourceLoad('%s')",
-            gson.toJson(fileSource)));
-        if (fileSource.getFileSrc().endsWith(".css")) {
-          writer.writeStyleSheet(fileSource.getFileSrc());
-        } else {
-          writer.writeExternalScript(fileSource.getFileSrc());
-        }
-        writer.writeScript("jstestdriver.manualResourceTracker.finishResourceLoad()");
+    logger.info("preloading {}", testCase.getId());
+    for (FileInfo file : testCase) {
+      if (file.isServeOnly()) {
+        continue;
       }
+      // TODO(corysmith): This is a problematic optimization.
+      // If a client connects with unknown schemes and causes a reset, this will mess up miserably.
+      // Must fix.
+      FileSource fileSource = file.toFileSource(prefix, schemes);
+      if (!(fileSource.getFileSrc().startsWith("http") || fileSource.getFileSrc().startsWith("/test"))) {
+        // better safe than sorry.
+        break;
+      }
+      logger.debug("Writing " + fileSource.getFileSrc());
+      writer.writeScript(String.format(
+          "jstestdriver.manualResourceTracker.startResourceLoad('%s')",
+          gson.toJson(fileSource)));
+      if (fileSource.getFileSrc().endsWith(".css")) {
+        writer.writeStyleSheet(fileSource.getFileSrc());
+      } else {
+        writer.writeExternalScript(fileSource.getFileSrc());
+      }
+      writer.writeScript("jstestdriver.manualResourceTracker.finishResourceLoad()");
     }
   }
 }

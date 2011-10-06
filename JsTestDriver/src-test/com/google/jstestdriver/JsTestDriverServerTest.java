@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.jstestdriver.browser.BrowserIdStrategy;
+import com.google.jstestdriver.config.ExecutionType;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.NullPathPrefix;
@@ -61,7 +62,8 @@ public class JsTestDriverServerTest extends TestCase {
         SlaveBrowser.TIMEOUT,
         new NullPathPrefix(),
         Sets.newHashSet(listener),
-        Collections.<FileInfoScheme>emptySet());
+        Collections.<FileInfoScheme>emptySet(),
+        ExecutionType.INTERACTIVE);
     return server;
   }
 

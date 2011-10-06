@@ -36,7 +36,7 @@ ResetCommandTest.prototype.testResetDefault = function() {
     return now;
   });
   
-  command.reset();
+  command.reset([]);
   
   assertEquals("http://host/path/name/refresh/" + now + "")
 };
@@ -63,9 +63,9 @@ ResetCommandTest.prototype.testResetDefault = function() {
     return now;
   });
   
-  command.reset();
+  command.reset([]);
   
-  assertEquals("http://host/path/name/refresh/" + now + "/load_type/preload", locationMock.newUrl)
+  assertEquals("http://host/path/name/refresh/" + now + "/load_type/load", locationMock.newUrl)
 };
 
 

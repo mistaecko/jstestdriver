@@ -35,8 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 class TestResourceHandler implements RequestHandler {
   private static final Logger logger = LoggerFactory.getLogger(TestResourceHandler.class);
 
-  private static final String TIME_IN_THE_PAST = "Sat, 22 Sep 1984 00:00:00 GMT";
-
   private final HttpServletRequest request;
   private final HttpServletResponse response;
   private final JstdTestCaseStore store;
@@ -53,10 +51,8 @@ class TestResourceHandler implements RequestHandler {
 
   @Override
   public void handleIt() throws IOException {
-    response.setHeader("Pragma", "no-cache");
-    response.setHeader("Cache-Control", "private, no-cache, no-store, max-age=0, must-revalidate");
-    response.setHeader("Expires", TIME_IN_THE_PAST);
-    service(request.getPathInfo().substring(1) /* remove the first / */, response.getWriter());
+    String fileName = request.getPathInfo().substring(1); /* remove the first / */
+    service(fileName, response.getWriter());
   }
 
   public void service(String fileName, PrintWriter writer) throws IOException {

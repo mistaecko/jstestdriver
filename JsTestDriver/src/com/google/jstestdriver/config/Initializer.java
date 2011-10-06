@@ -102,6 +102,7 @@ public class Initializer {
         serverAddress,
         flags.getCaptureAddress(),
         flags.getServerHandlerPrefix());
+    
     modules.add(
         new JsTestDriverModule(flags,
             resolvedConfiguration.getFilesList(),

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class BaseBrowserSessionManager implements BrowserSessionManager {
-  private static final long WAIT_INTERVAL = 500L;
+  private static final long WAIT_INTERVAL = 1000L;
   private static final Logger logger = LoggerFactory.getLogger(BaseBrowserSessionManager.class);
   private final Server server;
   private final String baseUrl;
@@ -42,7 +42,7 @@ public class BaseBrowserSessionManager implements BrowserSessionManager {
     if ("FAILED".equals(sessionId)) {
       while ("FAILED".equals(sessionId)) {
         try {
-          logger.error("Waiting for browser: " + browserId);
+          logger.error("Currently waiting for browser: {}, with is currently in use. ", browserId);
           sleeper.sleep(WAIT_INTERVAL);
         } catch (InterruptedException e) {
           logger.error("Could not create session for browser: " + browserId);

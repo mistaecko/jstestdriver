@@ -17,11 +17,14 @@ package com.google.jstestdriver;
 
 import com.google.jstestdriver.browser.BrowserRunner;
 import com.google.jstestdriver.config.ConfigurationSource;
+import com.google.jstestdriver.config.ExecutionType;
 import com.google.jstestdriver.guice.GuiceBinding;
 import com.google.jstestdriver.model.HandlerPathPrefix;
 
 import java.util.List;
 import java.util.Set;
+
+import javax.lang.model.type.ExecutableType;
 
 /**
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
@@ -77,6 +80,9 @@ public interface Flags {
 
   @GuiceBinding(name="serverHandlerPrefix")
   public HandlerPathPrefix getServerHandlerPrefix();
+  
+  @GuiceBinding(name="executionType")
+  public ExecutionType getExecutionType();
 
   public boolean getDisplayHelp();
 }

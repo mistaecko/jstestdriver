@@ -17,6 +17,7 @@ package com.google.jstestdriver;
 
 import com.google.common.collect.Sets;
 import com.google.jstestdriver.JsTestDriverServer.Factory;
+import com.google.jstestdriver.config.ExecutionType;
 import com.google.jstestdriver.hooks.FileInfoScheme;
 import com.google.jstestdriver.hooks.ServerListener;
 import com.google.jstestdriver.model.JstdTestCase;
@@ -112,6 +113,7 @@ public class ServerStartupAction implements ObservableAction {
     }
   }
 
+  @Override
   public void addObservers(List<Observer> observers) {
     observerList.addAll(observers);
   }
@@ -129,9 +131,11 @@ public class ServerStartupAction implements ObservableAction {
       this.nullPathPrefix = nullPathPrefix;
     }
 
+    @Override
     public JsTestDriverServer create(int port, int sslPort, JstdTestCaseStore testCaseStore) {
       return new JsTestDriverServerImpl(port, sslPort, testCaseStore, capturedBrowsers, timeout,
-          nullPathPrefix, Sets.<ServerListener>newHashSet(), Collections.<FileInfoScheme>emptySet());
+          nullPathPrefix, Sets.<ServerListener>newHashSet(), Collections.<FileInfoScheme>emptySet(),
+          ExecutionType.INTERACTIVE);
     }
   }
 
