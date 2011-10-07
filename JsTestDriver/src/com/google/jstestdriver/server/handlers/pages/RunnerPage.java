@@ -21,9 +21,6 @@ import static com.google.jstestdriver.server.handlers.pages.SlavePageRequest.TES
 import com.google.inject.Inject;
 import com.google.jstestdriver.util.HtmlWriter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 
 /**

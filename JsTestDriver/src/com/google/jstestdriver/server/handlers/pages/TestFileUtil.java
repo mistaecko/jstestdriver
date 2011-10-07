@@ -66,12 +66,15 @@ public class TestFileUtil {
     if (store.getCase(testCaseId) == null) { // no optimization without testcase id
       if (store.getCases().size() == 1) {
         testCase = store.getCases().iterator().next();
+        logger.debug("One test case found, writing: {}", testCase);
       } else {
+        logger.debug("More than one testcase found:\n{}", store.getCases());
         // no point in writing out random test cases, just quit.
         return;
       }
     } else {
       testCase = store.getCase(testCaseId);
+      logger.debug("Testcase found at id {}: {}", testCaseId, testCase);
     }
 
     logger.info("preloading {}", testCase.getId());
@@ -84,6 +87,7 @@ public class TestFileUtil {
       // Must fix.
       FileSource fileSource = file.toFileSource(prefix, schemes);
       if (!(fileSource.getFileSrc().startsWith("http") || fileSource.getFileSrc().startsWith("/test"))) {
+        logger.debug("Unknown FileSource [{}], bail out on writing", fileSource.getFileSrc());
         // better safe than sorry.
         break;
       }

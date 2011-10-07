@@ -234,10 +234,10 @@ public class FileInfo implements Cloneable {
       logger.trace("replace {} because {} != {}", new Object[]{getDisplayPath(), getTimestamp(), file.getTimestamp()});
       return true;
     }
-    if (getLength() != file.getLength()) {
+    /*if (getLength() != file.getLength()) {
       logger.trace("replace {} because {} != {}", new Object[]{getDisplayPath(), getLength(), file.getLength()});
       return true;
-    }
+    }*/
     return false;
   }
 }
