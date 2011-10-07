@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * A utility that write The contents of the FilesCache into an HtmlWriter.
@@ -94,7 +95,7 @@ public class TestFileUtil {
       logger.debug("Writing " + fileSource.getFileSrc());
       writer.writeScript(String.format(
           "jstestdriver.manualResourceTracker.startResourceLoad('%s')",
-          gson.toJson(fileSource)));
+          gson.toJson(fileSource).replace(Pattern.quote("\\"), "\\\\")));
       if (fileSource.getFileSrc().endsWith(".css")) {
         writer.writeStyleSheet(fileSource.getFileSrc());
       } else {
