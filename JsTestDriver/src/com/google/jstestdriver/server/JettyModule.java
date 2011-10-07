@@ -31,7 +31,6 @@ import org.mortbay.jetty.servlet.HashSessionIdManager;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.servlet.GzipFilter;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
 
@@ -39,13 +38,13 @@ import javax.servlet.Servlet;
 
 /**
  * Sippin' on Jetty and Guice.
- *
+ * 
  * @author rdionne@google.com (Robert Dionne)
  */
 public class JettyModule extends AbstractModule {
 
-  private static final URL KEYSTORE =
-      ClassLoader.getSystemResource("com/google/jstestdriver/keystore");
+  private static final URL KEYSTORE = JettyModule.class.getClassLoader()
+      .getResource("com/google/jstestdriver/keystore");
   private static final String KEY_PASSWORD = "asdfgh";
 
   private final int port;
@@ -64,8 +63,9 @@ public class JettyModule extends AbstractModule {
     bindConstant().annotatedWith(MaxFormContentSize.class).to(Integer.MAX_VALUE);
   }
 
-  @Provides @Singleton SslSocketConnector provideSslSocketConnector(@Port Integer port)
-      throws IOException {
+  @Provides
+  @Singleton
+  SslSocketConnector provideSslSocketConnector(@Port Integer port) {
     SslSocketConnector connector = new SslSocketConnector();
     connector.setKeystore(KEYSTORE.toString());
     connector.setKeyPassword(KEY_PASSWORD);
@@ -73,21 +73,24 @@ public class JettyModule extends AbstractModule {
     return connector;
   }
 
-  @Provides @Singleton SocketConnector provideSocketConnector(@Port Integer port) {
+  @Provides
+  @Singleton
+  SocketConnector provideSocketConnector(@Port Integer port) {
     SocketConnector connector = new SocketConnector();
     connector.setPort(port);
     return connector;
   }
 
-  @Provides @Singleton ServletHolder servletHolder(Servlet handlerServlet) {
+  @Provides
+  @Singleton
+  ServletHolder servletHolder(Servlet handlerServlet) {
     return new ServletHolder(handlerServlet);
   }
 
-  @Provides @Singleton Server provideJettyServer(
-      SocketConnector connector,
-      SslSocketConnector sslConnector,
-      @MaxFormContentSize Integer maxFormContentSize,
-      ServletHolder servletHolder) {
+  @Provides
+  @Singleton
+  Server provideJettyServer(SocketConnector connector, SslSocketConnector sslConnector,
+      @MaxFormContentSize Integer maxFormContentSize, ServletHolder servletHolder) {
     Server server = new Server();
     server.setGracefulShutdown(1);
     server.addConnector(connector);
@@ -98,7 +101,8 @@ public class JettyModule extends AbstractModule {
     context.setMaxFormContentSize(maxFormContentSize);
 
     context.addFilter(GzipFilter.class, handlerPrefix.prefixPath("/test/*"), Handler.ALL);
-    // TODO(rdionne): Fix HttpServletRequest#getPathInfo() provided by RequestHandlerServlet.
+    // TODO(rdionne): Fix HttpServletRequest#getPathInfo() provided by
+    // RequestHandlerServlet.
     context.addServlet(servletHolder, handlerPrefix.prefixPath("/"));
     context.addServlet(servletHolder, handlerPrefix.prefixPath("/cache"));
     context.addServlet(servletHolder, handlerPrefix.prefixPath("/capture/*"));
