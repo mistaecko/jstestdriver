@@ -48,7 +48,7 @@ public class TestResourceHandlerTest extends TestCase {
     EasyMock.expectLastCall().anyTimes();
     EasyMock.replay(response);
     TestResourceHandler handler =
-        new TestResourceHandler(null, response, new JstdTestCaseStore(), ExecutionType.INTERACTIVE);
+        new TestResourceHandler(null, response, new JstdTestCaseStore());
 
     handler.service("nothing", writer);
   }
@@ -69,7 +69,7 @@ public class TestResourceHandlerTest extends TestCase {
         Collections.<FileInfo>emptyList(),
             "id"));
     TestResourceHandler handler =
-        new TestResourceHandler(null, response, store, ExecutionType.INTERACTIVE);
+        new TestResourceHandler(null, response, store);
 
     handler.service("dummy.js", writer);
     assertEquals("data", out.toString());

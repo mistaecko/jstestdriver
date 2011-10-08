@@ -17,6 +17,7 @@ package com.google.jstestdriver.server.handlers.pages;
 
 import java.util.Collections;
 
+import com.google.gson.Gson;
 import com.google.jstestdriver.FileInfo;
 import com.google.jstestdriver.FilesCache;
 import com.google.jstestdriver.hooks.FileInfoScheme;
@@ -31,8 +32,8 @@ import junit.framework.TestCase;
 public class StandaloneRunnerPageTest extends TestCase {
   public void testRenderWithPrefix() throws Exception {
     new PrefixTester().testPrefixes(new BrowserControlledRunnerPage(
-      new JstdTestCaseStore(),
-        new NullPathPrefix(),
-        Collections.<FileInfoScheme>emptySet()));
+        new TestFileUtil(new JstdTestCaseStore(),
+            new NullPathPrefix(),
+            Collections.<FileInfoScheme>emptySet(), new Gson())));
   }
 }
