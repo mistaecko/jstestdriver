@@ -15,6 +15,7 @@
  */
 package com.google.jstestdriver;
 
+import java.io.File;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -43,8 +44,8 @@ public class RelativePathConverterTest extends TestCase {
 
     assertEquals(4, relativePaths.size());
     assertEquals("adirectory/afile.js", relativePaths.get(0).getFilePath());
-    assertEquals("myfile.js", relativePaths.get(1).getFilePath());
-    assertEquals("hehe/hihi/hoho/againafile.js", relativePaths.get(2).getFilePath());
-    assertEquals("meuh/coin/quack/woof/notagain.js", relativePaths.get(3).getFilePath());
+    assertEquals("myfile.js", relativePaths.get(1).getFilePath().replace(File.separatorChar, '/'));
+    assertEquals("hehe/hihi/hoho/againafile.js", relativePaths.get(2).getFilePath().replace(File.separatorChar, '/'));
+    assertEquals("meuh/coin/quack/woof/notagain.js", relativePaths.get(3).getFilePath().replace(File.separatorChar, '/'));
   }
 }

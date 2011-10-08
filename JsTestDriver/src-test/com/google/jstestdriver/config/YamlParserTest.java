@@ -49,8 +49,8 @@ public class YamlParserTest extends TestCase {
     List<FileInfo> listFiles = new ArrayList<FileInfo>(files);
 
     assertEquals(2, files.size());
-    assertTrue(listFiles.get(0).getFilePath().endsWith("code/*.js"));
-    assertTrue(listFiles.get(1).getFilePath().endsWith("test/*.js"));
+    assertTrue(listFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/*.js"));
+    assertTrue(listFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("test/*.js"));
   }
  
   public void testParseConfigFileAndHaveListOfFilesWithPatches()
@@ -73,9 +73,9 @@ public class YamlParserTest extends TestCase {
 
     assertEquals(3, files.size());
     assertTrue(listFiles.get(1).toString(),
-        listFiles.get(0).getFilePath().endsWith("code/code.js"));
+        listFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/code.js"));
     assertTrue(listFiles.get(1).toString(),
-        listFiles.get(1).getFilePath().endsWith("code/patch.js"));
+        listFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("code/patch.js"));
   }
 
   public void testParsePlugin() {
@@ -159,9 +159,9 @@ public class YamlParserTest extends TestCase {
     List<FileInfo> serveFiles = new ArrayList<FileInfo>(serveFilesSet);
 
     assertEquals(3, serveFilesSet.size());
-    assertTrue(serveFiles.get(0).getFilePath().endsWith("code/*.js"));
-    assertTrue(serveFiles.get(1).getFilePath().endsWith("test/*.js"));
-    assertTrue(serveFiles.get(2).getFilePath().endsWith("serve/serve1.js"));
+    assertTrue(serveFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/*.js"));
+    assertTrue(serveFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("test/*.js"));
+    assertTrue(serveFiles.get(2).getFilePath().replace(File.separatorChar, '/').endsWith("serve/serve1.js"));
     assertTrue(serveFiles.get(2).isServeOnly());
   }
   
@@ -184,8 +184,8 @@ public class YamlParserTest extends TestCase {
     List<FileInfo> serveFiles = Lists.newArrayList(serveFilesSet);
     
     assertEquals(2, serveFilesSet.size());
-    assertTrue(serveFiles.get(0).getFilePath().endsWith("code/*.js"));
-    assertTrue(serveFiles.get(1).getFilePath().endsWith("serve/serve1.js"));
+    assertTrue(serveFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/*.js"));
+    assertTrue(serveFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("serve/serve1.js"));
     assertTrue(serveFiles.get(1).isServeOnly());
     
     List<FileInfo> tests = config.getTests();
@@ -211,8 +211,8 @@ public class YamlParserTest extends TestCase {
     List<FileInfo> serveFiles = Lists.newArrayList(serveFilesSet);
     
     assertEquals(2, serveFilesSet.size());
-    assertTrue(serveFiles.get(0).getFilePath().endsWith("code/*.js"));
-    assertTrue(serveFiles.get(1).getFilePath().endsWith("serve/serve1.js"));
+    assertTrue(serveFiles.get(0).getFilePath().replace(File.separatorChar, '/').endsWith("code/*.js"));
+    assertTrue(serveFiles.get(1).getFilePath().replace(File.separatorChar, '/').endsWith("serve/serve1.js"));
     assertTrue(serveFiles.get(1).isServeOnly());
     
     List<FileInfo> tests = config.getTests();
