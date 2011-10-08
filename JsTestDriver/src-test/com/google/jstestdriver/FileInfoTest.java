@@ -40,10 +40,11 @@ public class FileInfoTest extends TestCase {
     
     assertTrue("A different timestamp means replace", oldFile.shouldReplaceWith(newFile));
     assertFalse("Same timestamp and length means noreplace", oldFile.shouldReplaceWith(oldFile));
-    
+    /*TODO: uncomment this test when the FileInfos stop being sent form the browser with a -1 length.
     FileInfo longer = new FileInfo("a/b/c/file.js", 0, 10, false, false, null, "a/b/c/file.js");
     FileInfo shorter = new FileInfo("a/b/c/file.js", 0, 3, false, false, null, "a/b/c/file.js");
     
     assertTrue("A different length means replace", longer.shouldReplaceWith(shorter));
+    */
   }
 }
