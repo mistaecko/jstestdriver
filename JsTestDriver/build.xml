@@ -447,6 +447,7 @@
         <include name="${javascript-resources}/lib/*.js" />
       </fileset>
       <exclude name="**/coverage/**" />
+      <exclude name="**/testisolation/**" />
       <!-- not excluding the token library for the jar with deps. -->
     </jar>
   </target>
@@ -466,6 +467,7 @@
       </fileset>
       <exclude name="**/coverage/**" />
       <exclude name="**/token/**" />
+      <exclude name="**/testisolation/**" />
     </jar>
   </target>
 
