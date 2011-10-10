@@ -28,6 +28,14 @@ import com.google.jstestdriver.server.handlers.CaptureHandler;
  * @author jeremiele@google.com (Jeremie Lenfant-Engelmann)
  */
 public class SlaveBrowserTest extends TestCase {
+  
+  /* (non-Javadoc)
+   * @see junit.framework.TestCase#setUp()
+   */
+  @Override
+  protected void setUp() throws Exception {
+    System.out.println(this);
+  }
 
   public void testSlaveBrowserHeartBeat() throws Exception {
     MockTime mockTime = new MockTime(0);
@@ -63,5 +71,66 @@ public class SlaveBrowserTest extends TestCase {
     assertEquals(
         "/slave/id/1/page/CONSOLE/mode/quirks/timeout/" + SlaveBrowser.TIMEOUT + "/upload_size/"
             + FileUploader.CHUNK_SIZE + "/rt/CLIENT", browser.getCaptureUrl());
+  }
+
+  public void testInUseExpired() throws Exception {
+    MockTime mockTime = new MockTime(System.currentTimeMillis());
+    SlaveBrowser browser = new SlaveBrowser(mockTime,
+        "1",
+        new BrowserInfo(),
+        SlaveBrowser.TIMEOUT,
+        null,
+        CaptureHandler.QUIRKS,
+        RunnerType.CLIENT, BrowserState.CAPTURED);
+    String sessionId = "foo";
+    browser.tryLock(sessionId);
+    browser.createCommand("json command");
+    assertTrue(browser.inUse());
+    mockTime.add(SlaveBrowser.SESSION_TIMEOUT + 1);
+    browser.resetCommandQueue();
+    assertFalse(browser.inUse());
+  }
+  
+  public void testInUseFalse() throws Exception {
+    MockTime mockTime = new MockTime(System.currentTimeMillis());
+    SlaveBrowser browser = new SlaveBrowser(mockTime,
+        "1",
+        new BrowserInfo(),
+        SlaveBrowser.TIMEOUT,
+        null,
+        CaptureHandler.QUIRKS,
+        RunnerType.CLIENT, BrowserState.CAPTURED);
+    assertFalse(browser.inUse());
+  }
+
+  public void testInUseSessionTimeout() throws Exception {
+    MockTime mockTime = new MockTime(System.currentTimeMillis());
+    SlaveBrowser browser = new SlaveBrowser(mockTime,
+        "1",
+        new BrowserInfo(),
+        SlaveBrowser.TIMEOUT,
+        null,
+        CaptureHandler.QUIRKS,
+        RunnerType.CLIENT, BrowserState.CAPTURED);
+    String sessionId = "foo";
+    assertTrue(browser.tryLock(sessionId));
+    browser.createCommand("json command");
+    assertTrue(browser.inUse());
+    mockTime.add(SlaveBrowser.SESSION_TIMEOUT + 1);
+    assertFalse(browser.inUse());
+  }
+  
+  public void testInUseAfterSessionStart() throws Exception {
+    MockTime mockTime = new MockTime(System.currentTimeMillis());
+    SlaveBrowser browser = new SlaveBrowser(mockTime,
+        "1",
+        new BrowserInfo(),
+        SlaveBrowser.TIMEOUT,
+        null,
+        CaptureHandler.QUIRKS,
+        RunnerType.CLIENT, BrowserState.CAPTURED);
+    String sessionId = "foo";
+    assertTrue(browser.tryLock(sessionId));
+    assertTrue(browser.inUse());
   }
 }

@@ -21,6 +21,7 @@ import static com.google.jstestdriver.runner.RunnerType.STANDALONE;
 import static com.google.jstestdriver.server.handlers.CaptureHandler.RUNNER_TYPE;
 import static java.lang.String.format;
 
+import com.google.common.base.Objects;
 import com.google.jstestdriver.Response.ResponseType;
 import com.google.jstestdriver.commands.NoopCommand;
 import com.google.jstestdriver.model.HandlerPathPrefix;
@@ -73,6 +74,7 @@ public class SlaveBrowser {
   private static final Logger LOGGER = LoggerFactory.getLogger(SlaveBrowser.class);
 
   public static final long TIMEOUT = 30000; // 30 seconds
+  public static final long SESSION_TIMEOUT = 2000;
   private static final int POLL_RESPONSE_TIMEOUT = 2;
 
   private final Time time;
@@ -88,6 +90,7 @@ public class SlaveBrowser {
   private AtomicReference<Command> lastCommandDequeued = new AtomicReference<Command>(null);
   private final long timeout;
   private final Lock lock = new Lock();
+
 
   private final HandlerPathPrefix prefix;
 
@@ -117,8 +120,28 @@ public class SlaveBrowser {
     return id;
   }
 
-  public Lock getLock() {
-    return lock;
+  public boolean tryLock(String sessionId) {
+    boolean success = lock.tryLock(sessionId);
+    if (success) {
+      heartBeatLock(sessionId);
+    }
+    return success;
+  }
+  
+  public void unlock(String sessionId) {
+    lock.unlock(sessionId);
+  }
+
+  public void forceUnlock() {
+    lock.forceUnlock();
+  }
+
+  public void heartBeatLock(String sessionId) {
+    if (Objects.equal(lock.getSessionId(), sessionId)) {
+      lock.setLastHeartBeat(time.now().getMillis());
+    } else {
+      LOGGER.error("Session heartbeat {} without a session on {}", sessionId, browserInfo);
+    }
   }
 
   public void createCommand(String data) {
@@ -291,4 +314,25 @@ public class SlaveBrowser {
   public LoadedFiles getLastLoadedFiles() {
     return lastloadedFiles.get();
   }
+
+  /**
+   * Indicates if the Browser is being used, or has been used recently.
+   */
+  public boolean inUse() {
+    // Has it been too long since the last session?
+    if (time.now().getMillis() - lock.getLastHeartBeat() > SESSION_TIMEOUT) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Clears all running commands and any queued commands.
+   */
+  public synchronized void resetCommandQueue() {
+    LOGGER.debug("resetCommandQueue: queued[{}]\n running:[{}]", commandsToRun, commandRunning);
+    clearCommandRunning();
+    commandsToRun.clear();
+  }
+
 }

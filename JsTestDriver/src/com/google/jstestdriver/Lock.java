@@ -26,26 +26,21 @@ public class Lock {
   private String sessionId = "";
   private long lastHeartBeat = 0;
 
-  public boolean tryLock(String sessionId) {
-    synchronized (lock) {
-      if (locked) {
-        return false;
-      }
-      locked = true;
-      this.sessionId = sessionId;
-      return true;
+  public synchronized boolean tryLock(String sessionId) {
+    if (locked) {
+      return false;
     }
+    locked = true;
+    this.sessionId = sessionId;
+    return true;
   }
 
-  public void unlock(String sessionId) {
-    synchronized (lock) {
-      if (!locked || (!this.sessionId.equals(sessionId))) {
-        throw new IllegalStateException(String.format("Unlock error [%s : %s]", this.sessionId,
-            sessionId));
-      }
-      locked = false;
-      sessionId = "";
+  public synchronized void unlock(String sessionId) {
+    if (!locked || (!this.sessionId.equals(sessionId))) {
+      throw new IllegalStateException(String.format("Unlock error [%s : %s]", this.sessionId,
+          sessionId));
     }
+    locked = false;
   }
 
   public String getSessionId() {
@@ -60,10 +55,8 @@ public class Lock {
     return lastHeartBeat;
   }
 
-  public void forceUnlock() {
-    synchronized (lock) {
-      locked = false;
-      sessionId = "";
-    }
+  public synchronized void forceUnlock() {
+    locked = false;
+    sessionId = "";
   }
 }
